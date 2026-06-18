@@ -1,6 +1,8 @@
+import { useRef } from 'react'
 import { TabScreen } from '../TabScreen'
 import { useTheme } from '../../theme/useTheme'
 import { useTracker } from '../../context/trackerContext'
+import { useToast } from '../../hooks/useToast'
 import { RANKS } from '../../lib/gamification'
 
 const PROTOCOLS = [
@@ -39,6 +41,20 @@ const PROTOCOLS = [
 export function CodexScreen() {
   const { tokens } = useTheme()
   const { gamification, settings, updateSettings, importData } = useTracker()
+  const { showToast } = useToast()
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  const handleImport = async (file: File) => {
+    try {
+      await importData(file)
+      showToast('Backup imported successfully.', 'success')
+    } catch (err) {
+      showToast(
+        err instanceof Error ? err.message : 'Import failed. Check the file format.',
+        'error',
+      )
+    }
+  }
 
   return (
     <TabScreen
@@ -92,42 +108,109 @@ export function CodexScreen() {
         >
           Settings
         </p>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, fontSize: 13 }}>
+        <label
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            marginBottom: 10,
+            fontSize: 13,
+            minHeight: 44,
+          }}
+        >
           <input
             type="checkbox"
             checked={settings.affirmationsEnabled}
             onChange={(e) => void updateSettings({ affirmationsEnabled: e.target.checked })}
+            style={{ width: 20, height: 20 }}
           />
           Show affirmations
         </label>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, fontSize: 13 }}>
+        <label
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            marginBottom: 10,
+            fontSize: 13,
+            minHeight: 44,
+          }}
+        >
           <input
             type="checkbox"
             checked={settings.elaraWhispers}
             onChange={(e) => void updateSettings({ elaraWhispers: e.target.checked })}
+            style={{ width: 20, height: 20 }}
           />
           Elara whispers
         </label>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, fontSize: 13 }}>
+        <p
+          style={{
+            margin: '0 0 10px',
+            fontSize: 11,
+            lineHeight: 1.5,
+            color: tokens.textMuted,
+          }}
+        >
+          Voice input appears in the header when enabled. Use only when safely parked — never
+          while driving or on Autopilot.
+        </p>
+        <label
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            marginBottom: 10,
+            fontSize: 13,
+            minHeight: 44,
+          }}
+        >
           <input
             type="checkbox"
             checked={settings.voiceEnabled}
             onChange={(e) => void updateSettings({ voiceEnabled: e.target.checked })}
+            style={{ width: 20, height: 20 }}
           />
-          Voice input (parked only)
+          Enable voice input (parked only)
         </label>
-        <label style={{ display: 'block', fontSize: 13, marginTop: 12 }}>
-          Import backup
+        <div style={{ marginTop: 16 }}>
+          <p
+            style={{
+              margin: '0 0 8px',
+              fontSize: 13,
+              fontWeight: 500,
+            }}
+          >
+            Import backup
+          </p>
           <input
+            ref={fileRef}
             type="file"
-            accept="application/json"
-            style={{ display: 'block', marginTop: 6, fontSize: 12 }}
+            accept="application/json,.json"
+            style={{ display: 'none' }}
             onChange={(e) => {
               const file = e.target.files?.[0]
-              if (file) void importData(file)
+              if (file) void handleImport(file)
+              e.target.value = ''
             }}
           />
-        </label>
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            style={{
+              minHeight: 48,
+              width: '100%',
+              borderRadius: 8,
+              border: `1px solid ${tokens.border}`,
+              background: tokens.surfaceElevated,
+              color: tokens.text,
+              fontSize: 12,
+              cursor: 'pointer',
+            }}
+          >
+            Choose JSON backup file
+          </button>
+        </div>
       </section>
       <ul
         style={{

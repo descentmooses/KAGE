@@ -1,16 +1,19 @@
-import { useState } from 'react'
 import { AppHeader } from './components/AppHeader'
 import { HomeScreen } from './components/HomeScreen'
 import { CRTOverlay } from './components/CRTOverlay'
 import { BottomNav } from './components/BottomNav'
 import { InstallPrompt } from './components/InstallPrompt'
+import { OnlineIndicator } from './components/OnlineIndicator'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { ActivateScreen } from './components/screens/ActivateScreen'
 import { ReflectScreen } from './components/screens/ReflectScreen'
 import { CodexScreen } from './components/screens/CodexScreen'
 import { TrackerProvider } from './context/TrackerProvider'
+import { ToastProvider } from './context/ToastProvider'
 import { useTheme } from './theme/useTheme'
 import { THEME_TRANSITION } from './theme/transitions'
 import type { TabId } from './types'
+import { useState } from 'react'
 
 function AppShell() {
   const [activeTab, setActiveTab] = useState<TabId>('home')
@@ -45,6 +48,7 @@ function AppShell() {
       }}
     >
       <AppHeader />
+      <OnlineIndicator />
 
       <div
         style={{ position: 'relative', flex: 1, minHeight: 0, overflow: 'hidden' }}
@@ -62,9 +66,13 @@ function AppShell() {
 
 function App() {
   return (
-    <TrackerProvider>
-      <AppShell />
-    </TrackerProvider>
+    <ErrorBoundary>
+      <ToastProvider>
+        <TrackerProvider>
+          <AppShell />
+        </TrackerProvider>
+      </ToastProvider>
+    </ErrorBoundary>
   )
 }
 

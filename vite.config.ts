@@ -3,17 +3,23 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import type { IncomingMessage, ServerResponse } from 'node:http'
+import pkg from './package.json' with { type: 'json' }
 
 // GitHub Pages project site — always build with /KAGE/ base for production
 const base = process.env.GITHUB_PAGES === 'true' || process.env.NODE_ENV === 'production'
   ? '/KAGE/'
   : '/'
 
-// Stable for the duration of each build/dev session
+// Unique per build — used for cache busting on GitHub Pages
 const buildVersion = Date.now().toString()
+const appVersion = pkg.version
 
 function versionPayload(version: string) {
-  return JSON.stringify({ version, builtAt: new Date().toISOString() }, null, 2)
+  return JSON.stringify(
+    { version, appVersion, builtAt: new Date().toISOString() },
+    null,
+    2,
+  )
 }
 
 function serveVersionJson(version: string) {
@@ -33,6 +39,7 @@ function cacheBustMetaPlugin(): Plugin {
       handler(html: string) {
         const meta = [
           `<meta name="build-version" content="${buildVersion}" />`,
+          `<meta name="app-version" content="${appVersion}" />`,
           '<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />',
           '<meta http-equiv="Pragma" content="no-cache" />',
           '<meta http-equiv="Expires" content="0" />',

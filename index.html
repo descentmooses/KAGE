@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-  <!-- KAGE cache bootstrap: runs before React so stale GitHub Pages caches self-heal -->
+  <!-- KAGE cache bootstrap: reload only when deploy version changes (preserves PWA offline cache) -->
   <script>
   (function(){try{
     var K='kage-deploy';
@@ -10,18 +10,20 @@
       var h=location.hostname;
       return (h==='localhost'||h==='127.0.0.1')?'/':'/KAGE/';
     }
-    if('serviceWorker'in navigator){
-      navigator.serviceWorker.getRegistrations().then(function(r){
-        r.forEach(function(x){x.unregister()});
-      });
-    }
-    if('caches'in window){
-      caches.keys().then(function(keys){
-        keys.forEach(function(n){caches.delete(n)});
-      });
+    function clearPwaCaches(){
+      if('serviceWorker'in navigator){
+        navigator.serviceWorker.getRegistrations().then(function(r){
+          r.forEach(function(x){x.unregister()});
+        });
+      }
+      if('caches'in window){
+        caches.keys().then(function(keys){
+          keys.forEach(function(n){caches.delete(n)});
+        });
+      }
     }
     var b=base();
-    fetch(b+'version.json?_='+Date.now(),{cache:'no-store',headers:{'Pragma':'no-cache'}})
+    fetch(b+'version.json?_='+Date.now(),{cache:'no-store',headers:{'Pragma':'no-cache','Cache-Control':'no-cache'}})
       .then(function(r){if(!r.ok)throw 0;return r.json();})
       .then(function(d){
         var v=d&&d.version;if(!v)return;
@@ -31,31 +33,26 @@
         var root=b.replace(/\/?$/,'/');
         if(stored&&stored!==v){
           localStorage.setItem(K,v);
-          if('serviceWorker'in navigator){
-            navigator.serviceWorker.getRegistrations().then(function(r){
-              r.forEach(function(x){x.unregister()});
-            });
-          }
-          if('caches'in window){
-            caches.keys().then(function(keys){keys.forEach(function(n){caches.delete(n)})});
-          }
+          clearPwaCaches();
           location.replace(root+'?bust='+v);
           return;
         }
         if(!stored)localStorage.setItem(K,v);
         if(bust&&bust!==v){
+          clearPwaCaches();
           location.replace(root+'?bust='+v);
           return;
         }
         var meta=document.querySelector('meta[name="build-version"]');
         if(meta&&meta.content&&meta.content!==v){
+          clearPwaCaches();
           location.replace(root+'?bust='+v);
         }
       }).catch(function(){});
   }catch(e){}})();
   </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#050505" />
     <meta name="description" content="KAGE — shadow mastery tracker for mind, body, and spirit" />
     <meta name="apple-mobile-web-app-capable" content="yes" />

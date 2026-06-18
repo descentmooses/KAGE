@@ -56,6 +56,8 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
                 background: active ? tokens.navActiveBg : 'transparent',
                 cursor: 'pointer',
                 padding: 0,
+                minHeight: 56,
+                WebkitTapHighlightColor: 'transparent',
                 transition: 'background 0.2s ease',
               }}
             >

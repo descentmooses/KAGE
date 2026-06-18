@@ -141,13 +141,15 @@ export function QuickLogPanel({ onVoiceNote }: QuickLogPanelProps) {
             type="button"
             onClick={() => void quickBump(area.id as AreaId)}
             style={{
-              minHeight: 72,
+              minHeight: 80,
+              minWidth: 44,
               borderRadius: 10,
               border: `1px solid ${tokens.border}`,
               background: tokens.surfaceElevated,
               cursor: 'pointer',
-              padding: '10px 8px',
+              padding: '12px 8px',
               color: tokens.text,
+              WebkitTapHighlightColor: 'transparent',
             }}
             aria-label={`Quick bump ${area.label}`}
           >
@@ -186,7 +188,7 @@ export function QuickLogPanel({ onVoiceNote }: QuickLogPanelProps) {
             textAlign: 'center',
           }}
         >
-          Tap mic in header for voice notes (parked only)
+          Tap header mic when parked — never while driving
         </p>
       )}
     </div>

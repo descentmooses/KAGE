@@ -1,13 +1,21 @@
-# Kage
+# KAGE
 
-Retro minimalist cyberpunk samurai PWA built with React, Vite, TypeScript, and Tailwind CSS.
+Shadow mastery tracker — mind (心), body (体), spirit (魂). Built with React, Vite, TypeScript, and Tailwind CSS.
+
+**Live:** https://descentmooses.github.io/KAGE/
 
 ## Features
 
-- Dark void-black aesthetic with neon cyan and magenta accents
-- Subtle CRT scanline overlay and vignette effects
-- Japanese-inspired minimal UI with kanji typography
-- Installable PWA with service worker and web manifest
+- Crimson cyber-Japanese dark aesthetic (light mode available)
+- IndexedDB daily logs, streaks, XP, and shadow ranks
+- 7-day trend charts, insights, daily quests, freedom goals
+- Morning activation + evening reflection
+- Quick-log panel for one-handed / Tesla glances
+- Elara whispers affirmations (toggleable)
+- Installable PWA with offline support
+- JSON export/import backup (privacy-first, no cloud required)
+
+See [CHANGELOG.md](./CHANGELOG.md) for release notes.
 
 ## Getting Started
 
@@ -16,40 +24,26 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) in your browser.
-
 ## Build
 
 ```bash
 npm run build
+npm run lint
 npm run preview
 ```
 
+Production build uses base path `/KAGE/` for GitHub Pages.
+
 ## GitHub Pages
 
-The app deploys automatically to the `gh-pages` branch on every push to `main`.
+Pushes to `main` deploy automatically via GitHub Actions to the `gh-pages` branch.
 
-**Live URL:** https://descentmooses.github.io/KAGE/
+1. [Repository Settings → Pages](https://github.com/descentmooses/KAGE/settings/pages)
+2. Source: **Deploy from a branch** → `gh-pages` → `/ (root)`
 
-### One-time setup
+After deploy, hard-refresh or open in a private tab if you still see an old version.
 
-If the site is not live yet, enable GitHub Pages in your repo:
-
-1. Open [Repository Settings → Pages](https://github.com/descentmooses/KAGE/settings/pages)
-2. Under **Build and deployment**, set **Source** to **Deploy from a branch**
-3. Choose branch **`gh-pages`**, folder **`/ (root)`**, then click **Save**
-
-Future pushes to `main` will redeploy automatically.
-
-To build locally with the same base path used in production:
-
-```bash
-npm run build:pages
-```
-
-## PWA
-
-The app registers a service worker and includes a web manifest for installability on supported devices. Icons are generated from `public/icons/icon.svg`:
+## PWA icons
 
 ```bash
 node scripts/generate-icons.mjs
@@ -57,8 +51,5 @@ node scripts/generate-icons.mjs
 
 ## Tech Stack
 
-- React 19
-- Vite 8
-- TypeScript
-- Tailwind CSS 4
-- vite-plugin-pwa
+- React 19 · Vite 8 · TypeScript · Tailwind CSS 4
+- IndexedDB (`idb`) · Recharts · vite-plugin-pwa

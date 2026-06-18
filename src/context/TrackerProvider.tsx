@@ -47,6 +47,7 @@ import {
   xpForReflection,
 } from '../lib/gamification'
 import { buildTrend, generateInsights } from '../lib/insights'
+import { LoadingScreen } from '../components/LoadingScreen'
 import { DAILY_QUESTS, evaluateQuests } from '../lib/quests'
 
 function uid() {
@@ -55,6 +56,8 @@ function uid() {
 
 export function TrackerProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [todayLog, setTodayLog] = useState<DailyLog | null>(null)
   const [allLogs, setAllLogs] = useState<DailyLog[]>([])
   const [gamification, setGamification] = useState<GamificationState | null>(null)
@@ -82,15 +85,30 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     setSettings(s)
     setMorningToday(morning)
     setReflectionToday(reflection)
+    setLoadError(null)
   }, [])
 
-  useEffect(() => {
-    void (async () => {
+  const bootstrap = useCallback(async () => {
+    setLoading(true)
+    setLoadError(null)
+    try {
       await migrateFromLocalStorage()
       await refresh()
       setReady(true)
-    })()
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Could not open your shadow archive.'
+      setLoadError(message)
+      setReady(true)
+    } finally {
+      setLoading(false)
+    }
   }, [refresh])
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time IndexedDB bootstrap on mount
+    void bootstrap()
+  }, [bootstrap])
 
   const ratings = useMemo(
     () => ({
@@ -275,44 +293,93 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
   )
 
   const exportData = useCallback(async () => {
-    const data = await exportAllData()
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `kage-export-${todayKey()}.json`
-    a.click()
-    URL.revokeObjectURL(url)
+    try {
+      const data = await exportAllData()
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `kage-export-${todayKey()}.json`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      throw err instanceof Error ? err : new Error('Export failed')
+    }
   }, [])
 
   const importData = useCallback(
     async (file: File) => {
-      const text = await file.text()
-      const payload = JSON.parse(text)
-      await importAllData(payload)
-      await refresh()
+      try {
+        const text = await file.text()
+        const payload = JSON.parse(text) as Awaited<ReturnType<typeof exportAllData>>
+        if (!payload?.dailyLogs || !Array.isArray(payload.dailyLogs)) {
+          throw new Error('Invalid KAGE backup file')
+        }
+        await importAllData(payload)
+        await refresh()
+      } catch (err) {
+        throw err instanceof Error ? err : new Error('Import failed')
+      }
     },
     [refresh],
   )
 
-  if (!ready || !gamification || !settings) {
+  if (loading) {
+    return <LoadingScreen />
+  }
+
+  if (loadError) {
     return (
       <div
+        role="alert"
         style={{
           height: '100%',
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
+          gap: 16,
+          padding: 24,
           background: '#050505',
-          color: '#c41e3a',
-          fontFamily: '"Orbitron", sans-serif',
-          letterSpacing: '0.5em',
-          fontSize: 12,
+          color: '#e8e8f0',
+          textAlign: 'center',
         }}
       >
-        KAGE
+        <p
+          style={{
+            margin: 0,
+            fontFamily: '"Orbitron", sans-serif',
+            fontSize: 11,
+            letterSpacing: '0.35em',
+            color: '#c41e3a',
+            textTransform: 'uppercase',
+          }}
+        >
+          Archive error
+        </p>
+        <p style={{ margin: 0, fontSize: 13, maxWidth: 320 }}>{loadError}</p>
+        <button
+          type="button"
+          onClick={() => void bootstrap()}
+          style={{
+            minHeight: 48,
+            minWidth: 140,
+            padding: '12px 20px',
+            borderRadius: 8,
+            border: '1px solid #c41e3a',
+            background: 'rgba(196,30,58,0.12)',
+            color: '#e85d4c',
+            cursor: 'pointer',
+          }}
+        >
+          Retry
+        </button>
       </div>
     )
+  }
+
+  if (!ready || !gamification || !settings) {
+    return <LoadingScreen message="Finalizing…" />
   }
 
   const value: TrackerContextValue = {

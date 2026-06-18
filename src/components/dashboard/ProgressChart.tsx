@@ -62,6 +62,8 @@ export function ProgressChart() {
               type="button"
               onClick={() => setPeriod(p.id)}
               style={{
+                minHeight: 44,
+                minWidth: 44,
                 fontSize: 9,
                 letterSpacing: '0.15em',
                 textTransform: 'uppercase',
