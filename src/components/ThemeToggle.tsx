@@ -10,61 +10,66 @@ export function ThemeToggle() {
       onClick={toggleTheme}
       aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
       title={isDark ? 'Light mode' : 'Dark mode'}
+      className="kage-touch-target"
       style={{
         position: 'relative',
-        width: 44,
-        height: 26,
+        width: 52,
+        height: 30,
         borderRadius: 999,
-        border: `1px solid ${tokens.border}`,
-        background: tokens.toggleTrack,
+        border: `1px solid ${isDark ? tokens.borderAccent : tokens.border}`,
+        background: isDark ? tokens.toggleTrackActive : tokens.toggleTrack,
         cursor: 'pointer',
         padding: 0,
         flexShrink: 0,
-        transition: 'background 0.3s ease, border-color 0.3s ease',
+        transition: 'background 0.35s ease, border-color 0.35s ease',
       }}
     >
       <span
+        aria-hidden
         style={{
           position: 'absolute',
-          top: 2,
-          left: isDark ? 2 : 18,
-          width: 20,
-          height: 20,
-          borderRadius: '50%',
-          background: tokens.toggleThumb,
-          boxShadow: isDark
-            ? '0 2px 8px rgba(0,0,0,0.35)'
-            : '0 2px 8px rgba(28,28,36,0.15)',
-          transition: 'left 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: 10,
+          top: '50%',
+          left: 8,
+          transform: 'translateY(-50%)',
+          fontSize: 9,
+          opacity: isDark ? 0.9 : 0.35,
+          color: tokens.gold,
+          transition: 'opacity 0.3s ease',
         }}
       >
-        <span
-          style={{
-            opacity: isDark ? 1 : 0,
-            transform: isDark ? 'scale(1)' : 'scale(0.5)',
-            transition: 'opacity 0.2s ease, transform 0.2s ease',
-            position: 'absolute',
-          }}
-          aria-hidden
-        >
-          ☾
-        </span>
-        <span
-          style={{
-            opacity: isDark ? 0 : 1,
-            transform: isDark ? 'scale(0.5)' : 'scale(1)',
-            transition: 'opacity 0.2s ease, transform 0.2s ease',
-            position: 'absolute',
-          }}
-          aria-hidden
-        >
-          ☀
-        </span>
+        ☾
       </span>
+      <span
+        aria-hidden
+        style={{
+          position: 'absolute',
+          top: '50%',
+          right: 8,
+          transform: 'translateY(-50%)',
+          fontSize: 9,
+          opacity: isDark ? 0.35 : 0.9,
+          color: tokens.crimson,
+          transition: 'opacity 0.3s ease',
+        }}
+      >
+        ☀
+      </span>
+      <span
+        style={{
+          position: 'absolute',
+          top: 3,
+          left: isDark ? 3 : 25,
+          width: 22,
+          height: 22,
+          borderRadius: '50%',
+          background: isDark ? tokens.toggleThumb : tokens.toggleThumbLight,
+          border: isDark ? 'none' : `1px solid ${tokens.border}`,
+          boxShadow: isDark
+            ? `0 2px 10px rgba(0,0,0,0.4), 0 0 8px ${tokens.accentGlow}`
+            : '0 2px 8px rgba(26,20,22,0.12)',
+          transition: 'left 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease, background 0.35s ease',
+        }}
+      />
     </button>
   )
 }

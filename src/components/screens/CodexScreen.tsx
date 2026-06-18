@@ -62,7 +62,7 @@ export function CodexScreen() {
       title="Bushido Protocols"
       subtitle="典籍 — shadow ranks, protocols, and settings"
     >
-      <section style={{ marginBottom: 28 }}>
+      <section style={{ marginBottom: 32 }}>
         <p
           style={{
             fontFamily: '"Orbitron", sans-serif',
@@ -70,32 +70,37 @@ export function CodexScreen() {
             letterSpacing: '0.35em',
             textTransform: 'uppercase',
             color: tokens.textMuted,
-            margin: '0 0 12px',
+            margin: '0 0 14px',
           }}
         >
           Shadow mastery ranks
         </p>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {RANKS.map((r) => (
-            <li
-              key={r.rank}
-              style={{
-                padding: '10px 14px',
-                borderRadius: 6,
-                border: `1px solid ${gamification.rank === r.rank ? tokens.crimson : tokens.border}`,
-                background: gamification.rank === r.rank ? tokens.bannerBg : tokens.cardBg,
-                fontSize: 12,
-                color: tokens.text,
-              }}
-            >
-              <strong style={{ color: tokens.crimson }}>{r.rank}</strong>
-              <span style={{ color: tokens.textMuted }}> — Level {r.minLevel}+</span>
-            </li>
-          ))}
+          {RANKS.map((r) => {
+            const active = gamification.rank === r.rank
+            return (
+              <li
+                key={r.rank}
+                style={{
+                  padding: '12px 16px',
+                  borderRadius: 8,
+                  border: `1px solid ${active ? tokens.crimson : tokens.border}`,
+                  background: active ? tokens.bannerBg : tokens.cardBg,
+                  fontSize: 13,
+                  color: tokens.text,
+                  boxShadow: active ? tokens.cardShadowAlt : 'none',
+                  transition: 'all 0.25s ease',
+                }}
+              >
+                <strong style={{ color: active ? tokens.crimson : tokens.ember }}>{r.rank}</strong>
+                <span style={{ color: tokens.textMuted }}> — Level {r.minLevel}+</span>
+              </li>
+            )
+          })}
         </ul>
       </section>
 
-      <section style={{ marginBottom: 28 }}>
+      <section style={{ marginBottom: 32 }}>
         <p
           style={{
             fontFamily: '"Orbitron", sans-serif',
@@ -103,80 +108,92 @@ export function CodexScreen() {
             letterSpacing: '0.35em',
             textTransform: 'uppercase',
             color: tokens.textMuted,
-            margin: '0 0 12px',
+            margin: '0 0 14px',
           }}
         >
           Settings
         </p>
-        <label
+        <div
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            marginBottom: 10,
-            fontSize: 13,
-            minHeight: 44,
+            padding: '16px 18px',
+            borderRadius: 10,
+            border: `1px solid ${tokens.border}`,
+            background: tokens.cardBg,
+            marginBottom: 20,
           }}
         >
-          <input
-            type="checkbox"
-            checked={settings.affirmationsEnabled}
-            onChange={(e) => void updateSettings({ affirmationsEnabled: e.target.checked })}
-            style={{ width: 20, height: 20 }}
-          />
-          Show affirmations
-        </label>
-        <label
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            marginBottom: 10,
-            fontSize: 13,
-            minHeight: 44,
-          }}
-        >
-          <input
-            type="checkbox"
-            checked={settings.elaraWhispers}
-            onChange={(e) => void updateSettings({ elaraWhispers: e.target.checked })}
-            style={{ width: 20, height: 20 }}
-          />
-          Elara whispers
-        </label>
-        <p
-          style={{
-            margin: '0 0 10px',
-            fontSize: 11,
-            lineHeight: 1.5,
-            color: tokens.textMuted,
-          }}
-        >
-          Voice input appears in the header when enabled. Use only when safely parked — never
-          while driving or on Autopilot.
-        </p>
-        <label
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            marginBottom: 10,
-            fontSize: 13,
-            minHeight: 44,
-          }}
-        >
-          <input
-            type="checkbox"
-            checked={settings.voiceEnabled}
-            onChange={(e) => void updateSettings({ voiceEnabled: e.target.checked })}
-            style={{ width: 20, height: 20 }}
-          />
-          Enable voice input (parked only)
-        </label>
-        <div style={{ marginTop: 16 }}>
+          <label
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              marginBottom: 12,
+              fontSize: 14,
+              minHeight: 48,
+              cursor: 'pointer',
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={settings.affirmationsEnabled}
+              onChange={(e) => void updateSettings({ affirmationsEnabled: e.target.checked })}
+              style={{ width: 22, height: 22, accentColor: tokens.crimson }}
+            />
+            Show affirmations
+          </label>
+          <label
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              marginBottom: 12,
+              fontSize: 14,
+              minHeight: 48,
+              cursor: 'pointer',
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={settings.elaraWhispers}
+              onChange={(e) => void updateSettings({ elaraWhispers: e.target.checked })}
+              style={{ width: 22, height: 22, accentColor: tokens.crimson }}
+            />
+            Elara whispers
+          </label>
           <p
             style={{
-              margin: '0 0 8px',
+              margin: '0 0 12px',
+              fontSize: 11,
+              lineHeight: 1.55,
+              color: tokens.textMuted,
+            }}
+          >
+            Voice input appears in the header when enabled. Use only when safely parked — never
+            while driving or on Autopilot.
+          </p>
+          <label
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              fontSize: 14,
+              minHeight: 48,
+              cursor: 'pointer',
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={settings.voiceEnabled}
+              onChange={(e) => void updateSettings({ voiceEnabled: e.target.checked })}
+              style={{ width: 22, height: 22, accentColor: tokens.crimson }}
+            />
+            Enable voice input (parked only)
+          </label>
+        </div>
+        <div>
+          <p
+            style={{
+              margin: '0 0 10px',
               fontSize: 13,
               fontWeight: 500,
             }}
@@ -197,21 +214,36 @@ export function CodexScreen() {
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
+            className="kage-touch-target"
             style={{
-              minHeight: 48,
+              minHeight: 52,
               width: '100%',
-              borderRadius: 8,
+              borderRadius: 10,
               border: `1px solid ${tokens.border}`,
               background: tokens.surfaceElevated,
               color: tokens.text,
-              fontSize: 12,
+              fontSize: 13,
               cursor: 'pointer',
+              transition: 'border-color 0.2s ease, background 0.2s ease',
             }}
           >
             Choose JSON backup file
           </button>
         </div>
       </section>
+
+      <p
+        style={{
+          fontFamily: '"Orbitron", sans-serif',
+          fontSize: 9,
+          letterSpacing: '0.35em',
+          textTransform: 'uppercase',
+          color: tokens.textMuted,
+          margin: '0 0 14px',
+        }}
+      >
+        The five virtues
+      </p>
       <ul
         style={{
           listStyle: 'none',
@@ -226,10 +258,11 @@ export function CodexScreen() {
           <li
             key={p.title}
             style={{
-              padding: 18,
+              padding: 20,
+              borderRadius: 10,
               border: `1px solid ${tokens.cardBorder}`,
               background: tokens.cardBg,
-              boxShadow: i % 2 === 0 ? tokens.cardShadowCyan : tokens.cardShadowMagenta,
+              boxShadow: i % 2 === 0 ? tokens.cardShadow : tokens.cardShadowAlt,
               transition: 'all 0.35s ease',
             }}
           >
@@ -237,17 +270,15 @@ export function CodexScreen() {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 10,
-                marginBottom: 10,
+                gap: 12,
+                marginBottom: 12,
               }}
             >
               <span
                 style={{
-                  fontSize: 22,
+                  fontSize: 26,
                   color: i % 2 === 0 ? tokens.crimson : tokens.ember,
                   fontFamily: '"Noto Sans JP", sans-serif',
-                  textShadow: 'none',
-                  transition: 'color 0.35s ease',
                 }}
               >
                 {p.kanji}
@@ -255,12 +286,11 @@ export function CodexScreen() {
               <h3
                 style={{
                   fontFamily: '"Orbitron", sans-serif',
-                  fontSize: 8,
+                  fontSize: 9,
                   letterSpacing: '0.3em',
                   color: tokens.text,
                   textTransform: 'uppercase',
                   margin: 0,
-                  transition: 'color 0.35s ease',
                 }}
               >
                 {p.title}
@@ -268,11 +298,10 @@ export function CodexScreen() {
             </div>
             <p
               style={{
-                fontSize: 12,
-                lineHeight: 1.65,
+                fontSize: 13,
+                lineHeight: 1.7,
                 color: tokens.textMuted,
                 margin: 0,
-                transition: 'color 0.35s ease',
               }}
             >
               {p.description}

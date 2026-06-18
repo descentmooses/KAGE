@@ -69,7 +69,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
     const themeColor = document.querySelector('meta[name="theme-color"]')
     if (themeColor) {
-      themeColor.setAttribute('content', mode === 'dark' ? '#0a0a0a' : '#ffffff')
+      themeColor.setAttribute('content', mode === 'dark' ? '#050505' : '#faf8f6')
     }
   }, [mode, tokens])
 

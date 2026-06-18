@@ -11,6 +11,8 @@ export function InstallPrompt() {
     <button
       type="button"
       onClick={() => void promptInstall()}
+      className="kage-touch-target"
+      aria-label="Install KAGE as an app"
       style={{
         position: 'fixed',
         bottom: 80,

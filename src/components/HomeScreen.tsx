@@ -40,7 +40,7 @@ export function HomeScreen() {
           height: '100%',
           overflowY: 'auto',
           WebkitOverflowScrolling: 'touch',
-          backgroundColor: tokens.surface,
+          backgroundColor: tokens.bg,
         }}
       >
         {highScore && <ShadowParticles />}

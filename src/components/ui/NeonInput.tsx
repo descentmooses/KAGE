@@ -32,7 +32,7 @@ export function NeonInput({
   }
 
   const handleFocus = (e: ReactFocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    e.currentTarget.style.borderColor = tokens.cyan
+    e.currentTarget.style.borderColor = tokens.inputFocusBorder
     e.currentTarget.style.boxShadow = tokens.inputFocusShadow
   }
 

@@ -51,7 +51,7 @@ export function SegmentedControl({
                 color: selected ? tokens.segmentTextSelected : tokens.segmentText,
                 background: selected ? tokens.segmentSelected : tokens.segmentUnselected,
                 border: `1px solid ${selected ? 'transparent' : tokens.segmentBorder}`,
-                boxShadow: selected ? `0 0 14px ${tokens.cyanGlow}` : 'none',
+                boxShadow: selected ? `0 0 12px ${tokens.accentGlow}` : 'none',
                 transition: 'all 0.15s ease',
                 transform: selected ? 'scale(1.02)' : 'scale(1)',
               }}

@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.4.0] — 2026-06-18
+
+### Crimson standard — full palette unification
+
+- Eliminated all remaining cyan/magenta tokens, CSS vars, glows, and icon colors
+- `tokens.ts` is now the single source of truth: void `#050505`, crimson `#c41e3a`, ember `#e85d4c`, gold `#c9a227`
+- Refreshed light/dark mode toggle with crimson track and warm thumb styling
+- Home and Codex screens polished as palette showcases — refined cards, rank list, protocol layout
+- Contextual Elara whispers tied to time of day, streaks, core score, and weak pillars
+- Quick-log press feedback, larger touch targets, XP gold gradient, streak milestone glow
+- Recharts trend lines use theme tokens with staggered animations
+- Global `:focus-visible` ring, `prefers-reduced-motion` respected
+- PWA icons updated to crimson cyber-Japanese standard
+
 ## [0.3.1] — 2026-06-18
 
 ### Polish for daily mobile use

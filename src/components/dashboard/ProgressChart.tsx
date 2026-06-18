@@ -28,11 +28,12 @@ export function ProgressChart() {
   return (
     <div
       style={{
-        padding: '18px 14px',
-        borderRadius: 10,
+        padding: '20px 16px',
+        borderRadius: 12,
         border: `1px solid ${tokens.border}`,
         background: tokens.cardBg,
         marginBottom: 20,
+        boxShadow: tokens.cardShadow,
       }}
     >
       <div
@@ -40,7 +41,8 @@ export function ProgressChart() {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: 14,
+          marginBottom: 16,
+          gap: 8,
         }}
       >
         <p
@@ -61,18 +63,18 @@ export function ProgressChart() {
               key={p.id}
               type="button"
               onClick={() => setPeriod(p.id)}
+              className="kage-touch-target"
               style={{
-                minHeight: 44,
-                minWidth: 44,
                 fontSize: 9,
                 letterSpacing: '0.15em',
                 textTransform: 'uppercase',
-                padding: '4px 8px',
-                borderRadius: 4,
+                padding: '6px 10px',
+                borderRadius: 6,
                 border: `1px solid ${period === p.id ? tokens.crimson : tokens.border}`,
                 background: period === p.id ? tokens.bannerBg : 'transparent',
                 color: period === p.id ? tokens.crimson : tokens.textMuted,
                 cursor: 'pointer',
+                transition: 'all 0.2s ease',
               }}
             >
               {p.label}
@@ -81,7 +83,7 @@ export function ProgressChart() {
         </div>
       </div>
 
-      <div style={{ width: '100%', height: 180 }}>
+      <div style={{ width: '100%', height: 180 }} aria-label="7-day trend chart">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 4, right: 4, left: -24, bottom: 0 }}>
             <XAxis
@@ -99,10 +101,13 @@ export function ProgressChart() {
             <Tooltip
               contentStyle={{
                 background: tokens.modalBg,
-                border: `1px solid ${tokens.border}`,
+                border: `1px solid ${tokens.borderAccent}`,
                 borderRadius: 8,
                 fontSize: 12,
+                color: tokens.text,
               }}
+              itemStyle={{ color: tokens.text }}
+              labelStyle={{ color: tokens.textMuted, marginBottom: 4 }}
             />
             <Line
               type="monotone"
@@ -111,6 +116,7 @@ export function ProgressChart() {
               strokeWidth={2}
               dot={false}
               name="Mind"
+              animationDuration={600}
             />
             <Line
               type="monotone"
@@ -119,23 +125,26 @@ export function ProgressChart() {
               strokeWidth={2}
               dot={false}
               name="Body"
+              animationDuration={700}
             />
             <Line
               type="monotone"
               dataKey="spirit"
-              stroke="#a8a8b8"
+              stroke={tokens.chartSpirit}
               strokeWidth={2}
               dot={false}
               name="Spirit"
+              animationDuration={800}
             />
             <Line
               type="monotone"
               dataKey="core"
-              stroke={tokens.textSubtle}
+              stroke={tokens.chartCore}
               strokeWidth={1}
               strokeDasharray="4 4"
               dot={false}
               name="Core"
+              animationDuration={500}
             />
           </LineChart>
         </ResponsiveContainer>

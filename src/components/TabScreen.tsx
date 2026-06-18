@@ -74,7 +74,7 @@ export function ConfirmBanner({ message }: { message: string }) {
         color: tokens.bannerText,
         border: `1px solid ${tokens.bannerBorder}`,
         background: tokens.bannerBg,
-        boxShadow: `0 0 16px ${tokens.cyanGlow}`,
+        boxShadow: `0 0 12px ${tokens.accentGlow}`,
         transition: 'all 0.35s ease',
       }}
     >

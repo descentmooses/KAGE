@@ -1,12 +1,13 @@
 @import "tailwindcss";
 
 @theme {
-  --color-void: #0a0a0a;
-  --color-ink: #0e0e0e;
-  --color-cyan: #00f9ff;
-  --color-magenta: #ff00aa;
-  --color-ghost: #8a8a9a;
-  --color-mist: #6a6a7a;
+  --color-void: #050505;
+  --color-ink: #0a0a0a;
+  --color-crimson: #c41e3a;
+  --color-ember: #e85d4c;
+  --color-gold: #c9a227;
+  --color-ghost: #9a9198;
+  --color-mist: #7a6e72;
 
   --font-display: "Orbitron", sans-serif;
   --font-jp: "Noto Sans JP", sans-serif;
@@ -15,22 +16,26 @@
 
 :root,
 [data-theme="dark"] {
-  --kage-bg: #0a0a0a;
-  --kage-text: #e8e8f0;
-  --kage-cyan: #00f9ff;
-  --kage-magenta: #ff00aa;
-  --kage-selection-bg: rgba(0, 249, 255, 0.2);
-  --kage-selection-text: #00f9ff;
+  --kage-bg: #050505;
+  --kage-text: #f8f0f2;
+  --kage-crimson: #c41e3a;
+  --kage-ember: #e85d4c;
+  --kage-gold: #c9a227;
+  --kage-selection-bg: rgba(196, 30, 58, 0.25);
+  --kage-selection-text: #e85d4c;
+  --kage-focus-ring: rgba(196, 30, 58, 0.5);
 }
 
 [data-theme="light"] {
-  --kage-bg: #ffffff;
-  --kage-surface: #ffffff;
-  --kage-text: #1c1c24;
-  --kage-cyan: #0098a8;
-  --kage-magenta: #c4007a;
-  --kage-selection-bg: rgba(0, 152, 168, 0.15);
-  --kage-selection-text: #0098a8;
+  --kage-bg: #faf8f6;
+  --kage-surface: #faf8f6;
+  --kage-text: #1a1416;
+  --kage-crimson: #a31830;
+  --kage-ember: #c44a3a;
+  --kage-gold: #a68b2a;
+  --kage-selection-bg: rgba(163, 24, 48, 0.14);
+  --kage-selection-text: #a31830;
+  --kage-focus-ring: rgba(163, 24, 48, 0.4);
 }
 
 *,
@@ -56,6 +61,11 @@ body {
   transition:
     background-color 500ms cubic-bezier(0.4, 0, 0.2, 1),
     color 500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+:focus-visible {
+  outline: 2px solid var(--kage-focus-ring);
+  outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -130,22 +140,6 @@ body {
   }
 }
 
-.animate-pulse-glow {
-  animation: pulse-glow 5s ease-in-out infinite;
-}
-
-.animate-core-breathe {
-  animation: core-breathe 4s ease-in-out infinite;
-}
-
-.animate-fade-in {
-  animation: fade-in 0.15s ease-out forwards;
-}
-
-.animate-score-pulse {
-  animation: score-pulse 1.2s ease-out;
-}
-
 @keyframes score-pulse {
   0% {
     transform: scale(1);
@@ -170,8 +164,54 @@ body {
   }
 }
 
+@keyframes milestone-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(201, 162, 39, 0);
+  }
+  50% {
+    box-shadow: 0 0 20px 2px rgba(201, 162, 39, 0.25);
+  }
+}
+
+@keyframes quick-log-press {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.96);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 5s ease-in-out infinite;
+}
+
+.animate-core-breathe {
+  animation: core-breathe 4s ease-in-out infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.15s ease-out forwards;
+}
+
+.animate-score-pulse {
+  animation: score-pulse 1.2s ease-out;
+}
+
 .animate-shadow-particle {
   animation: shadow-particle 4s ease-in-out infinite;
+}
+
+.animate-milestone {
+  animation: milestone-glow 2.5s ease-in-out infinite;
+}
+
+.animate-quick-log-press {
+  animation: quick-log-press 0.2s ease-out;
 }
 
 .kage-spinner {
@@ -191,4 +231,10 @@ body {
 
 .animate-modal-in {
   animation: modal-in 0.22s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.kage-touch-target {
+  min-height: 48px;
+  min-width: 48px;
+  -webkit-tap-highlight-color: transparent;
 }

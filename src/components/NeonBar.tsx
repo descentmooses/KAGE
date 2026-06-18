@@ -14,33 +14,34 @@ export function NeonBar({ area, value, onTap }: NeonBarProps) {
   const fillGlow =
     mode === 'dark'
       ? 'none'
-      : `0 0 14px ${tokens.cyan}, 0 0 28px ${tokens.cyanGlow}`
+      : `0 0 12px ${tokens.accentGlow}, 0 0 20px rgba(196,30,58,0.12)`
   const capGlow =
     mode === 'dark'
-      ? '0 0 6px #fff'
-      : `0 0 6px #fff, 0 0 14px ${tokens.cyan}, 0 0 22px ${tokens.magenta}`
-  const valueGlow = mode === 'dark' ? 'none' : `0 0 10px ${accentColor}`
+      ? '0 0 4px rgba(248,240,242,0.4)'
+      : `0 0 6px #fff, 0 0 12px ${tokens.crimson}, 0 0 18px ${tokens.accentGlow}`
+  const valueGlow = mode === 'dark' ? 'none' : `0 0 8px ${accentColor}44`
 
   return (
     <button
       type="button"
       onClick={onTap}
+      className="kage-touch-target"
       style={{
         display: 'block',
         width: '100%',
-        padding: '14px 6px',
+        padding: '16px 6px',
         margin: 0,
         border: 'none',
         background: 'transparent',
         cursor: 'pointer',
         textAlign: 'left',
         fontFamily: 'inherit',
-        borderRadius: 4,
+        borderRadius: 6,
         transition: 'background 0.15s ease',
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.background =
-          mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(28,28,36,0.03)'
+          mode === 'dark' ? 'rgba(248,240,242,0.03)' : 'rgba(26,20,22,0.04)'
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.background = 'transparent'

@@ -26,6 +26,7 @@ function RatingModalContent({
   const [selected, setSelected] = useState(initialValue ?? 5)
   const [saving, setSaving] = useState(false)
   const fillPercent = (selected / 10) * 100
+  const accentColor = area.color === 'ember' ? tokens.ember : tokens.crimson
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -87,8 +88,7 @@ function RatingModalContent({
           <span
             style={{
               fontSize: 48,
-              color: tokens.cyan,
-              textShadow: `0 0 30px ${tokens.cyanGlow}`,
+              color: accentColor,
               fontFamily: '"Noto Sans JP", sans-serif',
               transition: 'color 0.35s ease',
             }}
@@ -143,7 +143,7 @@ function RatingModalContent({
               height: '100%',
               width: `${fillPercent}%`,
               background: tokens.neonFill,
-              boxShadow: `0 0 12px ${tokens.cyan}`,
+              boxShadow: `0 0 10px ${tokens.accentGlow}`,
               transition: 'width 0.2s ease, background 0.35s ease',
             }}
           />
@@ -165,14 +165,15 @@ function RatingModalContent({
                 type="button"
                 onClick={() => setSelected(value)}
                 style={{
-                  padding: '10px 0',
+                  minHeight: 48,
+                  padding: '12px 0',
                   fontFamily: '"Share Tech Mono", monospace',
-                  fontSize: 12,
+                  fontSize: 13,
                   cursor: 'pointer',
                   color: isSelected ? tokens.segmentTextSelected : tokens.segmentText,
                   background: isSelected ? tokens.segmentSelected : tokens.segmentUnselected,
                   border: `1px solid ${isSelected ? 'transparent' : tokens.segmentBorder}`,
-                  boxShadow: isSelected ? `0 0 14px ${tokens.cyanGlow}` : 'none',
+                  boxShadow: isSelected ? `0 0 12px ${tokens.accentGlow}` : 'none',
                   transition: 'all 0.15s ease',
                   transform: isSelected ? 'scale(1.02)' : 'scale(1)',
                 }}
@@ -186,9 +187,10 @@ function RatingModalContent({
         <button
           type="button"
           onClick={handleSave}
+          className="kage-touch-target"
           style={{
             width: '100%',
-            padding: '14px 0',
+            padding: '16px 0',
             border: 'none',
             cursor: 'pointer',
             fontFamily: '"Orbitron", sans-serif',

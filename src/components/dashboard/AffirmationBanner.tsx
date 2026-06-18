@@ -4,21 +4,29 @@ import { useTracker } from '../../context/trackerContext'
 
 export function AffirmationBanner() {
   const { tokens } = useTheme()
-  const { settings } = useTracker()
+  const { settings, ratings, core, gamification } = useTracker()
 
   if (!settings.affirmationsEnabled) return null
 
-  const message = pickAffirmation(settings.elaraWhispers)
+  const message = pickAffirmation({
+    elara: settings.elaraWhispers,
+    mind: ratings.mind,
+    body: ratings.body,
+    spirit: ratings.spirit,
+    core,
+    streak: gamification.currentStreak,
+  })
 
   return (
     <div
       className="animate-fade-in"
       style={{
-        padding: '14px 16px',
-        borderRadius: 8,
+        padding: '16px 18px',
+        borderRadius: 10,
         border: `1px solid ${tokens.borderAccent}`,
         background: tokens.bannerBg,
         marginBottom: 20,
+        boxShadow: tokens.cardShadowAlt,
       }}
     >
       <p
@@ -37,8 +45,8 @@ export function AffirmationBanner() {
       <p
         style={{
           margin: 0,
-          fontSize: 13,
-          lineHeight: 1.55,
+          fontSize: 14,
+          lineHeight: 1.6,
           color: tokens.text,
         }}
       >
