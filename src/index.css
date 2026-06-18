@@ -1,0 +1,121 @@
+@import "tailwindcss";
+
+@theme {
+  --color-void: #000000;
+  --color-ink: #0a0a0c;
+  --color-slate: #121218;
+  --color-cyan: #00f0ff;
+  --color-cyan-dim: #00f0ff33;
+  --color-magenta: #ff00aa;
+  --color-magenta-dim: #ff00aa33;
+  --color-ghost: #8a8a9a;
+  --color-mist: #4a4a5a;
+
+  --font-display: "Orbitron", sans-serif;
+  --font-jp: "Noto Sans JP", sans-serif;
+  --font-mono: "Share Tech Mono", monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--color-void);
+  color: #e8e8f0;
+  font-family: var(--font-jp);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+::selection {
+  background: var(--color-cyan-dim);
+  color: var(--color-cyan);
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes scanline-drift {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(4px);
+  }
+}
+
+@keyframes flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  93% {
+    opacity: 0.85;
+  }
+  94% {
+    opacity: 1;
+  }
+  97% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes line-expand {
+  0% {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fade-up {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 4s ease-in-out infinite;
+}
+
+.animate-flicker {
+  animation: flicker 8s linear infinite;
+}
+
+.animate-line-expand {
+  animation: line-expand 1.2s ease-out forwards;
+}
+
+.animate-fade-up {
+  animation: fade-up 0.8s ease-out forwards;
+}
