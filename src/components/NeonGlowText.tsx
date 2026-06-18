@@ -36,6 +36,8 @@ export function NeonGlowText({
   const isLight = mode === 'light'
   const isHero = variant === 'hero'
   const isLightHeroShadow = isLight && isHero && lightShadow
+  const lightShadowFarOpacity = lightOutline ? 0.22 : 0.3
+  const lightShadowNearOpacity = lightOutline ? 0.32 : 0.45
 
   const textLayer: CSSProperties = {
     fontFamily: style?.fontFamily,
@@ -93,7 +95,7 @@ export function NeonGlowText({
             style={{
               ...layerBase,
               color: '#000000',
-              opacity: 0.3,
+              opacity: lightShadowFarOpacity,
               transform: 'translateY(0.14em) scale(1.02)',
               filter: 'blur(18px)',
             }}
@@ -105,7 +107,7 @@ export function NeonGlowText({
             style={{
               ...layerBase,
               color: '#000000',
-              opacity: 0.45,
+              opacity: lightShadowNearOpacity,
               transform: 'translateY(0.07em)',
               filter: 'blur(6px)',
             }}
