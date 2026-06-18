@@ -148,7 +148,7 @@ export function NeonGlowText({
           style={{
             ...layerBase,
             color: 'transparent',
-            WebkitTextStroke: '0.028em #000000',
+            WebkitTextStroke: '1em #000000',
             paintOrder: 'stroke fill',
           }}
         >
