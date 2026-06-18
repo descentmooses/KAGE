@@ -1,4 +1,5 @@
 import { useTheme } from '../theme/useTheme'
+import { pillarAccentColor } from '../lib/pillars'
 import type { AreaConfig } from '../types'
 
 interface NeonBarProps {
@@ -10,7 +11,7 @@ interface NeonBarProps {
 export function NeonBar({ area, value, onTap }: NeonBarProps) {
   const { tokens, mode } = useTheme()
   const fillPercent = (value / 10) * 100
-  const accentColor = area.color === 'ember' ? tokens.ember : tokens.crimson
+  const accentColor = pillarAccentColor(tokens, area.color)
   const fillGlow =
     mode === 'dark'
       ? 'none'

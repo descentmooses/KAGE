@@ -9,21 +9,14 @@ import { TrackerContext } from './trackerContext'
 import type { CelebrationEvent, TrackerContextValue } from './trackerTypes'
 import type {
   AppSettings,
-  AreaId,
   DailyLog,
   GamificationState,
   Goal,
-  LogSource,
   MorningLogEntry,
   Period,
   ReflectionEntry,
 } from '../types'
 import {
-  addMorningLog,
-  addReflectionLog,
-  clearAllData,
-  deleteGoal,
-  exportAllData,
   getAllDailyLogs,
   getDailyLog,
   getGamification,
@@ -31,37 +24,24 @@ import {
   getMorningLogByDate,
   getReflectionLogByDate,
   getSettings,
-  importAllData,
-  putDailyLog,
   putGamification,
-  putGoal,
-  putSettings,
 } from '../lib/db'
 import { DEFAULT_RATINGS, computeCore } from '../types'
 import { migrateFromLocalStorage } from '../lib/migrate'
 import { todayKey } from '../lib/dates'
-import {
-  applyXpDelta,
-  resetQuestsIfNewDay,
-  updateStreak,
-  xpForDailyLog,
-  xpForMorning,
-  xpForReflection,
-} from '../lib/gamification'
+import { resetQuestsIfNewDay } from '../lib/gamification'
 import { buildTrendForPeriod, generateInsights } from '../lib/insights'
-import { normalizeGoal, progressFromMilestones } from '../lib/goals'
-import { emitFirstShadowLog, emitShadowLogged } from '../lib/pwa/installUtils'
-import { isStreakMilestone } from '../lib/affirmations'
+import { normalizeGoal } from '../lib/goals'
 import { LoadingScreen } from '../components/LoadingScreen'
-import { DAILY_QUESTS, evaluateQuests, QUEST_BONUSES } from '../lib/quests'
-
-function uid() {
-  return crypto.randomUUID()
-}
-
-function celebrationId() {
-  return crypto.randomUUID()
-}
+import { evaluateQuests } from '../lib/quests'
+import { createApplyGamificationXp } from './tracker/actions/gamificationActions'
+import { createLoggingActions } from './tracker/actions/loggingActions'
+import { createGoalActions } from './tracker/actions/goalActions'
+import { createRitualActions } from './tracker/actions/ritualActions'
+import { createSettingsActions } from './tracker/actions/settingsActions'
+import { createDataActions } from './tracker/actions/dataActions'
+import { createQuestActions } from './tracker/actions/questActions'
+import { createCelebrationId } from './tracker/actions/types'
 
 export function TrackerProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false)
@@ -80,9 +60,12 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
 
   const clearCelebration = useCallback(() => setCelebration(null), [])
 
-  const pushCelebration = useCallback((message: string, type: CelebrationEvent['type'] = 'success') => {
-    setCelebration({ id: celebrationId(), message, type })
-  }, [])
+  const pushCelebration = useCallback(
+    (message: string, type: CelebrationEvent['type'] = 'success') => {
+      setCelebration({ id: createCelebrationId(), message, type })
+    },
+    [],
+  )
 
   const refresh = useCallback(async () => {
     const date = todayKey()
@@ -170,334 +153,70 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     [questCtx, gamification],
   )
 
-  const applyGamificationXp = useCallback(
-    async (g: GamificationState, amount: number, successMessage?: string) => {
-      const delta = applyXpDelta(g, amount)
-      await putGamification(delta.state)
-      if (delta.rankUp) {
-        pushCelebration(`Rank ascended — ${delta.state.rank}`, 'success')
-      } else if (delta.leveledUp) {
-        pushCelebration(`Level ${delta.state.level} — the shadow deepens`, 'success')
-      } else if (successMessage) {
-        pushCelebration(successMessage, 'success')
-      }
-      return delta.state
-    },
+  const applyGamificationXp = useMemo(
+    () => createApplyGamificationXp(pushCelebration),
     [pushCelebration],
   )
 
-  const persistLog = useCallback(
-    async (
-      patch: Partial<DailyLog> & { mind: number; body: number; spirit: number },
-      source: LogSource,
-      options?: { silent?: boolean; notes?: string },
-    ) => {
-      const date = todayKey()
-      const existingLog = await getDailyLog(date)
-      const priorLogs = await getAllDailyLogs()
-      const wasFirstEver = priorLogs.length === 0 && !existingLog
-      const log: DailyLog = {
-        date,
-        mind: patch.mind,
-        body: patch.body,
-        spirit: patch.spirit,
-        core: computeCore(patch.mind, patch.body, patch.spirit),
-        notes: options?.notes ?? patch.notes,
-        source,
-        loggedAt: new Date().toISOString(),
-      }
-      await putDailyLog(log)
-
-      let g = resetQuestsIfNewDay(await getGamification(), date)
-      if (!existingLog) {
-        g = updateStreak(g, date)
-        if (isStreakMilestone(g.currentStreak)) {
-          pushCelebration(`${g.currentStreak} days — the flame holds steady`, 'success')
-        }
-      }
-      if (log.core >= 85 && (!existingLog || existingLog.core < 85)) {
-        pushCelebration('Core ascendant — peak shadow state', 'success')
-      }
-      const xpGain = xpForDailyLog(log)
-      if (!options?.silent) {
-        await applyGamificationXp(g, xpGain, `Shadow logged — +${xpGain} XP`)
-      } else {
-        await putGamification(applyXpDelta(g, xpGain).state)
-      }
-      await refresh()
-      if (wasFirstEver) emitFirstShadowLog()
-      if (!options?.silent) emitShadowLogged()
-      return log
-    },
-    [applyGamificationXp, pushCelebration, refresh],
+  const { logRating, quickBump, saveTodayShadow, persistLog } = useMemo(
+    () =>
+      createLoggingActions({
+        ratings,
+        refresh,
+        onCelebrate: pushCelebration,
+        applyGamificationXp,
+      }),
+    [ratings, refresh, pushCelebration, applyGamificationXp],
   )
 
-  const logRating = useCallback(
-    async (area: AreaId, value: number, source: LogSource = 'quick') => {
-      await persistLog({ ...ratings, [area]: value }, source)
-    },
-    [persistLog, ratings],
+  const { saveMorning, saveReflection } = useMemo(
+    () =>
+      createRitualActions({
+        refresh,
+        applyGamificationXp,
+        persistLog,
+      }),
+    [refresh, applyGamificationXp, persistLog],
   )
 
-  const quickBump = useCallback(
-    async (area: AreaId, delta = 1) => {
-      const next = Math.min(10, Math.max(1, ratings[area] + delta))
-      await logRating(area, next, 'quick')
-    },
-    [logRating, ratings],
+  const { addGoal, updateGoal, updateGoalProgress, toggleMilestone, removeGoal } = useMemo(
+    () =>
+      createGoalActions({
+        goals,
+        refresh,
+        onCelebrate: pushCelebration,
+      }),
+    [goals, refresh, pushCelebration],
   )
 
-  const saveTodayShadow = useCallback(
-    async (
-      r: Record<AreaId, number>,
-      notes?: string,
-      source: LogSource = 'quick',
-    ) => {
-      await persistLog(
-        { mind: r.mind, body: r.body, spirit: r.spirit },
-        source,
-        { notes },
-      )
-    },
-    [persistLog],
+  const { updateSettings, saveWhisper, toggleFavoriteWhisper } = useMemo(
+    () =>
+      createSettingsActions({
+        settings,
+        refresh,
+      }),
+    [settings, refresh],
   )
 
-  const claimQuest = useCallback(
-    async (questId: string) => {
-      const quest = DAILY_QUESTS.find((q) => q.id === questId)
-      if (!quest) return
-
-      const date = todayKey()
-      let g = resetQuestsIfNewDay(await getGamification(), date)
-
-      if (g.completedQuestIds.includes(questId)) {
-        pushCelebration('Quest already claimed today.', 'info')
-        return
-      }
-
-      if (!quest.check(questCtx)) {
-        pushCelebration(quest.description, 'info')
-        return
-      }
-
-      g = {
-        ...g,
-        questDate: date,
-        completedQuestIds: [...g.completedQuestIds, questId],
-      }
-      const bonus = QUEST_BONUSES[questId]
-      const msg = bonus
-        ? `${quest.title} — +${quest.xp} XP · ${bonus}`
-        : `${quest.title} — +${quest.xp} XP`
-      await applyGamificationXp(g, quest.xp, msg)
-      await refresh()
-    },
-    [applyGamificationXp, pushCelebration, questCtx, refresh],
+  const { exportData, importData, resetDemoData } = useMemo(
+    () =>
+      createDataActions({
+        refresh,
+        onCelebrate: pushCelebration,
+      }),
+    [refresh, pushCelebration],
   )
 
-  const saveMorning = useCallback(
-    async (energy: number, intention: string, discipline: string) => {
-      const date = todayKey()
-      const entry: MorningLogEntry = {
-        id: uid(),
-        date,
-        energy,
-        intention: intention.trim(),
-        discipline: discipline.trim(),
-        loggedAt: new Date().toISOString(),
-      }
-      await addMorningLog(entry)
-      const g = resetQuestsIfNewDay(await getGamification(), date)
-      await applyGamificationXp(g, xpForMorning(), 'Dawn protocol sealed — +40 XP')
-      await refresh()
-    },
-    [applyGamificationXp, refresh],
+  const { claimQuest } = useMemo(
+    () =>
+      createQuestActions({
+        questCtx,
+        refresh,
+        onCelebrate: pushCelebration,
+        applyGamificationXp,
+      }),
+    [questCtx, refresh, pushCelebration, applyGamificationXp],
   )
-
-  const saveReflection = useCallback(
-    async (r: Record<AreaId, number>, journal: string) => {
-      const date = todayKey()
-      const entry: ReflectionEntry = {
-        id: uid(),
-        date,
-        mind: r.mind,
-        body: r.body,
-        spirit: r.spirit,
-        journal: journal.trim(),
-        loggedAt: new Date().toISOString(),
-      }
-      await addReflectionLog(entry)
-      await persistLog(
-        { mind: r.mind, body: r.body, spirit: r.spirit, notes: journal },
-        'reflect',
-        { silent: true },
-      )
-      const g = await getGamification()
-      await applyGamificationXp(g, xpForReflection(), 'Shadow archive sealed — +50 XP')
-      await refresh()
-    },
-    [applyGamificationXp, persistLog, refresh],
-  )
-
-  const addGoal = useCallback(
-    async (data: {
-      title: string
-      category: Goal['category']
-      target?: string
-      targetDate?: string
-      milestones?: Goal['milestones']
-    }) => {
-      const milestones = data.milestones ?? []
-      const progress =
-        milestones.length > 0 ? progressFromMilestones(milestones) : 0
-      const goal: Goal = {
-        id: uid(),
-        title: data.title,
-        category: data.category,
-        target: data.target,
-        targetDate: data.targetDate,
-        milestones,
-        progress,
-        createdAt: new Date().toISOString(),
-        completedAt: progress >= 100 ? new Date().toISOString() : undefined,
-      }
-      await putGoal(goal)
-      if (progress >= 100) {
-        pushCelebration(`Seed bloomed — “${goal.title}” complete`, 'success')
-      }
-      await refresh()
-    },
-    [pushCelebration, refresh],
-  )
-
-  const updateGoal = useCallback(
-    async (
-      id: string,
-      patch: Partial<
-        Pick<Goal, 'title' | 'category' | 'target' | 'targetDate' | 'progress' | 'milestones'>
-      >,
-    ) => {
-      const goal = goals.find((g) => g.id === id)
-      if (!goal) return
-      const milestones = patch.milestones ?? goal.milestones
-      const progress =
-        patch.progress ??
-        (milestones.length > 0 ? progressFromMilestones(milestones) : goal.progress)
-      const completedAt =
-        progress >= 100
-          ? goal.completedAt ?? new Date().toISOString()
-          : patch.progress !== undefined && patch.progress < 100
-            ? undefined
-            : goal.completedAt
-      await putGoal({ ...goal, ...patch, milestones, progress, completedAt })
-      await refresh()
-    },
-    [goals, refresh],
-  )
-
-  const updateGoalProgress = useCallback(
-    async (id: string, progress: number) => {
-      const clamped = Math.min(100, Math.max(0, progress))
-      const goal = goals.find((g) => g.id === id)
-      if (goal && clamped >= 100 && goal.progress < 100) {
-        pushCelebration(`Seed bloomed — “${goal.title}” complete`, 'success')
-      }
-      await updateGoal(id, { progress: clamped })
-    },
-    [goals, pushCelebration, updateGoal],
-  )
-
-  const toggleMilestone = useCallback(
-    async (goalId: string, milestoneId: string) => {
-      const goal = goals.find((g) => g.id === goalId)
-      if (!goal) return
-      const milestones = goal.milestones.map((m) =>
-        m.id === milestoneId ? { ...m, done: !m.done } : m,
-      )
-      const progress =
-        milestones.length > 0 ? progressFromMilestones(milestones) : goal.progress
-      const wasComplete = goal.progress >= 100
-      const completedAt =
-        progress >= 100 ? goal.completedAt ?? new Date().toISOString() : undefined
-      await putGoal({ ...goal, milestones, progress, completedAt })
-      if (progress >= 100 && !wasComplete) {
-        pushCelebration(`Milestone arc sealed — “${goal.title}”`, 'success')
-      }
-      await refresh()
-    },
-    [goals, pushCelebration, refresh],
-  )
-
-  const removeGoal = useCallback(
-    async (id: string) => {
-      await deleteGoal(id)
-      await refresh()
-    },
-    [refresh],
-  )
-
-  const updateSettings = useCallback(
-    async (patch: Partial<AppSettings>) => {
-      const current = (await getSettings()) ?? settings!
-      const next = { ...current, ...patch }
-      await putSettings(next)
-      await refresh()
-    },
-    [refresh, settings],
-  )
-
-  const saveWhisper = useCallback(
-    async (text: string) => {
-      const current = (await getSettings()) ?? settings!
-      const history = [text, ...(current.whisperHistory ?? [])].slice(0, 12)
-      await putSettings({ ...current, whisperHistory: history })
-      await refresh()
-    },
-    [refresh, settings],
-  )
-
-  const toggleFavoriteWhisper = useCallback(
-    async (text: string) => {
-      const current = (await getSettings()) ?? settings!
-      const favorites = current.favoriteWhispers ?? []
-      const next = favorites.includes(text)
-        ? favorites.filter((w) => w !== text)
-        : [text, ...favorites].slice(0, 24)
-      await putSettings({ ...current, favoriteWhispers: next })
-      await refresh()
-    },
-    [refresh, settings],
-  )
-
-  const exportData = useCallback(async () => {
-    const data = await exportAllData()
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `kage-export-${todayKey()}.json`
-    a.click()
-    URL.revokeObjectURL(url)
-  }, [])
-
-  const importData = useCallback(
-    async (file: File) => {
-      const text = await file.text()
-      const payload = JSON.parse(text) as Awaited<ReturnType<typeof exportAllData>>
-      if (!payload?.dailyLogs || !Array.isArray(payload.dailyLogs)) {
-        throw new Error('Invalid KAGE backup file')
-      }
-      await importAllData(payload)
-      await refresh()
-    },
-    [refresh],
-  )
-
-  const resetDemoData = useCallback(async () => {
-    await clearAllData()
-    await refresh()
-    pushCelebration('Demo data reset — your shadow slate is clean.', 'info')
-  }, [pushCelebration, refresh])
 
   if (loading) {
     return <LoadingScreen />
