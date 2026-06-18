@@ -5,11 +5,11 @@ export function ActivateScreen() {
     <ScreenShell
       kanji="活"
       title="Activate"
-      subtitle="覚醒 — protocols awaiting deployment"
+      subtitle="覚醒 — neural protocols dormant"
     >
-      <p className="mt-4 max-w-xs font-mono text-[10px] leading-relaxed tracking-wider text-mist/60">
+      <p className="mt-2 max-w-xs font-mono text-[10px] leading-relaxed tracking-wider text-mist/50">
         <span className="text-cyan">[</span>
-        standby
+        awaiting signal
         <span className="text-cyan">]</span>
       </p>
     </ScreenShell>

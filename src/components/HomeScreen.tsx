@@ -43,7 +43,7 @@ export function HomeScreen({ ratings, onLogRating }: HomeScreenProps) {
     [stats],
   )
 
-  const handleLog = (value: number) => {
+  const handleSave = (value: number) => {
     if (!activeArea) return
     onLogRating(activeArea.id, value)
     setActiveArea(null)
@@ -73,7 +73,7 @@ export function HomeScreen({ ratings, onLogRating }: HomeScreenProps) {
           <CoreDisplay value={core} />
 
           <section
-            className="mt-16 w-full"
+            className="mt-14 w-full sm:mt-16"
             aria-label="Mind, Body, Spirit"
           >
             {AREAS.map((area, i) => (
@@ -93,7 +93,7 @@ export function HomeScreen({ ratings, onLogRating }: HomeScreenProps) {
         area={activeArea}
         initialValue={activeArea ? ratings[activeArea.id] ?? stats[activeArea.id] : null}
         onClose={() => setActiveArea(null)}
-        onLog={handleLog}
+        onSave={handleSave}
       />
     </>
   )

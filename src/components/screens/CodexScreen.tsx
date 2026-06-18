@@ -5,11 +5,11 @@ export function CodexScreen() {
     <ScreenShell
       kanji="典"
       title="Codex"
-      subtitle="典籍 — knowledge fragments locked"
+      subtitle="典籍 — knowledge sealed"
     >
-      <p className="mt-4 max-w-xs font-mono text-[10px] leading-relaxed tracking-wider text-mist/60">
+      <p className="mt-2 max-w-xs font-mono text-[10px] leading-relaxed tracking-wider text-mist/50">
         <span className="text-cyan">[</span>
-        access restricted
+        clearance required
         <span className="text-cyan">]</span>
       </p>
     </ScreenShell>

@@ -5,21 +5,21 @@ interface RatingModalProps {
   area: AreaConfig | null
   initialValue: number | null
   onClose: () => void
-  onLog: (value: number) => void
+  onSave: (value: number) => void
 }
 
 interface RatingModalContentProps {
   area: AreaConfig
   initialValue: number | null
   onClose: () => void
-  onLog: (value: number) => void
+  onSave: (value: number) => void
 }
 
 function RatingModalContent({
   area,
   initialValue,
   onClose,
-  onLog,
+  onSave,
 }: RatingModalContentProps) {
   const [selected, setSelected] = useState(initialValue ?? 5)
 
@@ -32,6 +32,8 @@ function RatingModalContent({
   }, [onClose])
 
   const accent = area.color === 'cyan' ? '#00f9ff' : '#ff00aa'
+  const secondary = area.color === 'cyan' ? '#ff00aa' : '#00f9ff'
+  const fillPercent = (selected / 10) * 100
 
   return (
     <div
@@ -42,52 +44,75 @@ function RatingModalContent({
     >
       <button
         type="button"
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-fade-in"
+        className="absolute inset-0 bg-black/80 backdrop-blur-md animate-fade-in"
         onClick={onClose}
         aria-label="Close"
       />
 
       <div
-        className="relative w-full max-w-sm border border-white/[0.06] bg-ink/95 px-8 py-10 animate-fade-up"
+        className="relative w-full max-w-sm border border-white/[0.07] bg-void/95 px-8 py-10 animate-fade-up"
         style={{
-          boxShadow: `0 0 40px ${accent}11, inset 0 1px 0 rgba(255,255,255,0.04)`,
+          boxShadow: `0 0 60px ${accent}18, 0 0 120px ${secondary}08, inset 0 1px 0 rgba(255,255,255,0.05)`,
         }}
       >
         <div
           className="absolute inset-x-0 top-0 h-px"
           style={{
-            background: `linear-gradient(90deg, transparent, ${accent}, transparent)`,
+            background: `linear-gradient(90deg, transparent, ${accent}, ${secondary}, transparent)`,
           }}
         />
 
-        <header className="mb-10 text-center">
+        <header className="mb-8 text-center">
           <span
-            className="mb-3 block font-jp text-4xl font-light"
-            style={{ color: accent, textShadow: `0 0 30px ${accent}44` }}
+            className="mb-2 block font-jp text-5xl font-extralight"
+            style={{ color: accent, textShadow: `0 0 40px ${accent}55` }}
           >
             {area.kanji}
           </span>
           <h2
             id="rating-modal-title"
-            className="font-display text-sm tracking-[0.45em] text-white uppercase"
+            className="font-display text-[11px] tracking-[0.5em] text-white/80 uppercase"
           >
             {area.label}
           </h2>
         </header>
 
-        <div className="mb-3 flex items-baseline justify-between">
-          <span className="font-mono text-[9px] tracking-widest text-mist uppercase">
-            Intensity
-          </span>
+        {/* Large rating display */}
+        <div className="relative mb-8 flex flex-col items-center">
+          <div
+            className="pointer-events-none absolute h-32 w-32 rounded-full opacity-50"
+            style={{
+              background: `radial-gradient(circle, ${accent}22 0%, transparent 70%)`,
+            }}
+          />
           <span
-            className="font-mono text-2xl tabular-nums"
-            style={{ color: accent, textShadow: `0 0 16px ${accent}55` }}
+            className="core-glow relative font-display text-7xl font-medium tabular-nums leading-none"
+            aria-live="polite"
           >
             {selected}
           </span>
+          <span className="mt-2 font-mono text-[9px] tracking-[0.35em] text-mist uppercase">
+            of 10
+          </span>
         </div>
 
-        <div className="mb-10 grid grid-cols-5 gap-1.5">
+        {/* Preview bar */}
+        <div
+          className="relative mb-8 h-1.5 w-full overflow-hidden rounded-full"
+          style={{ background: 'rgba(255,255,255,0.05)' }}
+        >
+          <div
+            className="absolute inset-y-0 left-0 rounded-full transition-all duration-300"
+            style={{
+              width: `${fillPercent}%`,
+              background: `linear-gradient(90deg, ${accent}88, ${accent})`,
+              boxShadow: `0 0 12px ${accent}66`,
+            }}
+          />
+        </div>
+
+        {/* Segmented 1–10 */}
+        <div className="mb-8 grid grid-cols-5 gap-2">
           {Array.from({ length: 10 }, (_, i) => i + 1).map((value) => {
             const isSelected = selected === value
             return (
@@ -95,12 +120,14 @@ function RatingModalContent({
                 key={value}
                 type="button"
                 onClick={() => setSelected(value)}
-                className="relative py-2.5 font-mono text-[11px] transition-all duration-200"
+                className="relative py-3 font-mono text-xs transition-all duration-200 active:scale-95"
                 style={{
-                  color: isSelected ? accent : 'rgba(138,138,154,0.5)',
-                  background: isSelected ? `${accent}14` : 'transparent',
-                  border: `1px solid ${isSelected ? `${accent}55` : 'rgba(255,255,255,0.06)'}`,
-                  boxShadow: isSelected ? `0 0 12px ${accent}33` : 'none',
+                  color: isSelected ? '#0a0a0a' : 'rgba(138,138,154,0.55)',
+                  background: isSelected
+                    ? `linear-gradient(135deg, ${accent}, ${secondary})`
+                    : 'rgba(255,255,255,0.03)',
+                  border: `1px solid ${isSelected ? 'transparent' : 'rgba(255,255,255,0.07)'}`,
+                  boxShadow: isSelected ? `0 0 16px ${accent}55` : 'none',
                 }}
               >
                 {value}
@@ -111,14 +138,14 @@ function RatingModalContent({
 
         <button
           type="button"
-          onClick={() => onLog(selected)}
-          className="w-full py-3 font-display text-[10px] tracking-[0.4em] text-void uppercase transition-all duration-300 hover:brightness-110"
+          onClick={() => onSave(selected)}
+          className="w-full py-3.5 font-display text-[10px] tracking-[0.45em] text-void uppercase transition-all duration-300 hover:brightness-110 active:scale-[0.98]"
           style={{
-            background: `linear-gradient(90deg, ${accent}cc, ${area.color === 'cyan' ? '#ff00aa' : '#00f9ff'}cc)`,
-            boxShadow: `0 0 20px ${accent}33`,
+            background: `linear-gradient(90deg, ${accent}, ${secondary})`,
+            boxShadow: `0 0 24px ${accent}44`,
           }}
         >
-          Log
+          Save
         </button>
       </div>
     </div>
@@ -129,7 +156,7 @@ export function RatingModal({
   area,
   initialValue,
   onClose,
-  onLog,
+  onSave,
 }: RatingModalProps) {
   if (!area) return null
 
@@ -139,7 +166,7 @@ export function RatingModal({
       area={area}
       initialValue={initialValue}
       onClose={onClose}
-      onLog={onLog}
+      onSave={onSave}
     />
   )
 }
