@@ -13,17 +13,19 @@ export function KageHeroLogo() {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 'clamp(12px, 4vw, 28px)',
+        gap: 'clamp(16px, 5vw, 40px)',
         textAlign: 'center',
-        padding: '0 20px',
+        padding: '0 12px',
+        width: '100%',
+        maxWidth: '100vw',
       }}
     >
       <div
         aria-hidden
         style={{
           position: 'absolute',
-          width: 'min(95vw, 480px)',
-          height: 'min(95vw, 480px)',
+          width: 'min(120vw, 640px)',
+          height: 'min(120vw, 640px)',
           background: isLight
             ? 'radial-gradient(circle, rgba(0,0,0,0.06) 0%, transparent 70%)'
             : 'radial-gradient(circle, rgba(0,249,255,0.35) 0%, rgba(255,0,170,0.2) 35%, transparent 70%)',
@@ -37,9 +39,9 @@ export function KageHeroLogo() {
         aria-hidden
         style={{
           position: 'absolute',
-          width: 'min(70vw, 320px)',
-          height: 'min(28vw, 120px)',
-          bottom: '18%',
+          width: 'min(90vw, 420px)',
+          height: 'min(36vw, 160px)',
+          bottom: '12%',
           background: 'radial-gradient(ellipse, rgba(0,0,0,0.4) 0%, transparent 70%)',
           opacity: isLight ? 0.35 : 0.55,
           filter: 'blur(20px)',
@@ -52,7 +54,7 @@ export function KageHeroLogo() {
         as="p"
         style={{
           fontFamily: '"Orbitron", sans-serif',
-          fontSize: 'clamp(1.75rem, 8vw, 3rem)',
+          fontSize: 'clamp(2.25rem, 11vw, 4.25rem)',
           fontWeight: 600,
           letterSpacing: '0.55em',
           marginLeft: '0.55em',
@@ -66,7 +68,7 @@ export function KageHeroLogo() {
         as="h1"
         style={{
           fontFamily: '"Noto Sans JP", sans-serif',
-          fontSize: 'clamp(7rem, 38vw, 13rem)',
+          fontSize: 'clamp(10rem, 58vw, 22rem)',
           fontWeight: 500,
         }}
       >
