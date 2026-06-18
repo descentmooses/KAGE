@@ -139,6 +139,8 @@ export async function getSettings(): Promise<AppSettings> {
       affirmationsEnabled: true,
       elaraWhispers: true,
       voiceEnabled: true,
+      whisperHistory: [],
+      hasOnboarded: false,
     }
   )
 }
@@ -187,5 +189,31 @@ export async function importAllData(payload: Awaited<ReturnType<typeof exportAll
   for (const goal of payload.goals) await tx.objectStore('goals').put(goal)
   await tx.objectStore('meta').put(payload.gamification, 'gamification')
   await tx.objectStore('meta').put(payload.settings, 'settings')
+  await tx.done
+}
+
+/** Wipe all user data and restore default gamification + settings. */
+export async function clearAllData(): Promise<void> {
+  const db = await getDb()
+  const tx = db.transaction(
+    ['dailyLogs', 'morningLogs', 'reflectionLogs', 'goals', 'meta'],
+    'readwrite',
+  )
+  await tx.objectStore('dailyLogs').clear()
+  await tx.objectStore('morningLogs').clear()
+  await tx.objectStore('reflectionLogs').clear()
+  await tx.objectStore('goals').clear()
+  await tx.objectStore('meta').clear()
+  await tx.objectStore('meta').put(DEFAULT_GAMIFICATION, 'gamification')
+  await tx.objectStore('meta').put(
+    {
+      affirmationsEnabled: true,
+      elaraWhispers: true,
+      voiceEnabled: true,
+      whisperHistory: [],
+      hasOnboarded: false,
+    },
+    'settings',
+  )
   await tx.done
 }

@@ -49,6 +49,40 @@ export function addXp(state: GamificationState, amount: number): GamificationSta
   return { ...state, xp, level, rank: rankForLevel(level) }
 }
 
+export interface GamificationDelta {
+  state: GamificationState
+  leveledUp: boolean
+  rankUp: boolean
+  previousLevel: number
+  previousRank: ShadowRank
+}
+
+/** Apply XP and report whether level or rank changed (for celebration toasts). */
+export function applyXpDelta(
+  state: GamificationState,
+  amount: number,
+): GamificationDelta {
+  const previousLevel = state.level
+  const previousRank = state.rank
+  const next = addXp(state, amount)
+  return {
+    state: next,
+    leveledUp: next.level > previousLevel,
+    rankUp: next.rank !== previousRank,
+    previousLevel,
+    previousRank,
+  }
+}
+
+/** Reset quest completion when the calendar day changes. */
+export function resetQuestsIfNewDay(
+  state: GamificationState,
+  date = todayKey(),
+): GamificationState {
+  if (state.questDate === date) return state
+  return { ...state, questDate: date, completedQuestIds: [] }
+}
+
 export function updateStreak(
   state: GamificationState,
   logDate: string = todayKey(),

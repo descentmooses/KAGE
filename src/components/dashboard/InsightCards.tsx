@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useTheme } from '../../theme/useTheme'
 import { useTracker } from '../../context/trackerContext'
 import { filterLogsByPeriod } from '../../lib/insights'
@@ -66,7 +66,17 @@ export function InsightCards() {
 
 export function QuestList() {
   const { tokens } = useTheme()
-  const { quests } = useTracker()
+  const { quests, claimQuest } = useTracker()
+  const [claimingId, setClaimingId] = useState<string | null>(null)
+
+  const handleQuest = async (id: string) => {
+    setClaimingId(id)
+    try {
+      await claimQuest(id)
+    } finally {
+      setTimeout(() => setClaimingId(null), 400)
+    }
+  }
 
   return (
     <div
@@ -88,53 +98,78 @@ export function QuestList() {
           color: tokens.textMuted,
         }}
       >
-        Daily quests
+        Daily quests — tap to claim
       </p>
-      {quests.map((quest) => (
-        <div
-          key={quest.id}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            padding: '10px 0',
-            borderBottom: `1px solid ${tokens.border}`,
-            opacity: quest.done ? 0.55 : 1,
-          }}
-        >
-          <span
+      {quests.map((quest) => {
+        const glowing = claimingId === quest.id
+        return (
+          <button
+            key={quest.id}
+            type="button"
+            onClick={() => void handleQuest(quest.id)}
+            disabled={quest.done}
+            className={glowing ? 'animate-quest-claim' : undefined}
             style={{
-              width: 24,
-              height: 24,
-              borderRadius: 4,
-              border: `1px solid ${quest.done ? tokens.crimson : tokens.border}`,
-              background: quest.done ? tokens.bannerBg : 'transparent',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 12,
-              color: tokens.crimson,
+              gap: 12,
+              width: '100%',
+              padding: '12px 10px',
+              marginBottom: 6,
+              borderRadius: 8,
+              border: `1px solid ${
+                quest.done
+                  ? tokens.crimson
+                  : quest.eligible
+                    ? tokens.borderAccent
+                    : tokens.border
+              }`,
+              background: quest.done
+                ? tokens.bannerBg
+                : quest.eligible
+                  ? tokens.surfaceElevated
+                  : 'transparent',
+              cursor: quest.done ? 'default' : 'pointer',
+              opacity: quest.done ? 0.7 : 1,
+              textAlign: 'left',
+              minHeight: 56,
             }}
           >
-            {quest.done ? '✓' : ''}
-          </span>
-          <div style={{ flex: 1 }}>
-            <p style={{ margin: 0, fontSize: 13, color: tokens.text }}>{quest.title}</p>
-            <p style={{ margin: '2px 0 0', fontSize: 11, color: tokens.textMuted }}>
-              {quest.description}
-            </p>
-          </div>
-          <span
-            style={{
-              fontFamily: '"Share Tech Mono", monospace',
-              fontSize: 10,
-              color: tokens.gold,
-            }}
-          >
-            +{quest.xp}
-          </span>
-        </div>
-      ))}
+            <span
+              style={{
+                width: 26,
+                height: 26,
+                borderRadius: 6,
+                border: `1px solid ${quest.done ? tokens.crimson : tokens.border}`,
+                background: quest.done ? tokens.bannerBg : 'transparent',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 12,
+                color: tokens.crimson,
+                flexShrink: 0,
+              }}
+            >
+              {quest.done ? '✓' : quest.eligible ? '◎' : ''}
+            </span>
+            <div style={{ flex: 1 }}>
+              <p style={{ margin: 0, fontSize: 13, color: tokens.text }}>{quest.title}</p>
+              <p style={{ margin: '2px 0 0', fontSize: 11, color: tokens.textMuted }}>
+                {quest.description}
+              </p>
+            </div>
+            <span
+              style={{
+                fontFamily: '"Share Tech Mono", monospace',
+                fontSize: 10,
+                color: tokens.gold,
+              }}
+            >
+              +{quest.xp}
+            </span>
+          </button>
+        )
+      })}
     </div>
   )
 }

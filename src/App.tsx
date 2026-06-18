@@ -1,3 +1,4 @@
+import { CelebrationListener } from './components/CelebrationListener'
 import { AppHeader } from './components/AppHeader'
 import { HomeScreen } from './components/HomeScreen'
 import { CRTOverlay } from './components/CRTOverlay'
@@ -48,6 +49,7 @@ function AppShell() {
       }}
     >
       <AppHeader />
+      <CelebrationListener />
       <OnlineIndicator />
 
       <div

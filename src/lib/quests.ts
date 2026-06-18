@@ -1,4 +1,5 @@
 import type { DailyQuest, QuestContext } from '../types'
+import { todayKey } from './dates'
 
 export const DAILY_QUESTS: DailyQuest[] = [
   {
@@ -12,14 +13,14 @@ export const DAILY_QUESTS: DailyQuest[] = [
   {
     id: 'morning-protocol',
     title: 'Dawn Protocol',
-    description: 'Complete morning activation',
+    description: 'Complete morning activation (+Mind & Spirit)',
     xp: 40,
     check: ({ morningLogged }) => morningLogged,
   },
   {
     id: 'evening-archive',
     title: 'Shadow Archive',
-    description: 'Log evening reflection',
+    description: 'Log evening reflection (+Spirit)',
     xp: 50,
     check: ({ reflectionLogged }) => reflectionLogged,
   },
@@ -33,10 +34,29 @@ export const DAILY_QUESTS: DailyQuest[] = [
   },
 ]
 
-export function evaluateQuests(ctx: QuestContext, completedIds: string[]) {
-  return DAILY_QUESTS.map((quest) => ({
-    ...quest,
-    done: completedIds.includes(quest.id) || quest.check(ctx),
-    newlyComplete: !completedIds.includes(quest.id) && quest.check(ctx),
-  }))
+/** Bonus flavor text when a quest is claimed. */
+export const QUEST_BONUSES: Record<string, string> = {
+  'morning-protocol': '+Mind & +Spirit aligned',
+  'evening-archive': '+Spirit archived',
+  'log-all-pillars': 'Triad sealed',
+  'high-pillar': 'Peak discipline recorded',
+}
+
+export function evaluateQuests(
+  ctx: QuestContext,
+  completedIds: string[],
+  questDate: string | null,
+  today = todayKey(),
+) {
+  const questsAreToday = questDate === today
+  return DAILY_QUESTS.map((quest) => {
+    const eligible = quest.check(ctx)
+    const claimed = questsAreToday && completedIds.includes(quest.id)
+    return {
+      ...quest,
+      done: claimed,
+      eligible: eligible && !claimed,
+      newlyComplete: eligible && !claimed,
+    }
+  })
 }

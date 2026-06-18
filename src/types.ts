@@ -90,6 +90,8 @@ export interface AppSettings {
   affirmationsEnabled: boolean
   elaraWhispers: boolean
   voiceEnabled: boolean
+  whisperHistory?: string[]
+  hasOnboarded?: boolean
 }
 
 export interface AreaConfig {

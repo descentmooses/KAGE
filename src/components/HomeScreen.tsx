@@ -5,8 +5,10 @@ import { useTheme } from '../theme/useTheme'
 import { useTracker } from '../context/trackerContext'
 import { AffirmationBanner } from './dashboard/AffirmationBanner'
 import { HomeHeader } from './dashboard/HomeHeader'
+import { OnboardingHint } from './dashboard/OnboardingHint'
 import { RankBadge } from './dashboard/RankBadge'
 import { QuickLogPanel, CompactPillars } from './dashboard/QuickLogPanel'
+import { ShadowLogForm } from './dashboard/ShadowLogForm'
 import { ProgressChart } from './dashboard/ProgressChart'
 import { InsightCards, QuestList } from './dashboard/InsightCards'
 import { GoalPanel } from './dashboard/GoalPanel'
@@ -18,7 +20,6 @@ export function HomeScreen() {
   const { tokens } = useTheme()
   const { ratings, core, logRating, gamification } = useTracker()
   const [activeArea, setActiveArea] = useState<AreaConfig | null>(null)
-  const [voiceNote, setVoiceNote] = useState<string | null>(null)
 
   const highScore = core >= 85
 
@@ -28,9 +29,8 @@ export function HomeScreen() {
     setActiveArea(null)
   }
 
-  const onVoiceNote = useCallback((text: string) => {
-    setVoiceNote(text)
-    setTimeout(() => setVoiceNote(null), 4000)
+  const onVoiceNote = useCallback(() => {
+    /* voice routed via TrackerProvider pendingVoiceNote → ShadowLogForm */
   }, [])
 
   const openAdjust = useCallback((area: AreaConfig) => {
@@ -58,23 +58,18 @@ export function HomeScreen() {
           }}
         >
           <HomeHeader core={core} streak={gamification.currentStreak} />
+          <OnboardingHint />
           <AffirmationBanner />
           <QuickLogPanel onVoiceNote={onVoiceNote} onAdjust={openAdjust} />
           <CompactPillars onAdjust={openAdjust} />
 
-          {voiceNote && (
-            <p
-              className="animate-fade-in"
-              style={{
-                fontSize: 12,
-                color: tokens.textMuted,
-                margin: '0 0 16px',
-                fontStyle: 'italic',
-              }}
-            >
-              Voice: {voiceNote}
-            </p>
-          )}
+          <CollapsibleSection
+            title="Parked shadow log"
+            subtitle="Sliders + save today's entry"
+            defaultOpen={false}
+          >
+            <ShadowLogForm />
+          </CollapsibleSection>
 
           <CollapsibleSection
             title="Deeper shadow"

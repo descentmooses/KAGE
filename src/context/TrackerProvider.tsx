@@ -6,7 +6,7 @@ import {
   type ReactNode,
 } from 'react'
 import { TrackerContext } from './trackerContext'
-import type { TrackerContextValue } from './trackerTypes'
+import type { CelebrationEvent, TrackerContextValue } from './trackerTypes'
 import type {
   AppSettings,
   AreaId,
@@ -21,6 +21,7 @@ import type {
 import {
   addMorningLog,
   addReflectionLog,
+  clearAllData,
   deleteGoal,
   exportAllData,
   getAllDailyLogs,
@@ -40,17 +41,22 @@ import { DEFAULT_RATINGS, computeCore } from '../types'
 import { migrateFromLocalStorage } from '../lib/migrate'
 import { todayKey } from '../lib/dates'
 import {
-  addXp,
+  applyXpDelta,
+  resetQuestsIfNewDay,
   updateStreak,
   xpForDailyLog,
   xpForMorning,
   xpForReflection,
 } from '../lib/gamification'
-import { buildTrend, generateInsights } from '../lib/insights'
+import { buildTrendForPeriod, generateInsights } from '../lib/insights'
 import { LoadingScreen } from '../components/LoadingScreen'
-import { DAILY_QUESTS, evaluateQuests } from '../lib/quests'
+import { DAILY_QUESTS, evaluateQuests, QUEST_BONUSES } from '../lib/quests'
 
 function uid() {
+  return crypto.randomUUID()
+}
+
+function celebrationId() {
   return crypto.randomUUID()
 }
 
@@ -66,13 +72,27 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
   const [morningToday, setMorningToday] = useState<MorningLogEntry | null>(null)
   const [reflectionToday, setReflectionToday] = useState<ReflectionEntry | null>(null)
   const [period, setPeriod] = useState<Period>('weekly')
+  const [celebration, setCelebration] = useState<CelebrationEvent | null>(null)
+  const [pendingVoiceNote, setPendingVoiceNote] = useState<string | null>(null)
+
+  const clearCelebration = useCallback(() => setCelebration(null), [])
+
+  const pushCelebration = useCallback((message: string, type: CelebrationEvent['type'] = 'success') => {
+    setCelebration({ id: celebrationId(), message, type })
+  }, [])
 
   const refresh = useCallback(async () => {
     const date = todayKey()
-    const [log, logs, g, goalList, s, morning, reflection] = await Promise.all([
+    let g = await getGamification()
+    const resetG = resetQuestsIfNewDay(g, date)
+    if (resetG !== g) {
+      await putGamification(resetG)
+      g = resetG
+    }
+
+    const [log, logs, goalList, s, morning, reflection] = await Promise.all([
       getDailyLog(date),
       getAllDailyLogs(),
-      getGamification(),
       getGoals(),
       getSettings(),
       getMorningLogByDate(date),
@@ -124,68 +144,78 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     [ratings],
   )
 
-  const trend = useMemo(() => buildTrend(allLogs, 7), [allLogs])
+  const trend = useMemo(() => buildTrendForPeriod(allLogs, period), [allLogs, period])
   const insights = useMemo(() => generateInsights(allLogs), [allLogs])
+
+  const questCtx = useMemo(
+    () => ({
+      todayLog,
+      morningLogged: !!morningToday,
+      reflectionLogged: !!reflectionToday,
+    }),
+    [todayLog, morningToday, reflectionToday],
+  )
 
   const quests = useMemo(
     () =>
       evaluateQuests(
-        {
-          todayLog,
-          morningLogged: !!morningToday,
-          reflectionLogged: !!reflectionToday,
-        },
+        questCtx,
         gamification?.completedQuestIds ?? [],
+        gamification?.questDate ?? null,
       ),
-    [todayLog, morningToday, reflectionToday, gamification],
+    [questCtx, gamification],
+  )
+
+  const applyGamificationXp = useCallback(
+    async (g: GamificationState, amount: number, successMessage?: string) => {
+      const delta = applyXpDelta(g, amount)
+      await putGamification(delta.state)
+      if (delta.rankUp) {
+        pushCelebration(`Rank ascended — ${delta.state.rank}`, 'success')
+      } else if (delta.leveledUp) {
+        pushCelebration(`Level ${delta.state.level} — the shadow deepens`, 'success')
+      } else if (successMessage) {
+        pushCelebration(successMessage, 'success')
+      }
+      return delta.state
+    },
+    [pushCelebration],
   )
 
   const persistLog = useCallback(
-    async (patch: Partial<DailyLog> & { mind: number; body: number; spirit: number }, source: LogSource) => {
+    async (
+      patch: Partial<DailyLog> & { mind: number; body: number; spirit: number },
+      source: LogSource,
+      options?: { silent?: boolean; notes?: string },
+    ) => {
       const date = todayKey()
+      const existingLog = await getDailyLog(date)
       const log: DailyLog = {
         date,
         mind: patch.mind,
         body: patch.body,
         spirit: patch.spirit,
         core: computeCore(patch.mind, patch.body, patch.spirit),
-        notes: patch.notes,
+        notes: options?.notes ?? patch.notes,
         source,
         loggedAt: new Date().toISOString(),
       }
       await putDailyLog(log)
 
-      let g = await getGamification()
-      if (g.questDate !== date) {
-        g = { ...g, questDate: date, completedQuestIds: [] }
-      }
-      const hadLog = await getDailyLog(date)
-      if (!hadLog) {
+      let g = resetQuestsIfNewDay(await getGamification(), date)
+      if (!existingLog) {
         g = updateStreak(g, date)
       }
-      g = addXp(g, xpForDailyLog(log))
-
-      const completed = new Set(g.completedQuestIds)
-      for (const quest of DAILY_QUESTS) {
-        if (
-          quest.check({
-            todayLog: log,
-            morningLogged: !!morningToday,
-            reflectionLogged: !!reflectionToday,
-          })
-        ) {
-          if (!completed.has(quest.id)) {
-            completed.add(quest.id)
-            g = addXp(g, quest.xp)
-          }
-        }
+      const xpGain = xpForDailyLog(log)
+      if (!options?.silent) {
+        await applyGamificationXp(g, xpGain, `Shadow logged — +${xpGain} XP`)
+      } else {
+        await putGamification(applyXpDelta(g, xpGain).state)
       }
-      g = { ...g, completedQuestIds: [...completed] }
-      await putGamification(g)
       await refresh()
       return log
     },
-    [morningToday, reflectionToday, refresh],
+    [applyGamificationXp, refresh],
   )
 
   const logRating = useCallback(
@@ -203,6 +233,54 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     [logRating, ratings],
   )
 
+  const saveTodayShadow = useCallback(
+    async (
+      r: Record<AreaId, number>,
+      notes?: string,
+      source: LogSource = 'quick',
+    ) => {
+      await persistLog(
+        { mind: r.mind, body: r.body, spirit: r.spirit },
+        source,
+        { notes },
+      )
+    },
+    [persistLog],
+  )
+
+  const claimQuest = useCallback(
+    async (questId: string) => {
+      const quest = DAILY_QUESTS.find((q) => q.id === questId)
+      if (!quest) return
+
+      const date = todayKey()
+      let g = resetQuestsIfNewDay(await getGamification(), date)
+
+      if (g.completedQuestIds.includes(questId)) {
+        pushCelebration('Quest already claimed today.', 'info')
+        return
+      }
+
+      if (!quest.check(questCtx)) {
+        pushCelebration(quest.description, 'info')
+        return
+      }
+
+      g = {
+        ...g,
+        questDate: date,
+        completedQuestIds: [...g.completedQuestIds, questId],
+      }
+      const bonus = QUEST_BONUSES[questId]
+      const msg = bonus
+        ? `${quest.title} — +${quest.xp} XP · ${bonus}`
+        : `${quest.title} — +${quest.xp} XP`
+      await applyGamificationXp(g, quest.xp, msg)
+      await refresh()
+    },
+    [applyGamificationXp, pushCelebration, questCtx, refresh],
+  )
+
   const saveMorning = useCallback(
     async (energy: number, intention: string, discipline: string) => {
       const date = todayKey()
@@ -215,12 +293,11 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
         loggedAt: new Date().toISOString(),
       }
       await addMorningLog(entry)
-      let g = await getGamification()
-      g = addXp(g, xpForMorning())
-      await putGamification(g)
+      const g = resetQuestsIfNewDay(await getGamification(), date)
+      await applyGamificationXp(g, xpForMorning(), 'Dawn protocol sealed — +40 XP')
       await refresh()
     },
-    [refresh],
+    [applyGamificationXp, refresh],
   )
 
   const saveReflection = useCallback(
@@ -239,13 +316,13 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       await persistLog(
         { mind: r.mind, body: r.body, spirit: r.spirit, notes: journal },
         'reflect',
+        { silent: true },
       )
-      let g = await getGamification()
-      g = addXp(g, xpForReflection())
-      await putGamification(g)
+      const g = await getGamification()
+      await applyGamificationXp(g, xpForReflection(), 'Shadow archive sealed — +50 XP')
       await refresh()
     },
-    [persistLog, refresh],
+    [applyGamificationXp, persistLog, refresh],
   )
 
   const addGoal = useCallback(
@@ -264,14 +341,24 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     [refresh],
   )
 
-  const updateGoalProgress = useCallback(
-    async (id: string, progress: number) => {
+  const updateGoal = useCallback(
+    async (
+      id: string,
+      patch: Partial<Pick<Goal, 'title' | 'category' | 'target' | 'progress'>>,
+    ) => {
       const goal = goals.find((g) => g.id === id)
       if (!goal) return
-      await putGoal({ ...goal, progress: Math.min(100, Math.max(0, progress)) })
+      await putGoal({ ...goal, ...patch })
       await refresh()
     },
     [goals, refresh],
+  )
+
+  const updateGoalProgress = useCallback(
+    async (id: string, progress: number) => {
+      await updateGoal(id, { progress: Math.min(100, Math.max(0, progress)) })
+    },
+    [updateGoal],
   )
 
   const removeGoal = useCallback(
@@ -292,37 +379,45 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     [refresh, settings],
   )
 
+  const saveWhisper = useCallback(
+    async (text: string) => {
+      const current = (await getSettings()) ?? settings!
+      const history = [text, ...(current.whisperHistory ?? [])].slice(0, 12)
+      await putSettings({ ...current, whisperHistory: history })
+      await refresh()
+    },
+    [refresh, settings],
+  )
+
   const exportData = useCallback(async () => {
-    try {
-      const data = await exportAllData()
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `kage-export-${todayKey()}.json`
-      a.click()
-      URL.revokeObjectURL(url)
-    } catch (err) {
-      throw err instanceof Error ? err : new Error('Export failed')
-    }
+    const data = await exportAllData()
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `kage-export-${todayKey()}.json`
+    a.click()
+    URL.revokeObjectURL(url)
   }, [])
 
   const importData = useCallback(
     async (file: File) => {
-      try {
-        const text = await file.text()
-        const payload = JSON.parse(text) as Awaited<ReturnType<typeof exportAllData>>
-        if (!payload?.dailyLogs || !Array.isArray(payload.dailyLogs)) {
-          throw new Error('Invalid KAGE backup file')
-        }
-        await importAllData(payload)
-        await refresh()
-      } catch (err) {
-        throw err instanceof Error ? err : new Error('Import failed')
+      const text = await file.text()
+      const payload = JSON.parse(text) as Awaited<ReturnType<typeof exportAllData>>
+      if (!payload?.dailyLogs || !Array.isArray(payload.dailyLogs)) {
+        throw new Error('Invalid KAGE backup file')
       }
+      await importAllData(payload)
+      await refresh()
     },
     [refresh],
   )
+
+  const resetDemoData = useCallback(async () => {
+    await clearAllData()
+    await refresh()
+    pushCelebration('Demo data reset — your shadow slate is clean.', 'info')
+  }, [pushCelebration, refresh])
 
   if (loading) {
     return <LoadingScreen />
@@ -398,16 +493,25 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     morningToday,
     reflectionToday,
     quests,
+    celebration,
+    clearCelebration,
+    pendingVoiceNote,
+    setPendingVoiceNote,
     logRating,
     quickBump,
+    saveTodayShadow,
+    claimQuest,
     saveMorning,
     saveReflection,
     addGoal,
+    updateGoal,
     updateGoalProgress,
     removeGoal,
     updateSettings,
+    saveWhisper,
     exportData,
     importData,
+    resetDemoData,
     refresh,
   }
 

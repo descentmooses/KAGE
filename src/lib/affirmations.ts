@@ -9,6 +9,8 @@ export interface AffirmationContext {
   core: number
   streak: number
   history: PillarHistory
+  /** Random seed for “new whisper” draws. */
+  nonce?: number
 }
 
 type TimeOfDay = 'morning' | 'afternoon' | 'evening' | 'night'
@@ -133,8 +135,8 @@ function averageToday(ctx: AffirmationContext): number {
 export function pickAffirmation(ctx: AffirmationContext): string {
   const pools = ctx.elara ? ELARA_WHISPERS : GENERAL_AFFIRMATIONS
   const time = getTimeOfDay()
-  const daySeed = new Date().getDate() + new Date().getMonth() * 31
-  const hourSeed = daySeed + new Date().getHours()
+  const daySeed = new Date().getDate() + new Date().getMonth() * 31 + (ctx.nonce ?? 0)
+  const hourSeed = daySeed + new Date().getHours() + (ctx.nonce ?? 0)
   const avg = averageToday(ctx)
 
   if (ctx.history.steadyPillar && ctx.history.longDays && hourSeed % 3 === 0) {

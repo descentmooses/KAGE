@@ -39,6 +39,18 @@ export function buildTrend(logs: DailyLog[], days = 7): TrendPoint[] {
   })
 }
 
+/** Period-aware trend windows: Day = 3-day zoom, Week = 7, Month = 30. */
+export function buildTrendForPeriod(logs: DailyLog[], period: Period): TrendPoint[] {
+  const days = period === 'monthly' ? 30 : period === 'weekly' ? 7 : 3
+  return buildTrend(logs, days)
+}
+
+export function trendTitleForPeriod(period: Period): string {
+  if (period === 'monthly') return '30-day shadow trend'
+  if (period === 'weekly') return '7-day shadow trend'
+  return '3-day shadow trend'
+}
+
 export function filterLogsByPeriod(logs: DailyLog[], period: Period): DailyLog[] {
   const today = new Date().toISOString().slice(0, 10)
   if (period === 'daily') {

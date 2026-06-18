@@ -9,6 +9,7 @@ import {
 import { useTheme } from '../../theme/useTheme'
 import { useTracker } from '../../context/trackerContext'
 import type { Period } from '../../types'
+import { trendTitleForPeriod } from '../../lib/insights'
 
 const PERIODS: { id: Period; label: string }[] = [
   { id: 'daily', label: 'Day' },
@@ -55,7 +56,7 @@ export function ProgressChart() {
             color: tokens.textMuted,
           }}
         >
-          7-day shadow trend
+          {trendTitleForPeriod(period)}
         </p>
         <div style={{ display: 'flex', gap: 6 }}>
           {PERIODS.map((p) => (

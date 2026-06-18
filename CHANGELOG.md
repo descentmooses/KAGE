@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.5.1] — 2026-06-18
+
+### Functional core — persistence, loop, quests, goals, Elara
+
+- Fixed streak bug (first log of day now correctly increments streak)
+- Quest day-boundary reset on refresh; tap-to-claim quests with XP toasts
+- Level-up and rank-up celebration toasts
+- Shadow log form with sliders + “Save Today’s Shadow” (parked section)
+- Voice capture routes to shadow note field via `pendingVoiceNote`
+- Period-aware trend chart (3 / 7 / 30 days)
+- Goals: add/edit/delete modal, target field, grouped by pillar
+- Elara “New whisper” button + whisper history in settings
+- Settings gear panel: theme, export, reset demo data
+- First-time onboarding hint; `clearAllData()` for demo reset
+
 ## [0.5.0] — 2026-06-18
 
 ### Irreplaceable companion polish
