@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import {
   Line,
   LineChart,
@@ -8,8 +9,8 @@ import {
 } from 'recharts'
 import { useTheme } from '../../theme/useTheme'
 import { useTracker } from '../../context/trackerContext'
+import { buildTrendForPeriod, trendTitleForPeriod } from '../../lib/insights'
 import type { Period } from '../../types'
-import { trendTitleForPeriod } from '../../lib/insights'
 
 const PERIODS: { id: Period; label: string }[] = [
   { id: 'daily', label: 'Day' },
@@ -19,12 +20,18 @@ const PERIODS: { id: Period; label: string }[] = [
 
 export function ProgressChart() {
   const { tokens } = useTheme()
-  const { trend, period, setPeriod } = useTracker()
+  const { allLogs, period, setPeriod } = useTracker()
 
-  const chartData = trend.map((p) => ({
-    ...p,
-    label: p.label,
-  }))
+  const chartData = useMemo(() => {
+    return buildTrendForPeriod(allLogs, period).map((p) => ({
+      ...p,
+      // Core is stored 0–100; pillars are 1–10 — normalize for one axis
+      coreDisplay: Math.round(p.core / 10),
+    }))
+  }, [allLogs, period])
+
+  const chartHeight = period === 'monthly' ? 200 : 180
+  const xInterval = period === 'monthly' ? 4 : period === 'weekly' ? 0 : 0
 
   return (
     <div
@@ -58,12 +65,13 @@ export function ProgressChart() {
         >
           {trendTitleForPeriod(period)}
         </p>
-        <div style={{ display: 'flex', gap: 6 }}>
+        <div style={{ display: 'flex', gap: 6 }} role="group" aria-label="Chart time range">
           {PERIODS.map((p) => (
             <button
               key={p.id}
               type="button"
               onClick={() => setPeriod(p.id)}
+              aria-pressed={period === p.id}
               className="kage-touch-target"
               style={{
                 fontSize: 9,
@@ -84,14 +92,22 @@ export function ProgressChart() {
         </div>
       </div>
 
-      <div style={{ width: '100%', height: 180 }} aria-label="7-day trend chart">
+      <div
+        style={{ width: '100%', height: chartHeight }}
+        aria-label={`${trendTitleForPeriod(period)} chart`}
+      >
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={{ top: 4, right: 4, left: -24, bottom: 0 }}>
+          <LineChart
+            key={period}
+            data={chartData}
+            margin={{ top: 4, right: 4, left: -24, bottom: 0 }}
+          >
             <XAxis
               dataKey="label"
-              tick={{ fill: tokens.textMuted, fontSize: 10 }}
+              tick={{ fill: tokens.textMuted, fontSize: period === 'monthly' ? 8 : 10 }}
               axisLine={false}
               tickLine={false}
+              interval={xInterval}
             />
             <YAxis
               domain={[0, 10]}
@@ -115,37 +131,41 @@ export function ProgressChart() {
               dataKey="mind"
               stroke={tokens.crimson}
               strokeWidth={2}
-              dot={false}
+              dot={period === 'daily'}
               name="Mind"
-              animationDuration={600}
+              isAnimationActive
+              animationDuration={400}
             />
             <Line
               type="monotone"
               dataKey="body"
               stroke={tokens.ember}
               strokeWidth={2}
-              dot={false}
+              dot={period === 'daily'}
               name="Body"
-              animationDuration={700}
+              isAnimationActive
+              animationDuration={500}
             />
             <Line
               type="monotone"
               dataKey="spirit"
               stroke={tokens.chartSpirit}
               strokeWidth={2}
-              dot={false}
+              dot={period === 'daily'}
               name="Spirit"
-              animationDuration={800}
+              isAnimationActive
+              animationDuration={600}
             />
             <Line
               type="monotone"
-              dataKey="core"
+              dataKey="coreDisplay"
               stroke={tokens.chartCore}
               strokeWidth={1}
               strokeDasharray="4 4"
               dot={false}
               name="Core"
-              animationDuration={500}
+              isAnimationActive
+              animationDuration={350}
             />
           </LineChart>
         </ResponsiveContainer>
