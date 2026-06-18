@@ -31,6 +31,14 @@
         var root=b.replace(/\/?$/,'/');
         if(stored&&stored!==v){
           localStorage.setItem(K,v);
+          if('serviceWorker'in navigator){
+            navigator.serviceWorker.getRegistrations().then(function(r){
+              r.forEach(function(x){x.unregister()});
+            });
+          }
+          if('caches'in window){
+            caches.keys().then(function(keys){keys.forEach(function(n){caches.delete(n)})});
+          }
           location.replace(root+'?bust='+v);
           return;
         }
@@ -48,12 +56,13 @@
   </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0a0a0a" />
-    <meta name="description" content="Kage — retro minimalist cyberpunk samurai" />
+    <meta name="theme-color" content="#050505" />
+    <meta name="description" content="KAGE — shadow mastery tracker for mind, body, and spirit" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Kage" />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

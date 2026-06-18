@@ -66,8 +66,8 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
                     top: 0,
                     width: 48,
                     height: 2,
-                    background: `linear-gradient(90deg, ${tokens.cyan}, ${tokens.magenta})`,
-                    boxShadow: mode === 'dark' ? 'none' : `0 0 8px ${tokens.cyan}`,
+                    background: `linear-gradient(90deg, ${tokens.crimson}, ${tokens.ember})`,
+                    boxShadow: mode === 'dark' ? 'none' : `0 0 8px ${tokens.crimson}`,
                     transition: 'background 0.35s ease',
                   }}
                 />
@@ -76,8 +76,8 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
                 style={{
                   fontFamily: '"Noto Sans JP", sans-serif',
                   fontSize: 18,
-                  color: active ? tokens.cyan : tokens.textSubtle,
-                  textShadow: active ? `0 0 12px ${tokens.cyanGlow}` : 'none',
+                  color: active ? tokens.crimson : tokens.textSubtle,
+                  textShadow: 'none',
                   transition: 'color 0.2s ease, text-shadow 0.2s ease',
                 }}
               >

@@ -46,6 +46,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (mode === 'light') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sync visual effect layer to theme mode
       setShowDarkEffects(false)
       return
     }

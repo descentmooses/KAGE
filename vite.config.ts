@@ -1,6 +1,7 @@
 import { defineConfig, type Plugin, type ViteDevServer } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import { VitePWA } from 'vite-plugin-pwa'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 
 // GitHub Pages project site — always build with /KAGE/ base for production
@@ -77,7 +78,60 @@ function cacheBustPlugin(): Plugin {
 
 export default defineConfig({
   base,
-  plugins: [react(), tailwindcss(), cacheBustPlugin(), cacheBustMetaPlugin(), cacheBustAssetsPlugin()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    cacheBustPlugin(),
+    cacheBustMetaPlugin(),
+    cacheBustAssetsPlugin(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['favicon.svg', 'icons/icon-192.png', 'icons/icon-512.png'],
+      manifest: {
+        name: 'KAGE — Shadow Mastery',
+        short_name: 'KAGE',
+        description: 'Personal shadow mastery tracker for mind, body, and spirit.',
+        theme_color: '#050505',
+        background_color: '#050505',
+        display: 'standalone',
+        orientation: 'portrait',
+        start_url: base,
+        scope: base,
+        icons: [
+          {
+            src: `${base}icons/icon-192.png`,
+            sizes: '192x192',
+            type: 'image/png',
+          },
+          {
+            src: `${base}icons/icon-512.png`,
+            sizes: '512x512',
+            type: 'image/png',
+          },
+          {
+            src: `${base}icons/icon-512.png`,
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
+        ],
+      },
+      workbox: {
+        navigateFallback: `${base}index.html`,
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,json,woff2}'],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'google-fonts-cache',
+              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
+            },
+          },
+        ],
+      },
+    }),
+  ],
   build: {
     rollupOptions: {
       output: {

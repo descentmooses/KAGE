@@ -2,7 +2,7 @@ import type { CSSProperties, ReactNode } from 'react'
 
 /** Neon gradient fill without glow layers (avoids background-clip/filter on the same element). */
 export const NEON_CORE_GRADIENT =
-  'linear-gradient(155deg, #00f9ff 0%, #eef0f8 40%, #ff00aa 100%)'
+  'linear-gradient(155deg, #c41e3a 0%, #f0e6e8 42%, #8b1a2d 100%)'
 
 interface NeonGlowTextProps {
   children: ReactNode

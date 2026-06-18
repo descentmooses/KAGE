@@ -10,7 +10,7 @@ interface NeonBarProps {
 export function NeonBar({ area, value, onTap }: NeonBarProps) {
   const { tokens, mode } = useTheme()
   const fillPercent = (value / 10) * 100
-  const accentColor = area.color === 'magenta' ? tokens.magenta : tokens.cyan
+  const accentColor = area.color === 'ember' ? tokens.ember : tokens.crimson
   const fillGlow =
     mode === 'dark'
       ? 'none'

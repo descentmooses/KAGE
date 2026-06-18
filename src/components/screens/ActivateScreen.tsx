@@ -3,30 +3,28 @@ import { TabScreen, ConfirmBanner } from '../TabScreen'
 import { SegmentedControl } from '../ui/SegmentedControl'
 import { NeonInput } from '../ui/NeonInput'
 import { NeonButton } from '../ui/NeonButton'
-import { useMorningLog, useConfirmMessage } from '../../hooks/useMorningLog'
+import { useTracker } from '../../context/trackerContext'
+import { useConfirmMessage } from '../../hooks/useMorningLog'
+import type { MorningLogEntry } from '../../types'
 
-export function ActivateScreen() {
-  const { saveMorning } = useMorningLog()
+function ActivateForm({ initial }: { initial: MorningLogEntry | null }) {
+  const { saveMorning } = useTracker()
   const { message, show } = useConfirmMessage()
-  const [energy, setEnergy] = useState(7)
-  const [intention, setIntention] = useState('')
-  const [discipline, setDiscipline] = useState('')
+  const [energy, setEnergy] = useState(initial?.energy ?? 7)
+  const [intention, setIntention] = useState(initial?.intention ?? '')
+  const [discipline, setDiscipline] = useState(initial?.discipline ?? '')
 
   const handleLog = () => {
     if (!intention.trim() || !discipline.trim()) {
       show('Enter your intention and discipline to continue.')
       return
     }
-    saveMorning(energy, intention, discipline)
-    show('Morning logged — protocol engaged.')
+    void saveMorning(energy, intention, discipline)
+    show('Morning logged — protocol engaged. +40 XP')
   }
 
   return (
-    <TabScreen
-      kanji="活"
-      title="Morning Activation"
-      subtitle="覚醒 — set your signal for the day"
-    >
+    <>
       {message && <ConfirmBanner message={message} />}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -36,18 +34,32 @@ export function ActivateScreen() {
           label="One Intention for Today"
           value={intention}
           onChange={setIntention}
-          placeholder="What matters most today?"
+          placeholder="Wealth move, patent step, recovery block…"
         />
 
         <NeonInput
           label="One Small Discipline"
           value={discipline}
           onChange={setDiscipline}
-          placeholder="A tiny action you will not skip"
+          placeholder="Gym, macros log, family call…"
         />
 
         <NeonButton onClick={handleLog}>LOG MORNING</NeonButton>
       </div>
+    </>
+  )
+}
+
+export function ActivateScreen() {
+  const { morningToday } = useTracker()
+
+  return (
+    <TabScreen
+      kanji="活"
+      title="Morning Activation"
+      subtitle="覚醒 — set your signal for the day"
+    >
+      <ActivateForm key={morningToday?.id ?? 'new'} initial={morningToday} />
     </TabScreen>
   )
 }

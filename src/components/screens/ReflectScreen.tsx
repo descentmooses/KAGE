@@ -4,24 +4,19 @@ import { NeonBar } from '../NeonBar'
 import { RatingModal } from '../RatingModal'
 import { NeonInput } from '../ui/NeonInput'
 import { NeonButton } from '../ui/NeonButton'
-import { useReflectionLog } from '../../hooks/useReflectionLog'
+import { useTracker } from '../../context/trackerContext'
 import { useTheme } from '../../theme/useTheme'
-import type { AreaConfig, AreaId } from '../../types'
+import type { AreaConfig, AreaId, ReflectionEntry } from '../../types'
+import { AREA_CONFIGS } from '../../types'
 
-const AREAS: AreaConfig[] = [
-  { id: 'mind', label: 'Mind', kanji: '心', color: 'cyan' },
-  { id: 'body', label: 'Body', kanji: '体', color: 'magenta' },
-  { id: 'spirit', label: 'Spirit', kanji: '魂', color: 'cyan' },
-]
-
-export function ReflectScreen() {
+function ReflectForm({ initial }: { initial: ReflectionEntry | null }) {
   const { tokens } = useTheme()
-  const { saveReflection } = useReflectionLog()
+  const { saveReflection } = useTracker()
   const [saved, setSaved] = useState(false)
-  const [mind, setMind] = useState(7)
-  const [body, setBody] = useState(7)
-  const [spirit, setSpirit] = useState(7)
-  const [journal, setJournal] = useState('')
+  const [mind, setMind] = useState(initial?.mind ?? 7)
+  const [body, setBody] = useState(initial?.body ?? 7)
+  const [spirit, setSpirit] = useState(initial?.spirit ?? 7)
+  const [journal, setJournal] = useState(initial?.journal ?? '')
   const [activeArea, setActiveArea] = useState<AreaConfig | null>(null)
 
   const ratings = { mind, body, spirit }
@@ -35,54 +30,50 @@ export function ReflectScreen() {
   }
 
   const handleLog = () => {
-    saveReflection({ mind, body, spirit }, journal)
+    void saveReflection({ mind, body, spirit }, journal)
     setSaved(true)
     setTimeout(() => setSaved(false), 3000)
   }
 
   return (
     <>
-      <TabScreen
-        kanji="省"
-        title="Evening Reflection"
-        subtitle="内省 — review the shadow you cast today"
-      >
-        {saved && <ConfirmBanner message="Reflection logged. Archive updated." />}
+      {saved && (
+        <ConfirmBanner message="Reflection logged. Archive updated. Pillars synced to home." />
+      )}
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-          <p
-            style={{
-              fontFamily: '"Share Tech Mono", monospace',
-              fontSize: 9,
-              letterSpacing: '0.3em',
-              textTransform: 'uppercase',
-              margin: 0,
-              color: tokens.textMuted,
-            }}
-          >
-            How did you do today?
-          </p>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <p
+          style={{
+            fontFamily: '"Share Tech Mono", monospace',
+            fontSize: 9,
+            letterSpacing: '0.3em',
+            textTransform: 'uppercase',
+            margin: 0,
+            color: tokens.textMuted,
+          }}
+        >
+          How did you do today?
+        </p>
 
-          {AREAS.map((area) => (
-            <NeonBar
-              key={area.id}
-              area={area}
-              value={ratings[area.id as AreaId]}
-              onTap={() => setActiveArea(area)}
-            />
-          ))}
-
-          <NeonInput
-            label="What did you learn or overcome today?"
-            value={journal}
-            onChange={setJournal}
-            placeholder="A line or two in the shadow log..."
-            multiline
+        {AREA_CONFIGS.map((area) => (
+          <NeonBar
+            key={area.id}
+            area={area}
+            value={ratings[area.id as AreaId]}
+            onTap={() => setActiveArea(area)}
           />
+        ))}
 
-          <NeonButton onClick={handleLog}>LOG REFLECTION</NeonButton>
-        </div>
-      </TabScreen>
+        <NeonInput
+          label="What did you learn or overcome today?"
+          value={journal}
+          onChange={setJournal}
+          placeholder="A line or two in the shadow log..."
+          multiline
+        />
+
+        <NeonButton onClick={handleLog}>LOG REFLECTION</NeonButton>
+      </div>
 
       <RatingModal
         area={activeArea}
@@ -91,5 +82,19 @@ export function ReflectScreen() {
         onSave={handleSaveRating}
       />
     </>
+  )
+}
+
+export function ReflectScreen() {
+  const { reflectionToday } = useTracker()
+
+  return (
+    <TabScreen
+      kanji="省"
+      title="Evening Reflection"
+      subtitle="内省 — review the shadow you cast today"
+    >
+      <ReflectForm key={reflectionToday?.id ?? 'new'} initial={reflectionToday} />
+    </TabScreen>
   )
 }

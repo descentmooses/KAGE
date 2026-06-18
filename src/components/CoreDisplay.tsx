@@ -3,9 +3,10 @@ import { useTheme } from '../theme/useTheme'
 
 interface CoreDisplayProps {
   value: number
+  pulse?: boolean
 }
 
-export function CoreDisplay({ value }: CoreDisplayProps) {
+export function CoreDisplay({ value, pulse }: CoreDisplayProps) {
   const { tokens } = useTheme()
 
   return (
@@ -25,7 +26,7 @@ export function CoreDisplay({ value }: CoreDisplayProps) {
       </p>
 
       <div
-        className="animate-core-breathe"
+        className={pulse ? 'animate-core-breathe animate-score-pulse' : 'animate-core-breathe'}
         style={{
           position: 'relative',
           display: 'inline-block',

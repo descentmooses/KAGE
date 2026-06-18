@@ -3,23 +3,23 @@ import { AppHeader } from './components/AppHeader'
 import { HomeScreen } from './components/HomeScreen'
 import { CRTOverlay } from './components/CRTOverlay'
 import { BottomNav } from './components/BottomNav'
+import { InstallPrompt } from './components/InstallPrompt'
 import { ActivateScreen } from './components/screens/ActivateScreen'
 import { ReflectScreen } from './components/screens/ReflectScreen'
 import { CodexScreen } from './components/screens/CodexScreen'
-import { useRatings } from './hooks/useRatings'
+import { TrackerProvider } from './context/TrackerProvider'
 import { useTheme } from './theme/useTheme'
 import { THEME_TRANSITION } from './theme/transitions'
 import type { TabId } from './types'
 
-function App() {
+function AppShell() {
   const [activeTab, setActiveTab] = useState<TabId>('home')
-  const { ratings, logRating } = useRatings()
   const { tokens } = useTheme()
 
   const renderScreen = () => {
     switch (activeTab) {
       case 'home':
-        return <HomeScreen ratings={ratings} onLogRating={logRating} />
+        return <HomeScreen />
       case 'activate':
         return <ActivateScreen />
       case 'reflect':
@@ -27,7 +27,7 @@ function App() {
       case 'codex':
         return <CodexScreen />
       default:
-        return <HomeScreen ratings={ratings} onLogRating={logRating} />
+        return <HomeScreen />
     }
   }
 
@@ -55,7 +55,16 @@ function App() {
       </div>
 
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
+      <InstallPrompt />
     </div>
+  )
+}
+
+function App() {
+  return (
+    <TrackerProvider>
+      <AppShell />
+    </TrackerProvider>
   )
 }
 
