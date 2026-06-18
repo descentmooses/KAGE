@@ -111,12 +111,12 @@ export const darkTokens: ThemeTokens = {
 }
 
 export const lightTokens: ThemeTokens = {
-  bg: '#f5f2ed',
+  bg: '#ffffff',
   text: '#1c1c24',
   textMuted: '#6a6878',
   textSubtle: 'rgba(28,28,36,0.45)',
-  surface: 'rgba(255,255,255,0.92)',
-  surfaceElevated: 'rgba(255,255,255,0.97)',
+  surface: '#ffffff',
+  surfaceElevated: '#ffffff',
   border: 'rgba(28,28,36,0.1)',
   borderAccent: 'rgba(0,152,168,0.25)',
   cyan: '#0098a8',

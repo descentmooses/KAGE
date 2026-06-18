@@ -18,21 +18,22 @@ export function KageHeroLogo() {
         padding: '0 20px',
       }}
     >
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          width: 'min(95vw, 480px)',
-          height: 'min(95vw, 480px)',
-          background: isLight
-            ? 'radial-gradient(circle, rgba(0,0,0,0.06) 0%, transparent 70%)'
-            : 'radial-gradient(circle, rgba(0,249,255,0.35) 0%, rgba(255,0,170,0.2) 35%, transparent 70%)',
-          opacity: isLight ? 1 : 0.5,
-          filter: 'blur(48px)',
-          pointerEvents: 'none',
-          transform: 'scale(1.6)',
-        }}
-      />
+      {!isLight && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            width: 'min(95vw, 480px)',
+            height: 'min(95vw, 480px)',
+            background:
+              'radial-gradient(circle, rgba(0,249,255,0.35) 0%, rgba(255,0,170,0.2) 35%, transparent 70%)',
+            opacity: 0.5,
+            filter: 'blur(48px)',
+            pointerEvents: 'none',
+            transform: 'scale(1.6)',
+          }}
+        />
+      )}
 
       {!isLight && (
         <div
