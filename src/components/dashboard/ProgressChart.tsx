@@ -93,10 +93,15 @@ export function ProgressChart() {
       </div>
 
       <div
-        style={{ width: '100%', height: chartHeight }}
+        style={{
+          width: '100%',
+          height: chartHeight,
+          minHeight: chartHeight,
+          position: 'relative',
+        }}
         aria-label={`${trendTitleForPeriod(period)} chart`}
       >
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height={chartHeight} minWidth={0}>
           <LineChart
             key={period}
             data={chartData}

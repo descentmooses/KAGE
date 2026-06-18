@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.2] — 2026-06-18
+
+### Home hero & chart
+
+- Restored full-viewport `KageHeroLogo` hero — dashboard content appears only after scroll
+- Moved trend chart out of collapsed section so Recharts renders reliably
+- Explicit chart dimensions for ResponsiveContainer
+
 ## [0.5.1] — 2026-06-18
 
 ### Functional core — persistence, loop, quests, goals, Elara

@@ -1,10 +1,11 @@
 import { useState, useCallback } from 'react'
+import { KageHeroLogo } from './KageHeroLogo'
+import { CoreDisplay } from './CoreDisplay'
 import { NeonBar } from './NeonBar'
 import { RatingModal } from './RatingModal'
 import { useTheme } from '../theme/useTheme'
 import { useTracker } from '../context/trackerContext'
 import { AffirmationBanner } from './dashboard/AffirmationBanner'
-import { HomeHeader } from './dashboard/HomeHeader'
 import { OnboardingHint } from './dashboard/OnboardingHint'
 import { RankBadge } from './dashboard/RankBadge'
 import { QuickLogPanel, CompactPillars } from './dashboard/QuickLogPanel'
@@ -16,9 +17,13 @@ import { ShadowParticles } from './ShadowParticles'
 import { CollapsibleSection } from './ui/CollapsibleSection'
 import { AREA_CONFIGS, type AreaConfig } from '../types'
 
+/** Viewport minus app header + bottom nav (scroll content lives below hero). */
+const HERO_MIN_HEIGHT =
+  'calc(100dvh - 48px - 64px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))'
+
 export function HomeScreen() {
   const { tokens } = useTheme()
-  const { ratings, core, logRating, gamification } = useTracker()
+  const { ratings, core, logRating } = useTracker()
   const [activeArea, setActiveArea] = useState<AreaConfig | null>(null)
 
   const highScore = core >= 85
@@ -51,17 +56,54 @@ export function HomeScreen() {
 
         <section
           style={{
-            padding: '12px 20px 56px',
+            position: 'relative',
+            minHeight: HERO_MIN_HEIGHT,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            backgroundColor: tokens.surface,
+          }}
+        >
+          <KageHeroLogo />
+          <p
+            aria-hidden
+            style={{
+              position: 'absolute',
+              bottom: 20,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              margin: 0,
+              fontFamily: '"Share Tech Mono", monospace',
+              fontSize: 9,
+              letterSpacing: '0.35em',
+              textTransform: 'uppercase',
+              color: tokens.textSubtle,
+              opacity: 0.85,
+            }}
+          >
+            Scroll ↓
+          </p>
+        </section>
+
+        <section
+          style={{
+            padding: '28px 20px 56px',
             maxWidth: 400,
             margin: '0 auto',
             width: '100%',
           }}
         >
-          <HomeHeader core={core} streak={gamification.currentStreak} />
           <OnboardingHint />
           <AffirmationBanner />
+          <CoreDisplay value={core} pulse={highScore} />
+          <RankBadge />
+
           <QuickLogPanel onVoiceNote={onVoiceNote} onAdjust={openAdjust} />
           <CompactPillars onAdjust={openAdjust} />
+
+          <ProgressChart />
 
           <CollapsibleSection
             title="Parked shadow log"
@@ -73,11 +115,9 @@ export function HomeScreen() {
 
           <CollapsibleSection
             title="Deeper shadow"
-            subtitle="Rank, trends, quests, goals"
+            subtitle="Insights, quests, pillar detail, goals"
             defaultOpen={false}
           >
-            <RankBadge />
-            <ProgressChart />
             <InsightCards />
             <QuestList />
 
