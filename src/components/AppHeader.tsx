@@ -4,6 +4,7 @@ import { getBuildVersion } from '../lib/cacheBust'
 import { ConnectionDot } from './ConnectionDot'
 import { SettingsPanel } from './SettingsPanel'
 import { ElaraWhisperTrigger } from './elara/ElaraWhisperTrigger'
+import { InstallHeaderButton } from './install/InstallHeaderButton'
 import { useTracker } from '../context/trackerContext'
 import { useVoiceInput } from '../hooks/useVoiceInput'
 import { useToast } from '../hooks/useToast'
@@ -117,6 +118,8 @@ export function AppHeader() {
         )}
 
         <ElaraWhisperTrigger />
+
+        <InstallHeaderButton />
 
         <button
           type="button"

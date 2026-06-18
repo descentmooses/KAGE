@@ -101,6 +101,7 @@ export interface AppSettings {
   elaraWhispers: boolean
   voiceEnabled: boolean
   whisperHistory?: string[]
+  favoriteWhispers?: string[]
   hasOnboarded?: boolean
   whatsNewSeen?: string
 }

@@ -68,6 +68,7 @@ export interface TrackerContextValue {
   removeGoal: (id: string) => Promise<void>
   updateSettings: (patch: Partial<AppSettings>) => Promise<void>
   saveWhisper: (text: string) => Promise<void>
+  toggleFavoriteWhisper: (text: string) => Promise<void>
   exportData: () => Promise<void>
   importData: (file: File) => Promise<void>
   resetDemoData: () => Promise<void>

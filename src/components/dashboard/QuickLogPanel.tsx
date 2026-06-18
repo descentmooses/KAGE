@@ -5,6 +5,14 @@ import { useSwipeGesture } from '../../hooks/useSwipeGesture'
 import type { AreaConfig, AreaId } from '../../types'
 import { AREA_CONFIGS } from '../../types'
 
+function tapHaptic(pattern: number | number[] = 12) {
+  try {
+    navigator.vibrate?.(pattern)
+  } catch {
+    /* unsupported */
+  }
+}
+
 const QUICK_TAGS: { id: AreaId; label: string; kanji: string }[] = [
   { id: 'mind', label: 'Mind', kanji: '心' },
   { id: 'body', label: 'Body', kanji: '体' },
@@ -105,6 +113,7 @@ export function QuickLogPanel({ onAdjust }: QuickLogPanelProps) {
 
   const handleBump = (id: AreaId) => {
     setPressedId(id)
+    tapHaptic(10)
     void quickBump(id)
     setTimeout(() => setPressedId(null), 220)
   }
@@ -113,6 +122,7 @@ export function QuickLogPanel({ onAdjust }: QuickLogPanelProps) {
     const next = Math.min(10, Math.max(ratings[id], 7))
     setSwipeState({ id, dx: 28 })
     setPressedId(id)
+    tapHaptic([8, 24, 12])
     void logRating(id, next, 'quick')
     setTimeout(() => {
       setPressedId(null)
@@ -129,6 +139,7 @@ export function QuickLogPanel({ onAdjust }: QuickLogPanelProps) {
   const handleTag = (id: AreaId) => {
     setActiveTag(id)
     setPressedId(id)
+    tapHaptic(14)
     void logRating(id, ratings[id], 'quick')
     setTimeout(() => {
       setPressedId(null)

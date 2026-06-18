@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTheme } from '../theme/useTheme'
 import { useTracker } from '../context/trackerContext'
 import { ThemeToggle } from './ThemeToggle'
+import { useInstallPromptContext } from '../context/installPromptContext'
 
 interface SettingsPanelProps {
   open: boolean
@@ -11,6 +12,7 @@ interface SettingsPanelProps {
 export function SettingsPanel({ open, onClose }: SettingsPanelProps) {
   const { tokens } = useTheme()
   const { exportData, resetDemoData } = useTracker()
+  const { isStandalone, canInstall, openInstallInvite } = useInstallPromptContext()
   const [confirmReset, setConfirmReset] = useState(false)
 
   if (!open) return null
@@ -84,6 +86,27 @@ export function SettingsPanel({ open, onClose }: SettingsPanelProps) {
           <span style={{ fontSize: 13, color: tokens.text }}>Theme</span>
           <ThemeToggle />
         </div>
+
+        {!isStandalone && canInstall && (
+          <button
+            type="button"
+            onClick={openInstallInvite}
+            className="kage-touch-target"
+            style={{
+              width: '100%',
+              minHeight: 48,
+              marginBottom: 8,
+              borderRadius: 8,
+              border: `1px solid ${tokens.borderAccent}`,
+              background: tokens.bannerBg,
+              color: tokens.crimson,
+              fontSize: 12,
+              cursor: 'pointer',
+            }}
+          >
+            Install KAGE on home screen
+          </button>
+        )}
 
         <button
           type="button"

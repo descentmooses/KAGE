@@ -21,6 +21,7 @@ export function ElaraWhispersModal({ open, onClose }: ElaraWhispersModalProps) {
     morningToday,
     reflectionToday,
     saveWhisper,
+    toggleFavoriteWhisper,
   } = useTracker()
   const [nonce, setNonce] = useState(0)
 
@@ -54,6 +55,7 @@ export function ElaraWhispersModal({ open, onClose }: ElaraWhispersModalProps) {
   const primary = useMemo(() => pickAffirmation(ctx), [ctx])
   const companion = useMemo(() => pickCompanionWhisper(ctx, primary), [ctx, primary])
   const chips = useMemo(() => contextChips(ctx), [ctx])
+  const isFavorited = settings.favoriteWhispers?.includes(primary) ?? false
 
   if (!open || !settings.elaraWhispers) return null
 
@@ -170,6 +172,27 @@ export function ElaraWhispersModal({ open, onClose }: ElaraWhispersModalProps) {
           ))}
         </div>
 
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
+          <button
+            type="button"
+            onClick={() => void toggleFavoriteWhisper(primary)}
+            className="kage-touch-target"
+            aria-label={isFavorited ? 'Unfavorite whisper' : 'Favorite whisper'}
+            style={{
+              minHeight: 44,
+              padding: '0 16px',
+              borderRadius: 999,
+              border: `1px solid ${isFavorited ? tokens.gold : tokens.border}`,
+              background: isFavorited ? tokens.bannerBg : 'transparent',
+              color: isFavorited ? tokens.gold : tokens.textMuted,
+              fontSize: 11,
+              cursor: 'pointer',
+            }}
+          >
+            {isFavorited ? '★ Favored' : '☆ Keep close'}
+          </button>
+        </div>
+
         <p
           key={primary}
           className="animate-fade-in"
@@ -219,6 +242,38 @@ export function ElaraWhispersModal({ open, onClose }: ElaraWhispersModalProps) {
         >
           ANOTHER WHISPER
         </button>
+
+        {(settings.favoriteWhispers?.length ?? 0) > 0 && (
+          <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${tokens.border}` }}>
+            <p
+              style={{
+                margin: '0 0 8px',
+                fontSize: 9,
+                letterSpacing: '0.2em',
+                textTransform: 'uppercase',
+                color: tokens.gold,
+                textAlign: 'center',
+              }}
+            >
+              Kept close
+            </p>
+            {settings.favoriteWhispers!.slice(0, 2).map((w) => (
+              <p
+                key={w.slice(0, 32)}
+                style={{
+                  margin: '0 0 6px',
+                  fontSize: 11,
+                  lineHeight: 1.5,
+                  color: tokens.textSubtle,
+                  fontStyle: 'italic',
+                  textAlign: 'center',
+                }}
+              >
+                “{w.length > 72 ? `${w.slice(0, 72)}…` : w}”
+              </p>
+            ))}
+          </div>
+        )}
 
         {(settings.whisperHistory?.length ?? 0) > 0 && (
           <div style={{ marginTop: 8 }}>

@@ -3,7 +3,7 @@ import { AppHeader } from './components/AppHeader'
 import { HomeScreen } from './components/HomeScreen'
 import { CRTOverlay } from './components/CRTOverlay'
 import { BottomNav } from './components/BottomNav'
-import { InstallPrompt } from './components/InstallPrompt'
+import { InstallShell } from './components/InstallShell'
 import { OnlineIndicator } from './components/OnlineIndicator'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { ActivateScreen } from './components/screens/ActivateScreen'
@@ -62,7 +62,6 @@ function AppShell() {
       </div>
 
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
-      <InstallPrompt />
     </div>
   )
 }
@@ -72,9 +71,11 @@ function App() {
     <ErrorBoundary>
       <ToastProvider>
         <TrackerProvider>
-          <ElaraProvider>
-            <AppShell />
-          </ElaraProvider>
+          <InstallShell>
+            <ElaraProvider>
+              <AppShell />
+            </ElaraProvider>
+          </InstallShell>
         </TrackerProvider>
       </ToastProvider>
     </ErrorBoundary>

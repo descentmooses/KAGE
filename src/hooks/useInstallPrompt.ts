@@ -1,17 +1,15 @@
 import { useCallback, useEffect, useState } from 'react'
+import {
+  type BeforeInstallPromptEvent,
+  canOfferInstall,
+  isIOSSafari,
+  isStandaloneMode,
+} from '../lib/pwa/installUtils'
 
-interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
-}
-
+/** Low-level install prompt capture — prefer useInstallPromptContext in UI. */
 export function useInstallPrompt() {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null)
-  const [installed, setInstalled] = useState(
-    () =>
-      typeof window !== 'undefined' &&
-      window.matchMedia('(display-mode: standalone)').matches,
-  )
+  const [installed, setInstalled] = useState(isStandaloneMode)
 
   useEffect(() => {
     const onBeforeInstall = (e: Event) => {
@@ -40,5 +38,10 @@ export function useInstallPrompt() {
     return outcome === 'accepted'
   }, [deferred])
 
-  return { canInstall: !!deferred && !installed, installed, promptInstall }
+  return {
+    canInstall: canOfferInstall(deferred) && !installed,
+    isIOS: isIOSSafari(),
+    installed,
+    promptInstall,
+  }
 }

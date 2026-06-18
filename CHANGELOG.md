@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.6.1] — 2026-06-18
+
+### PWA installability & install invitation
+
+- Hardened `vite-plugin-pwa` manifest for `/KAGE/` base: `id`, `scope`, `start_url`, maskable icon, screenshots
+- Fixed duplicate/wrong manifest link in `index.html`; enriched iOS meta tags and apple-touch-icon sizes
+- Once-per-session **Install invite** bottom sheet (Android `beforeinstallprompt` + iOS Safari steps)
+- Triggers after first shadow log or ~50s on return visits; header/settings manual install affordance
+- Quick-log haptics, Elara whisper favorites, streak/core milestone celebrations
+
 ## [0.6.0] — 2026-06-18
 
 ### Elara Whispers · Freedom Goals · Visual elevation

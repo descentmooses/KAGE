@@ -141,6 +141,7 @@ export async function getSettings(): Promise<AppSettings> {
       elaraWhispers: true,
       voiceEnabled: true,
       whisperHistory: [],
+      favoriteWhispers: [],
       hasOnboarded: false,
     }
   )
@@ -212,6 +213,7 @@ export async function clearAllData(): Promise<void> {
       elaraWhispers: true,
       voiceEnabled: true,
       whisperHistory: [],
+      favoriteWhispers: [],
       hasOnboarded: false,
     },
     'settings',

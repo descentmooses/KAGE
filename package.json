@@ -1,13 +1,14 @@
 {
   "name": "kage",
   "private": true,
-  "version": "0.6.0",
+  "version": "0.6.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "GITHUB_PAGES=true tsc -b && GITHUB_PAGES=true vite build",
     "lint": "eslint .",
-    "preview": "vite preview --base /KAGE/"
+    "preview": "vite preview --base /KAGE/",
+    "generate:pwa": "node scripts/generate-icons.mjs"
   },
   "dependencies": {
     "idb": "^8.0.3",

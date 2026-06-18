@@ -10,6 +10,13 @@ const base = process.env.GITHUB_PAGES === 'true' || process.env.NODE_ENV === 'pr
   ? '/KAGE/'
   : '/'
 
+const scope = base
+const startUrl = base
+
+function asset(path: string) {
+  return `${base}${path.replace(/^\//, '')}`
+}
+
 // Unique per build — used for cache busting on GitHub Pages
 const buildVersion = Date.now().toString()
 const appVersion = pkg.version
@@ -93,45 +100,84 @@ export default defineConfig({
     cacheBustAssetsPlugin(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'icons/icon-192.png', 'icons/icon-512.png'],
+      injectRegister: 'auto',
+      includeAssets: [
+        'favicon.svg',
+        'icons/icon-192.png',
+        'icons/icon-512.png',
+        'icons/icon-maskable-512.png',
+        'screenshots/narrow.png',
+        'screenshots/wide.png',
+      ],
       manifest: {
+        id: scope,
         name: 'KAGE — Shadow Mastery',
         short_name: 'KAGE',
-        description: 'Personal shadow mastery tracker for mind, body, and spirit.',
+        description:
+          'Personal shadow mastery tracker for Mind 心, Body 体, and Spirit 魂. Offline-first discipline companion.',
         theme_color: '#050505',
         background_color: '#050505',
         display: 'standalone',
         orientation: 'portrait',
-        start_url: base,
-        scope: base,
+        start_url: startUrl,
+        scope,
+        lang: 'en',
+        dir: 'ltr',
+        categories: ['health', 'lifestyle', 'productivity'],
         icons: [
           {
-            src: `${base}icons/icon-192.png`,
+            src: asset('icons/icon-192.png'),
             sizes: '192x192',
             type: 'image/png',
+            purpose: 'any',
           },
           {
-            src: `${base}icons/icon-512.png`,
+            src: asset('icons/icon-512.png'),
             sizes: '512x512',
             type: 'image/png',
+            purpose: 'any',
           },
           {
-            src: `${base}icons/icon-512.png`,
+            src: asset('icons/icon-maskable-512.png'),
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable',
           },
         ],
+        screenshots: [
+          {
+            src: asset('screenshots/narrow.png'),
+            sizes: '540x720',
+            type: 'image/png',
+            form_factor: 'narrow',
+            label: 'KAGE daily triad and quick log',
+          },
+          {
+            src: asset('screenshots/wide.png'),
+            sizes: '1280x720',
+            type: 'image/png',
+            form_factor: 'wide',
+            label: 'Shadow mastery dashboard',
+          },
+        ],
       },
       workbox: {
-        navigateFallback: `${base}index.html`,
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,json,woff2}'],
+        navigateFallback: asset('index.html'),
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,json,woff2,webmanifest}'],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',
             options: {
               cacheName: 'google-fonts-cache',
+              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
+            },
+          },
+          {
+            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'google-fonts-webfont',
               expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
             },
           },

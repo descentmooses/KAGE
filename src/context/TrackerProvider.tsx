@@ -50,6 +50,8 @@ import {
 } from '../lib/gamification'
 import { buildTrendForPeriod, generateInsights } from '../lib/insights'
 import { normalizeGoal, progressFromMilestones } from '../lib/goals'
+import { emitFirstShadowLog } from '../lib/pwa/installUtils'
+import { isStreakMilestone } from '../lib/affirmations'
 import { LoadingScreen } from '../components/LoadingScreen'
 import { DAILY_QUESTS, evaluateQuests, QUEST_BONUSES } from '../lib/quests'
 
@@ -192,6 +194,8 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     ) => {
       const date = todayKey()
       const existingLog = await getDailyLog(date)
+      const priorLogs = await getAllDailyLogs()
+      const wasFirstEver = priorLogs.length === 0 && !existingLog
       const log: DailyLog = {
         date,
         mind: patch.mind,
@@ -207,6 +211,12 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       let g = resetQuestsIfNewDay(await getGamification(), date)
       if (!existingLog) {
         g = updateStreak(g, date)
+        if (isStreakMilestone(g.currentStreak)) {
+          pushCelebration(`${g.currentStreak} days — the flame holds steady`, 'success')
+        }
+      }
+      if (log.core >= 85 && (!existingLog || existingLog.core < 85)) {
+        pushCelebration('Core ascendant — peak shadow state', 'success')
       }
       const xpGain = xpForDailyLog(log)
       if (!options?.silent) {
@@ -215,9 +225,10 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
         await putGamification(applyXpDelta(g, xpGain).state)
       }
       await refresh()
+      if (wasFirstEver) emitFirstShadowLog()
       return log
     },
-    [applyGamificationXp, refresh],
+    [applyGamificationXp, pushCelebration, refresh],
   )
 
   const logRating = useCallback(
@@ -444,6 +455,19 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     [refresh, settings],
   )
 
+  const toggleFavoriteWhisper = useCallback(
+    async (text: string) => {
+      const current = (await getSettings()) ?? settings!
+      const favorites = current.favoriteWhispers ?? []
+      const next = favorites.includes(text)
+        ? favorites.filter((w) => w !== text)
+        : [text, ...favorites].slice(0, 24)
+      await putSettings({ ...current, favoriteWhispers: next })
+      await refresh()
+    },
+    [refresh, settings],
+  )
+
   const exportData = useCallback(async () => {
     const data = await exportAllData()
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
@@ -565,6 +589,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     removeGoal,
     updateSettings,
     saveWhisper,
+    toggleFavoriteWhisper,
     exportData,
     importData,
     resetDemoData,
