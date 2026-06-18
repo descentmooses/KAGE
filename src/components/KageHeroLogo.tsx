@@ -2,7 +2,8 @@ import { NeonGlowText } from './NeonGlowText'
 import { useTheme } from '../theme/useTheme'
 
 export function KageHeroLogo() {
-  const { tokens } = useTheme()
+  const { tokens, mode } = useTheme()
+  const isLight = mode === 'light'
 
   return (
     <div
@@ -21,16 +22,31 @@ export function KageHeroLogo() {
         aria-hidden
         style={{
           position: 'absolute',
-          width: 'min(90vw, 420px)',
-          height: 'min(90vw, 420px)',
-          background: `radial-gradient(circle, ${tokens.cyanGlow} 0%, transparent 65%)`,
-          opacity: 0.45,
-          filter: 'blur(40px)',
+          width: 'min(95vw, 480px)',
+          height: 'min(95vw, 480px)',
+          background: `radial-gradient(circle, ${tokens.cyanGlow} 0%, ${tokens.magentaGlow} 35%, transparent 70%)`,
+          opacity: isLight ? 0.55 : 0.5,
+          filter: 'blur(48px)',
+          pointerEvents: 'none',
+        }}
+      />
+
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          width: 'min(70vw, 320px)',
+          height: 'min(28vw, 120px)',
+          bottom: '18%',
+          background: 'radial-gradient(ellipse, rgba(0,0,0,0.35) 0%, transparent 70%)',
+          opacity: isLight ? 0.25 : 0.55,
+          filter: 'blur(20px)',
           pointerEvents: 'none',
         }}
       />
 
       <NeonGlowText
+        variant="hero"
         as="p"
         style={{
           fontFamily: '"Orbitron", sans-serif',
@@ -44,6 +60,7 @@ export function KageHeroLogo() {
       </NeonGlowText>
 
       <NeonGlowText
+        variant="hero"
         as="h1"
         style={{
           fontFamily: '"Noto Sans JP", sans-serif',
