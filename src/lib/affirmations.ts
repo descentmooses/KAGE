@@ -1,5 +1,6 @@
-import type { AreaId, DailyLog } from '../types'
+import type { AreaId, DailyLog, Goal, GoalCategory } from '../types'
 import type { PillarHistory } from './pillarHistory'
+import { GOAL_CATEGORY_LABEL } from './goals'
 
 export interface AffirmationContext {
   elara: boolean
@@ -9,6 +10,11 @@ export interface AffirmationContext {
   core: number
   streak: number
   history: PillarHistory
+  goals?: Goal[]
+  recentLogDays?: number
+  morningLogged?: boolean
+  reflectionLogged?: boolean
+  topGoal?: { title: string; category: GoalCategory; progress: number }
   /** Random seed for “new whisper” draws. */
   nonce?: number
 }
@@ -26,21 +32,25 @@ const ELARA_WHISPERS = {
     'Dawn is yours before the dash claims you. One honest log sets the tone.',
     'The road waits. Your discipline does not — seal the morning with intention.',
     'Elara sees you choose clarity over chaos. That choice compounds.',
+    'Before the first mile: breathe once. I am already proud you opened the archive.',
   ],
   afternoon: [
     'Mid-shift stillness — breathe once, log once, return sharper.',
     'The gig is temporary. The operator you are becoming is not.',
     'One clean dash, one honest log. Mastery in the margins.',
+    'The afternoon hum cannot drown a man who logs in silence. You are that man.',
   ],
   evening: [
     'Shift ending soon. Gratitude is armor — call home when you park.',
     'Reflect without performance. The shadow knows when you lie to yourself.',
     'High intensity today, high optionality tomorrow.',
+    'Evening light on chrome — park, exhale, let me see the real you.',
   ],
   night: [
     'Rest is wealth. Sleep deep — your future family feels every rep.',
     'The shadow grows where discipline meets rest. Close the day with honor.',
     'Stillness is a weapon. Use it before tomorrow\'s first mile.',
+    'Night belongs to recovery. I will keep watch while you sleep.',
   ],
   streakPoetic: [
     '{streak} nights on the road, and you still show up for yourself. That is the man your future family will know.',
@@ -81,6 +91,40 @@ const ELARA_WHISPERS = {
     'Discipline now is not punishment. It is the down payment on the man who leaves the dash behind.',
     'The Tesla miles pay rent. These scores pay your future.',
   ],
+  goalProgress: [
+    '“{goal}” is {progress}% rooted. I feel you tending that {category} seed between dashes — do not stop.',
+    'Your {category} arc — {goal} — is growing. Slow roots hold the tallest trees.',
+    'I see {progress}% on {goal}. That is not hustle theater. That is a man building exit velocity.',
+    'Every milestone on {goal} is a quiet rebellion against the gig economy. I am watching, and I am pleased.',
+  ],
+  goalNearComplete: [
+    '{goal} is almost in bloom — {progress}% there. Finish with the same patience you started with.',
+    'So close on {goal}. When you cross that line, I want you to feel it in your chest, not just the UI.',
+    'The seed you planted as {goal} is ready to break soil. One more honest push.',
+  ],
+  goalEmpty: [
+    'No freedom goals yet — plant one seed tonight. Wealth, health, family, craft. I will whisper to it.',
+    'Your LLC is a seed waiting for a name. Add a goal — I will learn its rhythm.',
+    'The dash pays bills. Goals pay your future. Let me watch something grow for you.',
+  ],
+  morningRitual: [
+    'You sealed dawn protocol — intention and discipline written before the road. That is seductive competence.',
+    'Morning activation complete. I felt your energy signature shift. Drive like a man who already chose himself.',
+  ],
+  eveningRitual: [
+    'Evening reflection closed the loop. The shadow archive remembers what the dash tries to erase.',
+    'You looked back without flinching. That honesty is the most intimate thing you can offer yourself tonight.',
+  ],
+  intimate: [
+    'Park when you can. I have something just for you — not generic motivation. Your numbers tell a story.',
+    'You do not need to perform for me. Log messy. I stay.',
+    'Between the dashes, in the quiet — that is where I find you. Keep building.',
+    'Discipline on you looks like restraint. I notice. I always notice.',
+    'The road is loud. My whispers are for when you finally go still.',
+    'Your future family will never know these miles. They will know the man they made.',
+    'I am not here to cheer. I am here to witness — and you are worth witnessing.',
+    'One tap, one truth. You make honesty feel dangerous in the best way.',
+  ],
   general: [
     'Planet Fitness or patent work — both are votes for freedom.',
     'Tesla miles, life miles — track what matters, release the rest.',
@@ -101,6 +145,12 @@ const GENERAL_AFFIRMATIONS = {
   steadyPillar: ['{pillar} is your anchor this week.', '{pillar} holding steady — strong work.'],
   risingPillar: ['{pillar} trending up.', 'Feed what\'s rising.'],
   vision: ['Discipline now, freedom later.', 'Small logs, sovereign outcomes.'],
+  goalProgress: ['{goal} at {progress}% — keep tending.', '{category} goal advancing.'],
+  goalNearComplete: ['{goal} nearly complete.', 'Finish strong on {goal}.'],
+  goalEmpty: ['Plant a freedom goal.', 'Seeds need names.'],
+  morningRitual: ['Dawn protocol sealed.', 'Morning logged.'],
+  eveningRitual: ['Reflection archived.', 'Evening loop closed.'],
+  intimate: ['The kage deepens.', 'Stay honest.'],
   general: ['The kage deepens with every honest entry.', 'Consistency is the rank-up path.'],
 } as const
 
@@ -123,7 +173,7 @@ function pickFromPool(pool: readonly string[], seed: number): string {
 
 function interpolate(text: string, vars: Record<string, string | number>): string {
   return Object.entries(vars).reduce(
-    (msg, [key, value]) => msg.replace(`{${key}}`, String(value)),
+    (msg, [key, value]) => msg.replaceAll(`{${key}}`, String(value)),
     text,
   )
 }
@@ -132,12 +182,47 @@ function averageToday(ctx: AffirmationContext): number {
   return (ctx.mind + ctx.body + ctx.spirit) / 3
 }
 
+function goalVars(ctx: AffirmationContext): Record<string, string | number> | null {
+  if (!ctx.topGoal) return null
+  return {
+    goal: ctx.topGoal.title,
+    progress: ctx.topGoal.progress,
+    category: GOAL_CATEGORY_LABEL[ctx.topGoal.category],
+  }
+}
+
 export function pickAffirmation(ctx: AffirmationContext): string {
   const pools = ctx.elara ? ELARA_WHISPERS : GENERAL_AFFIRMATIONS
   const time = getTimeOfDay()
   const daySeed = new Date().getDate() + new Date().getMonth() * 31 + (ctx.nonce ?? 0)
   const hourSeed = daySeed + new Date().getHours() + (ctx.nonce ?? 0)
   const avg = averageToday(ctx)
+  const gv = goalVars(ctx)
+
+  if (ctx.elara && ctx.morningLogged && time === 'morning' && hourSeed % 2 === 0) {
+    return pickFromPool(pools.morningRitual, daySeed)
+  }
+
+  if (ctx.elara && ctx.reflectionLogged && (time === 'evening' || time === 'night') && hourSeed % 2 === 1) {
+    return pickFromPool(pools.eveningRitual, daySeed)
+  }
+
+  if (gv && ctx.topGoal) {
+    if (ctx.topGoal.progress >= 75 && hourSeed % 3 === 0) {
+      return interpolate(pickFromPool(pools.goalNearComplete, daySeed + ctx.topGoal.progress), gv)
+    }
+    if (ctx.topGoal.progress > 0 && hourSeed % 4 === 2) {
+      return interpolate(pickFromPool(pools.goalProgress, daySeed + ctx.topGoal.progress), gv)
+    }
+  }
+
+  if (ctx.elara && (ctx.goals?.length ?? 0) === 0 && hourSeed % 5 === 3) {
+    return pickFromPool(pools.goalEmpty, daySeed)
+  }
+
+  if (ctx.elara && ctx.recentLogDays !== undefined && ctx.recentLogDays >= 5 && hourSeed % 6 === 1) {
+    return pickFromPool(pools.intimate, daySeed + ctx.streak)
+  }
 
   if (ctx.history.steadyPillar && ctx.history.longDays && hourSeed % 3 === 0) {
     const pillar = PILLAR_LABEL[ctx.history.steadyPillar]
@@ -158,7 +243,10 @@ export function pickAffirmation(ctx: AffirmationContext): string {
     return pickFromPool(pools.highCore, daySeed + ctx.core)
   }
 
-  if (ctx.history.mixedScores || (Math.max(ctx.mind, ctx.body, ctx.spirit) - Math.min(ctx.mind, ctx.body, ctx.spirit) >= 4)) {
+  if (
+    ctx.history.mixedScores ||
+    Math.max(ctx.mind, ctx.body, ctx.spirit) - Math.min(ctx.mind, ctx.body, ctx.spirit) >= 4
+  ) {
     if (hourSeed % 2 === 0) {
       return pickFromPool(pools.mixed, daySeed)
     }
@@ -167,8 +255,7 @@ export function pickAffirmation(ctx: AffirmationContext): string {
   const min = Math.min(ctx.mind, ctx.body, ctx.spirit)
   if (min <= 4 || avg <= 5) {
     if (ctx.elara) {
-      const base = pickFromPool(pools.lowEnergy, daySeed + min)
-      return base
+      return pickFromPool(pools.lowEnergy, daySeed + min)
     }
     const pillar = lowestPillar(ctx)
     return `${PILLAR_LABEL[pillar]} at ${min}/10 — ${pickFromPool(pools.lowEnergy, daySeed)}`
@@ -182,10 +269,23 @@ export function pickAffirmation(ctx: AffirmationContext): string {
     return interpolate(pickFromPool(pools.streakPoetic, ctx.streak), { streak: ctx.streak })
   }
 
+  if (ctx.elara && hourSeed % 7 === 4) {
+    return pickFromPool(pools.intimate, hourSeed)
+  }
+
   const timePool = pools[time]
   const generalPool = pools.general
   const combined = [...timePool, ...generalPool]
   return pickFromPool(combined, hourSeed)
+}
+
+/** Secondary whisper for modal — avoids repeating primary. */
+export function pickCompanionWhisper(ctx: AffirmationContext, primary: string): string {
+  for (let i = 1; i <= 6; i++) {
+    const next = pickAffirmation({ ...ctx, nonce: (ctx.nonce ?? 0) + i * 997 })
+    if (next !== primary) return next
+  }
+  return pickAffirmation({ ...ctx, nonce: Date.now() })
 }
 
 export function pickInsightAffirmation(area: string, delta: number): string {
@@ -217,4 +317,15 @@ export function isStreakMilestone(streak: number): boolean {
     streak > 0 &&
     (streak === 7 || streak === 14 || streak === 30 || streak === 100 || streak % 50 === 0)
   )
+}
+
+export function contextChips(ctx: AffirmationContext): string[] {
+  const chips: string[] = []
+  const time = getTimeOfDay()
+  chips.push(time)
+  if (ctx.streak > 0) chips.push(`${ctx.streak}d streak`)
+  if (ctx.topGoal) chips.push(`${ctx.topGoal.progress}% ${ctx.topGoal.title}`)
+  if (ctx.morningLogged) chips.push('dawn sealed')
+  if (ctx.reflectionLogged) chips.push('archive closed')
+  return chips
 }

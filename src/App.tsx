@@ -10,6 +10,7 @@ import { ActivateScreen } from './components/screens/ActivateScreen'
 import { ReflectScreen } from './components/screens/ReflectScreen'
 import { CodexScreen } from './components/screens/CodexScreen'
 import { TrackerProvider } from './context/TrackerProvider'
+import { ElaraProvider } from './context/ElaraProvider'
 import { ToastProvider } from './context/ToastProvider'
 import { useTheme } from './theme/useTheme'
 import { THEME_TRANSITION } from './theme/transitions'
@@ -71,7 +72,9 @@ function App() {
     <ErrorBoundary>
       <ToastProvider>
         <TrackerProvider>
-          <AppShell />
+          <ElaraProvider>
+            <AppShell />
+          </ElaraProvider>
         </TrackerProvider>
       </ToastProvider>
     </ErrorBoundary>

@@ -326,3 +326,43 @@ body {
 .animate-quest-claim {
   animation: quest-claim 0.4s ease-out;
 }
+
+@keyframes whisper-glow {
+  0%,
+  100% {
+    box-shadow: 0 -8px 48px rgba(0, 0, 0, 0.55), 0 0 24px rgba(196, 30, 58, 0.12);
+  }
+  50% {
+    box-shadow: 0 -8px 48px rgba(0, 0, 0, 0.55), 0 0 36px rgba(196, 30, 58, 0.22);
+  }
+}
+
+@keyframes growth-fill {
+  from {
+    opacity: 0.6;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pillar-shift {
+  from {
+    opacity: 0.5;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-whisper-glow {
+  animation: whisper-glow 4s ease-in-out infinite;
+}
+
+.animate-growth-fill {
+  animation: growth-fill 0.8s ease-out;
+}
+
+.animate-pillar-shift {
+  animation: pillar-shift 0.5s ease-out;
+}

@@ -5,8 +5,13 @@ import { useSwipeGesture } from '../../hooks/useSwipeGesture'
 import type { AreaConfig, AreaId } from '../../types'
 import { AREA_CONFIGS } from '../../types'
 
+const QUICK_TAGS: { id: AreaId; label: string; kanji: string }[] = [
+  { id: 'mind', label: 'Mind', kanji: '心' },
+  { id: 'body', label: 'Body', kanji: '体' },
+  { id: 'spirit', label: 'Spirit', kanji: '魂' },
+]
+
 interface QuickLogPanelProps {
-  onVoiceNote?: (text: string) => void
   onAdjust: (area: AreaConfig) => void
 }
 
@@ -42,28 +47,33 @@ function SwipeableQuickLogButton({
       onTouchEnd={swipe.onTouchEnd}
       className={`kage-touch-target${isPressed ? ' animate-quick-log-press' : ''}`}
       style={{
-        minHeight: 96,
-        borderRadius: 14,
+        minHeight: 108,
+        borderRadius: 16,
         border: `2px solid ${active ? tokens.crimson : tokens.border}`,
         background: active ? tokens.bannerBg : tokens.surfaceElevated,
         cursor: 'pointer',
-        padding: '16px 10px',
+        padding: '18px 10px',
         color: tokens.text,
-        transition: 'border-color 0.15s ease, background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease',
-        transform: isSwiping ? `translateX(${swipeDx}px) scale(0.98)` : isPressed ? 'scale(0.97)' : 'scale(1)',
-        boxShadow: active ? `0 0 18px ${tokens.accentGlow}` : 'none',
+        transition:
+          'border-color 0.15s ease, background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease',
+        transform: isSwiping
+          ? `translateX(${swipeDx}px) scale(0.98)`
+          : isPressed
+            ? 'scale(0.97)'
+            : 'scale(1)',
+        boxShadow: active ? `0 0 22px ${tokens.accentGlow}` : tokens.cardShadow,
         touchAction: 'pan-y',
       }}
       aria-label={`${area.label} ${value} of 10. Tap to bump, swipe right for good score, swipe left to adjust.`}
     >
-      <span style={{ fontSize: 30, display: 'block', lineHeight: 1 }}>{area.kanji}</span>
+      <span style={{ fontSize: 32, display: 'block', lineHeight: 1 }}>{area.kanji}</span>
       <span
         style={{
           fontFamily: '"Orbitron", sans-serif',
           fontSize: 9,
           letterSpacing: '0.25em',
           color: tokens.textMuted,
-          marginTop: 6,
+          marginTop: 8,
           display: 'block',
         }}
       >
@@ -73,7 +83,7 @@ function SwipeableQuickLogButton({
         className={value >= 8 ? 'animate-score-pulse' : undefined}
         style={{
           fontFamily: '"Share Tech Mono", monospace',
-          fontSize: 22,
+          fontSize: 24,
           fontWeight: 700,
           color: accentColor,
           marginTop: 8,
@@ -86,11 +96,12 @@ function SwipeableQuickLogButton({
   )
 }
 
-export function QuickLogPanel({ onVoiceNote, onAdjust }: QuickLogPanelProps) {
+export function QuickLogPanel({ onAdjust }: QuickLogPanelProps) {
   const { tokens } = useTheme()
   const { ratings, quickBump, logRating } = useTracker()
   const [pressedId, setPressedId] = useState<AreaId | null>(null)
   const [swipeState, setSwipeState] = useState<{ id: AreaId; dx: number } | null>(null)
+  const [activeTag, setActiveTag] = useState<AreaId | null>(null)
 
   const handleBump = (id: AreaId) => {
     setPressedId(id)
@@ -115,8 +126,44 @@ export function QuickLogPanel({ onVoiceNote, onAdjust }: QuickLogPanelProps) {
     onAdjust(area)
   }
 
+  const handleTag = (id: AreaId) => {
+    setActiveTag(id)
+    setPressedId(id)
+    void logRating(id, ratings[id], 'quick')
+    setTimeout(() => {
+      setPressedId(null)
+      setActiveTag(null)
+    }, 300)
+  }
+
   return (
     <div style={{ marginBottom: 20 }}>
+      <div
+        style={{
+          padding: '10px 12px',
+          borderRadius: 10,
+          border: `1px solid ${tokens.borderAccent}`,
+          background: tokens.bannerBg,
+          marginBottom: 12,
+        }}
+      >
+        <p
+          style={{
+            margin: 0,
+            fontFamily: '"Share Tech Mono", monospace',
+            fontSize: 9,
+            letterSpacing: '0.2em',
+            textTransform: 'uppercase',
+            color: tokens.crimson,
+          }}
+        >
+          Parked only — safety first
+        </p>
+        <p style={{ margin: '4px 0 0', fontSize: 11, lineHeight: 1.45, color: tokens.textMuted }}>
+          Log only when safely parked. Never while driving or on Autopilot.
+        </p>
+      </div>
+
       <div
         style={{
           display: 'flex',
@@ -167,18 +214,53 @@ export function QuickLogPanel({ onVoiceNote, onAdjust }: QuickLogPanelProps) {
           )
         })}
       </div>
-      {onVoiceNote && (
-        <p
-          style={{
-            margin: '12px 0 0',
-            fontSize: 11,
-            color: tokens.textSubtle,
-            textAlign: 'center',
-          }}
-        >
-          Tap to +1 · header mic when parked only
-        </p>
-      )}
+
+      <p
+        style={{
+          margin: '12px 0 8px',
+          fontSize: 9,
+          letterSpacing: '0.2em',
+          textTransform: 'uppercase',
+          color: tokens.textSubtle,
+          textAlign: 'center',
+        }}
+      >
+        Quick tags
+      </p>
+      <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+        {QUICK_TAGS.map((tag) => (
+          <button
+            key={tag.id}
+            type="button"
+            onClick={() => handleTag(tag.id)}
+            className="kage-touch-target"
+            style={{
+              flex: 1,
+              minHeight: 52,
+              borderRadius: 10,
+              border: `1px solid ${activeTag === tag.id ? tokens.crimson : tokens.border}`,
+              background: activeTag === tag.id ? tokens.bannerBg : tokens.cardBg,
+              color: activeTag === tag.id ? tokens.crimson : tokens.textMuted,
+              fontSize: 11,
+              cursor: 'pointer',
+              boxShadow: activeTag === tag.id ? `0 0 14px ${tokens.accentGlow}` : 'none',
+            }}
+          >
+            {tag.kanji} {tag.label}
+          </button>
+        ))}
+      </div>
+
+      <p
+        style={{
+          margin: '12px 0 0',
+          fontSize: 11,
+          color: tokens.textSubtle,
+          textAlign: 'center',
+        }}
+      >
+        Tap +1 · header mic when parked · voice confirms before save
+      </p>
     </div>
   )
 }
@@ -207,12 +289,13 @@ export function CompactPillars({ onAdjust }: CompactPillarsProps) {
           onClick={() => onAdjust(area)}
           className="kage-touch-target"
           style={{
-            minHeight: 56,
+            minHeight: 60,
             borderRadius: 10,
             border: `1px solid ${tokens.border}`,
             background: tokens.cardBg,
-            padding: '10px 8px',
+            padding: '12px 8px',
             cursor: 'pointer',
+            boxShadow: tokens.cardShadow,
           }}
           aria-label={`Adjust ${area.label}, ${ratings[area.id]} of 10`}
         >

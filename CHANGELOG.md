@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.6.0] — 2026-06-18
+
+### Elara Whispers · Freedom Goals · Visual elevation
+
+- **Elara Whispers** — context-aware modal with companion whispers, context chips, whisper history; header ✦ trigger and banner “Open”
+- **Freedom goals** — target dates, milestone steps, growth bars, seed/bonsai metaphor; goals influence quest hints and Elara tone
+- **MBS balance radar** — compact Recharts radar for holistic triad view
+- **Quick log** — larger touch targets, parked-only safety banner, pillar quick-tags, voice confirmation flow
+- **Rituals** — guided dawn and evening ceremonies on Activate / Reflect screens
+- **What's new** — v0.6.0 banner with acknowledge dismiss
+- Export/import normalizes goal milestones; export format version 2
+
 ## [0.5.2] — 2026-06-18
 
 ### Home hero & chart

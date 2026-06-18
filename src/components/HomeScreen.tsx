@@ -7,10 +7,13 @@ import { useTheme } from '../theme/useTheme'
 import { useTracker } from '../context/trackerContext'
 import { AffirmationBanner } from './dashboard/AffirmationBanner'
 import { OnboardingHint } from './dashboard/OnboardingHint'
+import { WhatsNewBanner } from './dashboard/WhatsNewBanner'
+import { VoiceConfirmBanner } from './dashboard/VoiceConfirmBanner'
 import { RankBadge } from './dashboard/RankBadge'
 import { QuickLogPanel, CompactPillars } from './dashboard/QuickLogPanel'
 import { ShadowLogForm } from './dashboard/ShadowLogForm'
 import { ProgressChart } from './dashboard/ProgressChart'
+import { BalanceRadar } from './dashboard/BalanceRadar'
 import { InsightCards, QuestList } from './dashboard/InsightCards'
 import { GoalPanel } from './dashboard/GoalPanel'
 import { ShadowParticles } from './ShadowParticles'
@@ -33,10 +36,6 @@ export function HomeScreen() {
     void logRating(activeArea.id, value)
     setActiveArea(null)
   }
-
-  const onVoiceNote = useCallback(() => {
-    /* voice routed via TrackerProvider pendingVoiceNote → ShadowLogForm */
-  }, [])
 
   const openAdjust = useCallback((area: AreaConfig) => {
     setActiveArea(area)
@@ -96,14 +95,19 @@ export function HomeScreen() {
           }}
         >
           <OnboardingHint />
+          <WhatsNewBanner />
+          <VoiceConfirmBanner />
           <AffirmationBanner />
           <CoreDisplay value={core} pulse={highScore} />
           <RankBadge />
 
-          <QuickLogPanel onVoiceNote={onVoiceNote} onAdjust={openAdjust} />
+          <QuickLogPanel onAdjust={openAdjust} />
           <CompactPillars onAdjust={openAdjust} />
 
           <ProgressChart />
+          <BalanceRadar />
+
+          <GoalPanel />
 
           <CollapsibleSection
             title="Parked shadow log"
@@ -115,7 +119,7 @@ export function HomeScreen() {
 
           <CollapsibleSection
             title="Deeper shadow"
-            subtitle="Insights, quests, pillar detail, goals"
+            subtitle="Insights, quests, pillar detail"
             defaultOpen={false}
           >
             <InsightCards />
@@ -143,8 +147,6 @@ export function HomeScreen() {
                 />
               ))}
             </div>
-
-            <GoalPanel />
           </CollapsibleSection>
         </section>
       </main>

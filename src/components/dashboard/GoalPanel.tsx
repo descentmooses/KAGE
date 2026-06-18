@@ -2,19 +2,46 @@ import { useState } from 'react'
 import { useTheme } from '../../theme/useTheme'
 import { useTracker } from '../../context/trackerContext'
 import type { Goal, GoalCategory } from '../../types'
-import { GoalModal } from './GoalModal'
+import { GOAL_CATEGORY_LABEL } from '../../lib/goals'
+import { GoalModal, type GoalFormData } from './GoalModal'
+import { SeedBonsai } from './SeedBonsai'
 
-const CATEGORY_LABEL: Record<GoalCategory, string> = {
-  wealth: 'Wealth',
-  health: 'Health',
-  family: 'Family',
-  craft: 'Craft',
-  custom: 'Custom',
+function GrowthBar({ progress, color }: { progress: number; color: string }) {
+  return (
+    <div
+      style={{
+        height: 6,
+        borderRadius: 3,
+        background: 'rgba(255,255,255,0.06)',
+        overflow: 'hidden',
+        marginTop: 8,
+      }}
+    >
+      <div
+        className="animate-growth-fill"
+        style={{
+          height: '100%',
+          width: `${progress}%`,
+          borderRadius: 3,
+          background: `linear-gradient(90deg, ${color}88, ${color})`,
+          boxShadow: progress >= 75 ? `0 0 12px ${color}55` : 'none',
+          transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+        }}
+      />
+    </div>
+  )
 }
 
 export function GoalPanel() {
   const { tokens } = useTheme()
-  const { goals, addGoal, updateGoal, updateGoalProgress, removeGoal } = useTracker()
+  const {
+    goals,
+    addGoal,
+    updateGoal,
+    updateGoalProgress,
+    toggleMilestone,
+    removeGoal,
+  } = useTracker()
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<Goal | null>(null)
 
@@ -28,18 +55,17 @@ export function GoalPanel() {
     setModalOpen(true)
   }
 
-  const handleSave = (data: { title: string; category: GoalCategory; target?: string }) => {
+  const handleSave = (data: GoalFormData) => {
     if (editing) {
       void updateGoal(editing.id, data)
     } else {
-      void addGoal(data.title, data.category, data.target)
+      void addGoal(data)
     }
   }
 
   const grouped = goals.reduce<Record<string, Goal[]>>((acc, g) => {
-    const key = g.category
-    acc[key] = acc[key] ?? []
-    acc[key].push(g)
+    acc[g.category] = acc[g.category] ?? []
+    acc[g.category].push(g)
     return acc
   }, {})
 
@@ -47,55 +73,64 @@ export function GoalPanel() {
     <div
       style={{
         padding: '16px 14px',
-        borderRadius: 10,
+        borderRadius: 12,
         border: `1px solid ${tokens.border}`,
         background: tokens.cardBg,
         marginBottom: 24,
+        boxShadow: tokens.cardShadow,
       }}
     >
       <div
         style={{
           display: 'flex',
-          justifyContent: 'space-between',
+          gap: 14,
           alignItems: 'center',
-          marginBottom: 12,
+          marginBottom: 16,
         }}
       >
-        <p
-          style={{
-            margin: 0,
-            fontFamily: '"Orbitron", sans-serif',
-            fontSize: 9,
-            letterSpacing: '0.35em',
-            textTransform: 'uppercase',
-            color: tokens.textMuted,
-          }}
-        >
-          Freedom goals
-        </p>
+        <SeedBonsai goals={goals} />
+        <div style={{ flex: 1 }}>
+          <p
+            style={{
+              margin: '0 0 4px',
+              fontFamily: '"Orbitron", sans-serif',
+              fontSize: 9,
+              letterSpacing: '0.35em',
+              textTransform: 'uppercase',
+              color: tokens.textMuted,
+            }}
+          >
+            Freedom goals
+          </p>
+          <p style={{ margin: 0, fontSize: 12, lineHeight: 1.5, color: tokens.textSubtle }}>
+            Wealth · health · family · craft — seeds for life after the dash
+          </p>
+        </div>
         <button
           type="button"
           onClick={openAdd}
           className="kage-touch-target"
           style={{
-            minHeight: 40,
+            minHeight: 44,
             padding: '0 12px',
-            borderRadius: 6,
+            borderRadius: 8,
             border: 'none',
             background: tokens.btnGradient,
             color: tokens.btnText,
             fontSize: 9,
             letterSpacing: '0.2em',
             cursor: 'pointer',
+            flexShrink: 0,
           }}
         >
-          ADD GOAL
+          ADD
         </button>
       </div>
 
       {goals.length === 0 && (
-        <p style={{ margin: '0 0 12px', fontSize: 12, color: tokens.textMuted }}>
-          Wealth, health, family, craft — plant seeds for life after the dash.
+        <p style={{ margin: '0 0 12px', fontSize: 13, lineHeight: 1.55, color: tokens.textMuted }}>
+          Plant your first seed — a named goal with optional milestones. Elara will learn its
+          rhythm.
         </p>
       )}
 
@@ -110,13 +145,13 @@ export function GoalPanel() {
               color: tokens.crimson,
             }}
           >
-            {CATEGORY_LABEL[category as GoalCategory] ?? category}
+            {GOAL_CATEGORY_LABEL[category as GoalCategory] ?? category}
           </p>
           {list.map((goal) => (
             <div
               key={goal.id}
               style={{
-                padding: '12px 0',
+                padding: '14px 0',
                 borderBottom: `1px solid ${tokens.border}`,
               }}
             >
@@ -126,36 +161,112 @@ export function GoalPanel() {
                   justifyContent: 'space-between',
                   alignItems: 'flex-start',
                   gap: 8,
-                  marginBottom: 6,
+                  marginBottom: 4,
                 }}
               >
                 <div>
-                  <span style={{ fontSize: 13, color: tokens.text }}>{goal.title}</span>
+                  <span
+                    style={{
+                      fontSize: 14,
+                      color: goal.completedAt ? tokens.textMuted : tokens.text,
+                      textDecoration: goal.completedAt ? 'line-through' : 'none',
+                    }}
+                  >
+                    {goal.title}
+                  </span>
                   {goal.target && (
                     <p style={{ margin: '4px 0 0', fontSize: 11, color: tokens.textMuted }}>
                       {goal.target}
                     </p>
                   )}
+                  {goal.targetDate && (
+                    <p style={{ margin: '2px 0 0', fontSize: 10, color: tokens.textSubtle }}>
+                      by {goal.targetDate}
+                    </p>
+                  )}
                 </div>
-                <span style={{ fontSize: 10, color: tokens.gold }}>{goal.progress}%</span>
+                <span
+                  className={goal.progress >= 75 ? 'animate-milestone' : undefined}
+                  style={{ fontSize: 11, color: tokens.gold, fontFamily: '"Share Tech Mono", monospace' }}
+                >
+                  {goal.progress}%
+                </span>
               </div>
-              <input
-                type="range"
-                min={0}
-                max={100}
-                value={goal.progress}
-                onChange={(e) => void updateGoalProgress(goal.id, Number(e.target.value))}
-                style={{ width: '100%', accentColor: tokens.crimson, minHeight: 36 }}
-                aria-label={`${goal.title} progress`}
-              />
-              <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+
+              <GrowthBar progress={goal.progress} color={tokens.crimson} />
+
+              {goal.milestones.length > 0 ? (
+                <div style={{ marginTop: 10 }}>
+                  {goal.milestones.map((m) => (
+                    <button
+                      key={m.id}
+                      type="button"
+                      onClick={() => void toggleMilestone(goal.id, m.id)}
+                      className="kage-touch-target"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 10,
+                        width: '100%',
+                        minHeight: 44,
+                        padding: '6px 0',
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: 22,
+                          height: 22,
+                          borderRadius: 6,
+                          border: `1px solid ${m.done ? tokens.crimson : tokens.border}`,
+                          background: m.done ? tokens.bannerBg : 'transparent',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: 11,
+                          color: tokens.crimson,
+                          flexShrink: 0,
+                        }}
+                      >
+                        {m.done ? '✓' : ''}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: 12,
+                          color: m.done ? tokens.textMuted : tokens.text,
+                          textDecoration: m.done ? 'line-through' : 'none',
+                        }}
+                      >
+                        {m.label}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={goal.progress}
+                  onChange={(e) => void updateGoalProgress(goal.id, Number(e.target.value))}
+                  style={{ width: '100%', accentColor: tokens.crimson, minHeight: 44, marginTop: 8 }}
+                  aria-label={`${goal.title} progress`}
+                />
+              )}
+
+              <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
                 <button
                   type="button"
                   onClick={() => openEdit(goal)}
+                  className="kage-touch-target"
                   style={{
                     fontSize: 10,
-                    padding: '6px 10px',
-                    borderRadius: 4,
+                    padding: '8px 12px',
+                    minHeight: 40,
+                    borderRadius: 6,
                     border: `1px solid ${tokens.border}`,
                     background: 'transparent',
                     color: tokens.textMuted,
@@ -167,10 +278,12 @@ export function GoalPanel() {
                 <button
                   type="button"
                   onClick={() => void removeGoal(goal.id)}
+                  className="kage-touch-target"
                   style={{
                     fontSize: 10,
-                    padding: '6px 10px',
-                    borderRadius: 4,
+                    padding: '8px 12px',
+                    minHeight: 40,
+                    borderRadius: 6,
                     border: `1px solid ${tokens.border}`,
                     background: 'transparent',
                     color: tokens.crimson,

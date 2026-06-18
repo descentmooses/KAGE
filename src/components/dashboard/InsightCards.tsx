@@ -3,6 +3,7 @@ import { useTheme } from '../../theme/useTheme'
 import { useTracker } from '../../context/trackerContext'
 import { filterLogsByPeriod } from '../../lib/insights'
 import { pickWeeklySummary } from '../../lib/affirmations'
+import { questHintForGoals } from '../../lib/goals'
 
 export function InsightCards() {
   const { tokens } = useTheme()
@@ -66,8 +67,9 @@ export function InsightCards() {
 
 export function QuestList() {
   const { tokens } = useTheme()
-  const { quests, claimQuest } = useTracker()
+  const { quests, claimQuest, goals } = useTracker()
   const [claimingId, setClaimingId] = useState<string | null>(null)
+  const goalHint = useMemo(() => questHintForGoals(goals), [goals])
 
   const handleQuest = async (id: string) => {
     setClaimingId(id)
@@ -100,6 +102,22 @@ export function QuestList() {
       >
         Daily quests — tap to claim
       </p>
+      {goalHint && (
+        <p
+          style={{
+            margin: '0 0 12px',
+            padding: '10px 12px',
+            borderRadius: 8,
+            border: `1px dashed ${tokens.borderAccent}`,
+            fontSize: 12,
+            lineHeight: 1.5,
+            color: tokens.textMuted,
+            fontStyle: 'italic',
+          }}
+        >
+          {goalHint}
+        </p>
+      )}
       {quests.map((quest) => {
         const glowing = claimingId === quest.id
         return (

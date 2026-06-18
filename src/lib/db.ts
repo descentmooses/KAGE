@@ -8,6 +8,7 @@ import type {
   ReflectionEntry,
 } from '../types'
 import { DEFAULT_GAMIFICATION } from './gamification'
+import { normalizeGoal } from './goals'
 
 interface KageDB extends DBSchema {
   dailyLogs: {
@@ -161,7 +162,7 @@ export async function exportAllData() {
       getSettings(),
     ])
   return {
-    version: 1,
+    version: 2,
     exportedAt: new Date().toISOString(),
     dailyLogs,
     morningLogs,
@@ -186,7 +187,7 @@ export async function importAllData(payload: Awaited<ReturnType<typeof exportAll
   for (const log of payload.dailyLogs) await tx.objectStore('dailyLogs').put(log)
   for (const log of payload.morningLogs) await tx.objectStore('morningLogs').put(log)
   for (const log of payload.reflectionLogs) await tx.objectStore('reflectionLogs').put(log)
-  for (const goal of payload.goals) await tx.objectStore('goals').put(goal)
+  for (const goal of payload.goals) await tx.objectStore('goals').put(normalizeGoal(goal))
   await tx.objectStore('meta').put(payload.gamification, 'gamification')
   await tx.objectStore('meta').put(payload.settings, 'settings')
   await tx.done

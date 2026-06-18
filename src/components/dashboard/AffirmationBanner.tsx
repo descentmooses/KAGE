@@ -1,47 +1,64 @@
 import { useMemo, useState } from 'react'
 import { useTheme } from '../../theme/useTheme'
 import { pickAffirmation } from '../../lib/affirmations'
-import { buildPillarHistory } from '../../lib/pillarHistory'
+import { buildAffirmationContext } from '../../lib/affirmationContext'
 import { useTracker } from '../../context/trackerContext'
+import { useElara } from '../../context/elaraContext'
 
 export function AffirmationBanner() {
   const { tokens } = useTheme()
-  const { settings, ratings, core, gamification, allLogs, saveWhisper } = useTracker()
+  const { openElara } = useElara()
+  const {
+    settings,
+    ratings,
+    core,
+    gamification,
+    allLogs,
+    goals,
+    morningToday,
+    reflectionToday,
+    saveWhisper,
+  } = useTracker()
   const [nonce, setNonce] = useState(0)
   const [display, setDisplay] = useState<string | null>(null)
 
-  const history = useMemo(() => buildPillarHistory(allLogs), [allLogs])
+  const ctx = useMemo(
+    () =>
+      buildAffirmationContext({
+        elara: settings.elaraWhispers,
+        mind: ratings.mind,
+        body: ratings.body,
+        spirit: ratings.spirit,
+        core,
+        streak: gamification.currentStreak,
+        allLogs,
+        goals,
+        morningToday,
+        reflectionToday,
+        nonce,
+      }),
+    [
+      settings.elaraWhispers,
+      ratings,
+      core,
+      gamification.currentStreak,
+      allLogs,
+      goals,
+      morningToday,
+      reflectionToday,
+      nonce,
+    ],
+  )
 
   if (!settings.affirmationsEnabled) return null
 
-  const message =
-    display ??
-    pickAffirmation({
-      elara: settings.elaraWhispers,
-      mind: ratings.mind,
-      body: ratings.body,
-      spirit: ratings.spirit,
-      core,
-      streak: gamification.currentStreak,
-      history,
-      nonce,
-    })
-
+  const message = display ?? pickAffirmation(ctx)
   const isPoetic = message.length > 90
 
   const receiveWhisper = () => {
     const nextNonce = Date.now()
     setNonce(nextNonce)
-    const fresh = pickAffirmation({
-      elara: settings.elaraWhispers,
-      mind: ratings.mind,
-      body: ratings.body,
-      spirit: ratings.spirit,
-      core,
-      streak: gamification.currentStreak,
-      history,
-      nonce: nextNonce,
-    })
+    const fresh = pickAffirmation({ ...ctx, nonce: nextNonce })
     setDisplay(fresh)
     void saveWhisper(fresh)
   }
@@ -67,36 +84,64 @@ export function AffirmationBanner() {
           marginBottom: 8,
         }}
       >
-        <p
+        <button
+          type="button"
+          onClick={settings.elaraWhispers ? openElara : undefined}
           style={{
             margin: 0,
+            padding: 0,
+            border: 'none',
+            background: 'transparent',
             fontFamily: '"Share Tech Mono", monospace',
             fontSize: 10,
             letterSpacing: '0.2em',
             textTransform: 'uppercase',
             color: tokens.crimson,
+            cursor: settings.elaraWhispers ? 'pointer' : 'default',
           }}
         >
           {settings.elaraWhispers ? 'Elara whispers' : 'Shadow note'}
-        </p>
-        <button
-          type="button"
-          onClick={receiveWhisper}
-          className="kage-touch-target"
-          style={{
-            minHeight: 40,
-            padding: '0 12px',
-            borderRadius: 999,
-            border: `1px solid ${tokens.crimson}`,
-            background: 'transparent',
-            color: tokens.crimson,
-            fontSize: 9,
-            letterSpacing: '0.12em',
-            cursor: 'pointer',
-          }}
-        >
-          New whisper
         </button>
+        <div style={{ display: 'flex', gap: 6 }}>
+          {settings.elaraWhispers && (
+            <button
+              type="button"
+              onClick={openElara}
+              className="kage-touch-target"
+              style={{
+                minHeight: 40,
+                padding: '0 10px',
+                borderRadius: 999,
+                border: `1px solid ${tokens.borderAccent}`,
+                background: tokens.surfaceElevated,
+                color: tokens.crimson,
+                fontSize: 9,
+                letterSpacing: '0.08em',
+                cursor: 'pointer',
+              }}
+            >
+              Open
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={receiveWhisper}
+            className="kage-touch-target"
+            style={{
+              minHeight: 40,
+              padding: '0 12px',
+              borderRadius: 999,
+              border: `1px solid ${tokens.crimson}`,
+              background: 'transparent',
+              color: tokens.crimson,
+              fontSize: 9,
+              letterSpacing: '0.12em',
+              cursor: 'pointer',
+            }}
+          >
+            New whisper
+          </button>
+        </div>
       </div>
       <p
         key={message}

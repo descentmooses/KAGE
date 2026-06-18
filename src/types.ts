@@ -52,13 +52,22 @@ export interface ReflectionEntry {
   loggedAt: string
 }
 
+export interface GoalMilestone {
+  id: string
+  label: string
+  done: boolean
+}
+
 export interface Goal {
   id: string
   title: string
   category: GoalCategory
   target?: string
+  targetDate?: string
+  milestones: GoalMilestone[]
   progress: number
   createdAt: string
+  completedAt?: string
 }
 
 export interface DailyQuest {
@@ -73,6 +82,7 @@ export interface QuestContext {
   todayLog: DailyLog | null
   morningLogged: boolean
   reflectionLogged: boolean
+  goals?: Goal[]
 }
 
 export interface GamificationState {
@@ -92,6 +102,7 @@ export interface AppSettings {
   voiceEnabled: boolean
   whisperHistory?: string[]
   hasOnboarded?: boolean
+  whatsNewSeen?: string
 }
 
 export interface AreaConfig {

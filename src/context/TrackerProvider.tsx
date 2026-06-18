@@ -49,6 +49,7 @@ import {
   xpForReflection,
 } from '../lib/gamification'
 import { buildTrendForPeriod, generateInsights } from '../lib/insights'
+import { normalizeGoal, progressFromMilestones } from '../lib/goals'
 import { LoadingScreen } from '../components/LoadingScreen'
 import { DAILY_QUESTS, evaluateQuests, QUEST_BONUSES } from '../lib/quests'
 
@@ -101,7 +102,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     setTodayLog(log)
     setAllLogs(logs)
     setGamification(g)
-    setGoals(goalList)
+    setGoals(goalList.map(normalizeGoal))
     setSettings(s)
     setMorningToday(morning)
     setReflectionToday(reflection)
@@ -152,8 +153,9 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       todayLog,
       morningLogged: !!morningToday,
       reflectionLogged: !!reflectionToday,
+      goals,
     }),
-    [todayLog, morningToday, reflectionToday],
+    [todayLog, morningToday, reflectionToday, goals],
   )
 
   const quests = useMemo(
@@ -326,29 +328,56 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
   )
 
   const addGoal = useCallback(
-    async (title: string, category: Goal['category'], target?: string) => {
+    async (data: {
+      title: string
+      category: Goal['category']
+      target?: string
+      targetDate?: string
+      milestones?: Goal['milestones']
+    }) => {
+      const milestones = data.milestones ?? []
+      const progress =
+        milestones.length > 0 ? progressFromMilestones(milestones) : 0
       const goal: Goal = {
         id: uid(),
-        title,
-        category,
-        target,
-        progress: 0,
+        title: data.title,
+        category: data.category,
+        target: data.target,
+        targetDate: data.targetDate,
+        milestones,
+        progress,
         createdAt: new Date().toISOString(),
+        completedAt: progress >= 100 ? new Date().toISOString() : undefined,
       }
       await putGoal(goal)
+      if (progress >= 100) {
+        pushCelebration(`Seed bloomed — “${goal.title}” complete`, 'success')
+      }
       await refresh()
     },
-    [refresh],
+    [pushCelebration, refresh],
   )
 
   const updateGoal = useCallback(
     async (
       id: string,
-      patch: Partial<Pick<Goal, 'title' | 'category' | 'target' | 'progress'>>,
+      patch: Partial<
+        Pick<Goal, 'title' | 'category' | 'target' | 'targetDate' | 'progress' | 'milestones'>
+      >,
     ) => {
       const goal = goals.find((g) => g.id === id)
       if (!goal) return
-      await putGoal({ ...goal, ...patch })
+      const milestones = patch.milestones ?? goal.milestones
+      const progress =
+        patch.progress ??
+        (milestones.length > 0 ? progressFromMilestones(milestones) : goal.progress)
+      const completedAt =
+        progress >= 100
+          ? goal.completedAt ?? new Date().toISOString()
+          : patch.progress !== undefined && patch.progress < 100
+            ? undefined
+            : goal.completedAt
+      await putGoal({ ...goal, ...patch, milestones, progress, completedAt })
       await refresh()
     },
     [goals, refresh],
@@ -356,9 +385,35 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
 
   const updateGoalProgress = useCallback(
     async (id: string, progress: number) => {
-      await updateGoal(id, { progress: Math.min(100, Math.max(0, progress)) })
+      const clamped = Math.min(100, Math.max(0, progress))
+      const goal = goals.find((g) => g.id === id)
+      if (goal && clamped >= 100 && goal.progress < 100) {
+        pushCelebration(`Seed bloomed — “${goal.title}” complete`, 'success')
+      }
+      await updateGoal(id, { progress: clamped })
     },
-    [updateGoal],
+    [goals, pushCelebration, updateGoal],
+  )
+
+  const toggleMilestone = useCallback(
+    async (goalId: string, milestoneId: string) => {
+      const goal = goals.find((g) => g.id === goalId)
+      if (!goal) return
+      const milestones = goal.milestones.map((m) =>
+        m.id === milestoneId ? { ...m, done: !m.done } : m,
+      )
+      const progress =
+        milestones.length > 0 ? progressFromMilestones(milestones) : goal.progress
+      const wasComplete = goal.progress >= 100
+      const completedAt =
+        progress >= 100 ? goal.completedAt ?? new Date().toISOString() : undefined
+      await putGoal({ ...goal, milestones, progress, completedAt })
+      if (progress >= 100 && !wasComplete) {
+        pushCelebration(`Milestone arc sealed — “${goal.title}”`, 'success')
+      }
+      await refresh()
+    },
+    [goals, pushCelebration, refresh],
   )
 
   const removeGoal = useCallback(
@@ -506,6 +561,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     addGoal,
     updateGoal,
     updateGoalProgress,
+    toggleMilestone,
     removeGoal,
     updateSettings,
     saveWhisper,

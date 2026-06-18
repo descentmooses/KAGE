@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTheme } from '../../theme/useTheme'
-import type { Goal, GoalCategory } from '../../types'
+import type { Goal, GoalCategory, GoalMilestone } from '../../types'
 
 const CATEGORIES: { id: GoalCategory; label: string }[] = [
   { id: 'wealth', label: 'Wealth' },
@@ -10,10 +10,22 @@ const CATEGORIES: { id: GoalCategory; label: string }[] = [
   { id: 'custom', label: 'Custom' },
 ]
 
+export interface GoalFormData {
+  title: string
+  category: GoalCategory
+  target?: string
+  targetDate?: string
+  milestones: GoalMilestone[]
+}
+
 interface GoalModalFormProps {
   goal?: Goal | null
   onClose: () => void
-  onSave: (data: { title: string; category: GoalCategory; target?: string }) => void
+  onSave: (data: GoalFormData) => void
+}
+
+function uid() {
+  return crypto.randomUUID()
 }
 
 function GoalModalForm({ goal, onClose, onSave }: GoalModalFormProps) {
@@ -21,6 +33,9 @@ function GoalModalForm({ goal, onClose, onSave }: GoalModalFormProps) {
   const [title, setTitle] = useState(goal?.title ?? '')
   const [category, setCategory] = useState<GoalCategory>(goal?.category ?? 'wealth')
   const [target, setTarget] = useState(goal?.target ?? '')
+  const [targetDate, setTargetDate] = useState(goal?.targetDate ?? '')
+  const [milestones, setMilestones] = useState<GoalMilestone[]>(goal?.milestones ?? [])
+  const [milestoneInput, setMilestoneInput] = useState('')
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -30,9 +45,26 @@ function GoalModalForm({ goal, onClose, onSave }: GoalModalFormProps) {
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
 
+  const addMilestone = () => {
+    const label = milestoneInput.trim()
+    if (!label) return
+    setMilestones((m) => [...m, { id: uid(), label, done: false }])
+    setMilestoneInput('')
+  }
+
+  const removeMilestone = (id: string) => {
+    setMilestones((m) => m.filter((x) => x.id !== id))
+  }
+
   const handleSubmit = () => {
     if (!title.trim()) return
-    onSave({ title: title.trim(), category, target: target.trim() || undefined })
+    onSave({
+      title: title.trim(),
+      category,
+      target: target.trim() || undefined,
+      targetDate: targetDate || undefined,
+      milestones,
+    })
     onClose()
   }
 
@@ -43,10 +75,13 @@ function GoalModalForm({ goal, onClose, onSave }: GoalModalFormProps) {
         position: 'relative',
         width: '100%',
         maxWidth: 360,
+        maxHeight: 'min(85dvh, 640px)',
+        overflowY: 'auto',
         padding: '24px 20px',
         background: tokens.modalBg,
         border: `1px solid ${tokens.modalBorder}`,
         boxShadow: tokens.modalShadow,
+        borderRadius: 12,
       }}
     >
       <h2
@@ -80,9 +115,7 @@ function GoalModalForm({ goal, onClose, onSave }: GoalModalFormProps) {
         />
       </label>
 
-      <p style={{ margin: '0 0 8px', fontSize: 11, color: tokens.textMuted }}>
-        Pillar
-      </p>
+      <p style={{ margin: '0 0 8px', fontSize: 11, color: tokens.textMuted }}>Pillar</p>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
         {CATEGORIES.map((c) => (
           <button
@@ -107,7 +140,7 @@ function GoalModalForm({ goal, onClose, onSave }: GoalModalFormProps) {
         ))}
       </div>
 
-      <label style={{ display: 'block', marginBottom: 16 }}>
+      <label style={{ display: 'block', marginBottom: 12 }}>
         <span style={{ fontSize: 11, color: tokens.textMuted }}>Target (optional)</span>
         <input
           value={target}
@@ -126,6 +159,95 @@ function GoalModalForm({ goal, onClose, onSave }: GoalModalFormProps) {
         />
       </label>
 
+      <label style={{ display: 'block', marginBottom: 16 }}>
+        <span style={{ fontSize: 11, color: tokens.textMuted }}>Target date (optional)</span>
+        <input
+          type="date"
+          value={targetDate}
+          onChange={(e) => setTargetDate(e.target.value)}
+          style={{
+            width: '100%',
+            marginTop: 6,
+            padding: '10px 12px',
+            borderRadius: 8,
+            border: `1px solid ${tokens.inputBorder}`,
+            background: tokens.inputBg,
+            color: tokens.text,
+            fontSize: 13,
+          }}
+        />
+      </label>
+
+      <p style={{ margin: '0 0 8px', fontSize: 11, color: tokens.textMuted }}>Milestones</p>
+      <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+        <input
+          value={milestoneInput}
+          onChange={(e) => setMilestoneInput(e.target.value)}
+          placeholder="Step toward freedom…"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              addMilestone()
+            }
+          }}
+          style={{
+            flex: 1,
+            padding: '10px 12px',
+            borderRadius: 8,
+            border: `1px solid ${tokens.inputBorder}`,
+            background: tokens.inputBg,
+            color: tokens.text,
+            fontSize: 13,
+          }}
+        />
+        <button
+          type="button"
+          onClick={addMilestone}
+          className="kage-touch-target"
+          style={{
+            minHeight: 44,
+            padding: '0 14px',
+            borderRadius: 8,
+            border: `1px solid ${tokens.crimson}`,
+            background: tokens.bannerBg,
+            color: tokens.crimson,
+            fontSize: 11,
+            cursor: 'pointer',
+          }}
+        >
+          Add
+        </button>
+      </div>
+      {milestones.map((m) => (
+        <div
+          key={m.id}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 8,
+            padding: '8px 0',
+            borderBottom: `1px solid ${tokens.border}`,
+          }}
+        >
+          <span style={{ fontSize: 12, color: tokens.text }}>{m.label}</span>
+          <button
+            type="button"
+            onClick={() => removeMilestone(m.id)}
+            style={{
+              fontSize: 10,
+              padding: '4px 8px',
+              border: 'none',
+              background: 'transparent',
+              color: tokens.crimson,
+              cursor: 'pointer',
+            }}
+          >
+            Remove
+          </button>
+        </div>
+      ))}
+
       <button
         type="button"
         onClick={handleSubmit}
@@ -133,6 +255,7 @@ function GoalModalForm({ goal, onClose, onSave }: GoalModalFormProps) {
         style={{
           width: '100%',
           minHeight: 48,
+          marginTop: 16,
           border: 'none',
           borderRadius: 8,
           background: tokens.btnGradient,
@@ -153,7 +276,7 @@ interface GoalModalProps {
   open: boolean
   goal?: Goal | null
   onClose: () => void
-  onSave: (data: { title: string; category: GoalCategory; target?: string }) => void
+  onSave: (data: GoalFormData) => void
 }
 
 export function GoalModal({ open, goal, onClose, onSave }: GoalModalProps) {

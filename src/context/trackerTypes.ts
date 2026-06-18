@@ -50,12 +50,21 @@ export interface TrackerContextValue {
   claimQuest: (questId: string) => Promise<void>
   saveMorning: (energy: number, intention: string, discipline: string) => Promise<void>
   saveReflection: (ratings: Record<AreaId, number>, journal: string) => Promise<void>
-  addGoal: (title: string, category: Goal['category'], target?: string) => Promise<void>
+  addGoal: (data: {
+    title: string
+    category: Goal['category']
+    target?: string
+    targetDate?: string
+    milestones?: Goal['milestones']
+  }) => Promise<void>
   updateGoal: (
     id: string,
-    patch: Partial<Pick<Goal, 'title' | 'category' | 'target' | 'progress'>>,
+    patch: Partial<
+      Pick<Goal, 'title' | 'category' | 'target' | 'targetDate' | 'progress' | 'milestones'>
+    >,
   ) => Promise<void>
   updateGoalProgress: (id: string, progress: number) => Promise<void>
+  toggleMilestone: (goalId: string, milestoneId: string) => Promise<void>
   removeGoal: (id: string) => Promise<void>
   updateSettings: (patch: Partial<AppSettings>) => Promise<void>
   saveWhisper: (text: string) => Promise<void>

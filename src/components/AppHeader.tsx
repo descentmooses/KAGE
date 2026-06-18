@@ -3,6 +3,7 @@ import { useTheme } from '../theme/useTheme'
 import { getBuildVersion } from '../lib/cacheBust'
 import { ConnectionDot } from './ConnectionDot'
 import { SettingsPanel } from './SettingsPanel'
+import { ElaraWhisperTrigger } from './elara/ElaraWhisperTrigger'
 import { useTracker } from '../context/trackerContext'
 import { useVoiceInput } from '../hooks/useVoiceInput'
 import { useToast } from '../hooks/useToast'
@@ -114,6 +115,8 @@ export function AppHeader() {
             </span>
           </button>
         )}
+
+        <ElaraWhisperTrigger />
 
         <button
           type="button"
