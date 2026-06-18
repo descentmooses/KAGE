@@ -1,5 +1,6 @@
 import { NeonGlowText } from './NeonGlowText'
 import { useTheme } from '../theme/useTheme'
+import { THEME_TRANSITION } from '../theme/transitions'
 
 export function KageHeroLogo() {
   const { mode } = useTheme()
@@ -18,39 +19,37 @@ export function KageHeroLogo() {
         padding: '0 20px',
       }}
     >
-      {!isLight && (
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            width: 'min(95vw, 480px)',
-            height: 'min(95vw, 480px)',
-            background:
-              'radial-gradient(circle, rgba(0,249,255,0.35) 0%, rgba(255,0,170,0.2) 35%, transparent 70%)',
-            opacity: 0.5,
-            filter: 'blur(48px)',
-            pointerEvents: 'none',
-            transform: 'scale(1.6)',
-          }}
-        />
-      )}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          width: 'min(95vw, 480px)',
+          height: 'min(95vw, 480px)',
+          background:
+            'radial-gradient(circle, rgba(0,249,255,0.35) 0%, rgba(255,0,170,0.2) 35%, transparent 70%)',
+          opacity: isLight ? 0 : 0.5,
+          filter: 'blur(48px)',
+          pointerEvents: 'none',
+          transform: 'scale(1.6)',
+          transition: THEME_TRANSITION,
+        }}
+      />
 
-      {!isLight && (
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            width: 'min(70vw, 320px)',
-            height: 'min(28vw, 120px)',
-            bottom: '18%',
-            background: 'radial-gradient(ellipse, rgba(0,0,0,0.4) 0%, transparent 70%)',
-            opacity: 0.55,
-            filter: 'blur(20px)',
-            pointerEvents: 'none',
-            transform: 'scale(1.6)',
-          }}
-        />
-      )}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          width: 'min(70vw, 320px)',
+          height: 'min(28vw, 120px)',
+          bottom: '18%',
+          background: 'radial-gradient(ellipse, rgba(0,0,0,0.4) 0%, transparent 70%)',
+          opacity: isLight ? 0 : 0.55,
+          filter: 'blur(20px)',
+          pointerEvents: 'none',
+          transform: 'scale(1.6)',
+          transition: THEME_TRANSITION,
+        }}
+      />
 
       <NeonGlowText
         variant="hero"

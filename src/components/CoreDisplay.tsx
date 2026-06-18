@@ -1,5 +1,6 @@
 import { NeonGlowText } from './NeonGlowText'
 import { useTheme } from '../theme/useTheme'
+import { THEME_TRANSITION } from '../theme/transitions'
 
 interface CoreDisplayProps {
   value: number
@@ -40,6 +41,7 @@ export function CoreDisplay({ value }: CoreDisplayProps) {
             opacity: 0.4,
             filter: 'blur(20px)',
             pointerEvents: 'none',
+            transition: THEME_TRANSITION,
           }}
         />
         <NeonGlowText

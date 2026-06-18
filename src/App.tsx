@@ -8,6 +8,7 @@ import { ReflectScreen } from './components/screens/ReflectScreen'
 import { CodexScreen } from './components/screens/CodexScreen'
 import { useRatings } from './hooks/useRatings'
 import { useTheme } from './theme/useTheme'
+import { THEME_TRANSITION } from './theme/transitions'
 import type { TabId } from './types'
 
 function App() {
@@ -40,7 +41,7 @@ function App() {
         overflow: 'hidden',
         backgroundColor: tokens.surface,
         color: tokens.text,
-        transition: 'background-color 0.35s ease, color 0.35s ease',
+        transition: THEME_TRANSITION,
       }}
     >
       <AppHeader />

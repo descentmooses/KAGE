@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { ThemeContext } from './themeContext'
 import { getTokens, type ThemeMode } from './tokens'
+import { THEME_TRANSITION, withThemeTransition } from './transitions'
 
 const STORAGE_KEY = 'kage-theme'
 
@@ -27,7 +28,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const toggleTheme = useCallback(() => {
-    setMode(mode === 'dark' ? 'light' : 'dark')
+    const next = mode === 'dark' ? 'light' : 'dark'
+    withThemeTransition(() => setMode(next))
   }, [mode, setMode])
 
   const tokens = useMemo(() => getTokens(mode), [mode])
@@ -36,6 +38,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     document.documentElement.setAttribute('data-theme', mode)
     document.body.style.backgroundColor = tokens.surface
     document.body.style.color = tokens.text
+    document.body.style.transition = THEME_TRANSITION
+
+    const themeColor = document.querySelector('meta[name="theme-color"]')
+    if (themeColor) {
+      themeColor.setAttribute('content', mode === 'dark' ? '#0a0a0a' : '#ffffff')
+    }
   }, [mode, tokens])
 
   const value = useMemo(
