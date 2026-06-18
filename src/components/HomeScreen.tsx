@@ -51,7 +51,7 @@ export function HomeScreen({ ratings, onLogRating }: HomeScreenProps) {
 
   return (
     <>
-      <main className="relative flex h-full w-full items-center justify-center px-8 sm:px-12">
+      <main className="relative flex h-full w-full items-center justify-center overflow-y-auto px-6 py-4 sm:px-10">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div
             className="absolute top-1/2 left-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-[0.06]"
@@ -73,7 +73,7 @@ export function HomeScreen({ ratings, onLogRating }: HomeScreenProps) {
           <CoreDisplay value={core} />
 
           <section
-            className="mt-14 w-full sm:mt-16"
+            className="mt-10 w-full sm:mt-12"
             aria-label="Mind, Body, Spirit"
           >
             {AREAS.map((area, i) => (

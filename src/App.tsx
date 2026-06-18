@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AppHeader } from './components/AppHeader'
 import { HomeScreen } from './components/HomeScreen'
 import { CRTOverlay } from './components/CRTOverlay'
 import { BottomNav } from './components/BottomNav'
@@ -14,6 +15,8 @@ function App() {
 
   return (
     <div className="relative flex h-full w-full flex-col overflow-hidden bg-void">
+      <AppHeader />
+
       <div className="relative min-h-0 flex-1 overflow-hidden">
         {activeTab === 'home' && (
           <HomeScreen ratings={ratings} onLogRating={logRating} />
@@ -23,6 +26,7 @@ function App() {
         {activeTab === 'codex' && <CodexScreen />}
         <CRTOverlay />
       </div>
+
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   )
