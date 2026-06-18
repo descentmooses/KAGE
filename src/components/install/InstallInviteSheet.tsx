@@ -6,19 +6,24 @@ import { useToast } from '../../hooks/useToast'
 function ShareIcon() {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <rect x="7" y="3" width="10" height="10" rx="2" stroke="currentColor" strokeWidth="1.5" />
       <path
-        d="M12 13v5M9 16h6"
+        d="M12 3v10M8 7l4-4 4 4"
         stroke="currentColor"
         strokeWidth="1.5"
         strokeLinecap="round"
+        strokeLinejoin="round"
       />
-      <path
-        d="M4 14v5a2 2 0 002 2h12a2 2 0 002-2v-5"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
+      <rect x="4" y="11" width="16" height="10" rx="2" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  )
+}
+
+function MenuIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <circle cx="12" cy="6" r="1.5" fill="currentColor" />
+      <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+      <circle cx="12" cy="18" r="1.5" fill="currentColor" />
     </svg>
   )
 }
@@ -64,8 +69,15 @@ function StepRow({
 
 export function InstallInviteSheet() {
   const { tokens } = useTheme()
-  const { open, isIOS, deferredPrompt, closeInstallInvite, dismissForSession, promptInstall } =
-    useInstallPromptContext()
+  const {
+    open,
+    isIOS,
+    isAndroid,
+    deferredPrompt,
+    hasNativePrompt,
+    dismissForSession,
+    promptInstall,
+  } = useInstallPromptContext()
   const { showToast } = useToast()
 
   if (!open) return null
@@ -75,6 +87,8 @@ export function InstallInviteSheet() {
       const outcome = await promptInstall()
       if (outcome === 'accepted') {
         showToast('KAGE is now on your home screen. The path continues with you.', 'success')
+      } else if (outcome === 'dismissed') {
+        dismissForSession()
       }
       return
     }
@@ -83,8 +97,11 @@ export function InstallInviteSheet() {
 
   const handleLater = () => {
     dismissForSession()
-    closeInstallInvite()
   }
+
+  const showIOSSteps = isIOS && !hasNativePrompt
+  const showAndroidSteps = isAndroid && !hasNativePrompt
+  const showDesktopSteps = !isIOS && !isAndroid && !hasNativePrompt
 
   return (
     <div
@@ -170,7 +187,7 @@ export function InstallInviteSheet() {
           </p>
         </div>
 
-        {isIOS && !deferredPrompt ? (
+        {showIOSSteps && (
           <div style={{ marginBottom: 20 }}>
             <StepRow n="1" title="Tap Share">
               <div
@@ -186,12 +203,12 @@ export function InstallInviteSheet() {
                 }}
               >
                 <ShareIcon />
-                <span style={{ fontSize: 12, color: tokens.textMuted }}>Safari share menu</span>
+                <span style={{ fontSize: 12, color: tokens.textMuted }}>Browser share menu</span>
               </div>
             </StepRow>
             <StepRow n="2" title='Scroll — tap “Add to Home Screen”'>
               <p style={{ margin: 0, fontSize: 13, color: tokens.textMuted, lineHeight: 1.5 }}>
-                The option lives below the fold in the share sheet.
+                In Chrome: Share → “Add to Home Screen”. In Safari: Share → “Add to Home Screen”.
               </p>
             </StepRow>
             <StepRow n="3" title='Tap “Add”'>
@@ -200,10 +217,59 @@ export function InstallInviteSheet() {
               </p>
             </StepRow>
           </div>
-        ) : (
+        )}
+
+        {showAndroidSteps && (
+          <div style={{ marginBottom: 20 }}>
+            <StepRow n="1" title="Open the browser menu">
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '8px 12px',
+                  borderRadius: 10,
+                  border: `1px solid ${tokens.border}`,
+                  color: tokens.crimson,
+                  background: tokens.surfaceElevated,
+                }}
+              >
+                <MenuIcon />
+                <span style={{ fontSize: 12, color: tokens.textMuted }}>⋮ top-right in Chrome</span>
+              </div>
+            </StepRow>
+            <StepRow n="2" title='Tap “Install app” or “Add to Home screen”'>
+              <p style={{ margin: 0, fontSize: 13, color: tokens.textMuted, lineHeight: 1.5 }}>
+                Wording varies by Chrome version — both install KAGE to your home screen.
+              </p>
+            </StepRow>
+            <StepRow n="3" title="Confirm">
+              <p style={{ margin: 0, fontSize: 13, color: tokens.textMuted, lineHeight: 1.5 }}>
+                Launch from your home screen like any app — fully offline.
+              </p>
+            </StepRow>
+          </div>
+        )}
+
+        {showDesktopSteps && (
+          <div style={{ marginBottom: 20 }}>
+            <StepRow n="1" title="Look for the install icon">
+              <p style={{ margin: 0, fontSize: 13, color: tokens.textMuted, lineHeight: 1.5 }}>
+                In Chrome/Edge, an install icon may appear in the address bar (⊕ or monitor).
+              </p>
+            </StepRow>
+            <StepRow n="2" title="Or use the browser menu">
+              <p style={{ margin: 0, fontSize: 13, color: tokens.textMuted, lineHeight: 1.5 }}>
+                ⋮ Menu → “Install KAGE…” or “Apps” → “Install this site as an app”.
+              </p>
+            </StepRow>
+          </div>
+        )}
+
+        {hasNativePrompt && (
           <p
             style={{
-              margin: '0 0 20px',
+              margin: '0 0 16px',
               fontSize: 14,
               lineHeight: 1.65,
               color: tokens.text,
@@ -215,7 +281,7 @@ export function InstallInviteSheet() {
           </p>
         )}
 
-        {deferredPrompt && (
+        {hasNativePrompt ? (
           <button
             type="button"
             onClick={() => void handleInstall()}
@@ -236,6 +302,27 @@ export function InstallInviteSheet() {
             }}
           >
             INSTALL KAGE
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={handleLater}
+            className="kage-touch-target"
+            style={{
+              width: '100%',
+              minHeight: 56,
+              marginBottom: 10,
+              borderRadius: 12,
+              border: `1px solid ${tokens.crimson}`,
+              background: tokens.bannerBg,
+              color: tokens.crimson,
+              fontFamily: '"Orbitron", sans-serif',
+              fontSize: 11,
+              letterSpacing: '0.3em',
+              cursor: 'pointer',
+            }}
+          >
+            GOT IT
           </button>
         )}
 
@@ -266,7 +353,7 @@ export function InstallInviteSheet() {
             letterSpacing: '0.08em',
           }}
         >
-          Won&apos;t appear again this session
+          Won&apos;t auto-prompt again this session · tap header Install anytime
         </p>
       </div>
     </div>

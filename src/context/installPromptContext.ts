@@ -5,7 +5,12 @@ export interface InstallPromptContextValue {
   deferredPrompt: BeforeInstallPromptEvent | null
   isStandalone: boolean
   isIOS: boolean
-  canInstall: boolean
+  isAndroid: boolean
+  /** Show install affordances (header, pill, settings) — false when already installed. */
+  showInstallUI: boolean
+  /** Chromium native install prompt available. */
+  hasNativePrompt: boolean
+  pillVisible: boolean
   open: boolean
   openInstallInvite: () => void
   closeInstallInvite: () => void

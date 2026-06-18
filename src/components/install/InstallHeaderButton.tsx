@@ -4,9 +4,9 @@ import { useInstallPromptContext } from '../../context/installPromptContext'
 /** Compact header affordance — manual install entry. */
 export function InstallHeaderButton() {
   const { tokens } = useTheme()
-  const { isStandalone, canInstall, openInstallInvite } = useInstallPromptContext()
+  const { isStandalone, showInstallUI, openInstallInvite } = useInstallPromptContext()
 
-  if (isStandalone || !canInstall) return null
+  if (isStandalone || !showInstallUI) return null
 
   return (
     <button

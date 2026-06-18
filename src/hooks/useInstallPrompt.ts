@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
 import {
   type BeforeInstallPromptEvent,
-  canOfferInstall,
-  isIOSSafari,
+  hasNativeInstallPrompt,
+  isIOSDevice,
   isStandaloneMode,
+  shouldShowInstallUI,
 } from '../lib/pwa/installUtils'
 
 /** Low-level install prompt capture — prefer useInstallPromptContext in UI. */
@@ -39,8 +40,9 @@ export function useInstallPrompt() {
   }, [deferred])
 
   return {
-    canInstall: canOfferInstall(deferred) && !installed,
-    isIOS: isIOSSafari(),
+    canInstall: shouldShowInstallUI() && !installed,
+    hasNativePrompt: hasNativeInstallPrompt(deferred),
+    isIOS: isIOSDevice(),
     installed,
     promptInstall,
   }

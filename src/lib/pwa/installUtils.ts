@@ -1,4 +1,4 @@
-/** Session flag — prompt shown or dismissed this browser session. */
+/** Session flag — install invite dismissed or auto-shown this browser session. */
 export const INSTALL_SESSION_KEY = 'kage-install-prompt-shown'
 
 export interface BeforeInstallPromptEvent extends Event {
@@ -16,22 +16,37 @@ export function isStandaloneMode(): boolean {
   )
 }
 
-/** iOS Safari (not Chrome/Firefox on iOS). */
-export function isIOSSafari(): boolean {
+/** Any iOS device (Safari, Chrome, Firefox, etc.). */
+export function isIOSDevice(): boolean {
   if (typeof navigator === 'undefined') return false
   const ua = navigator.userAgent
-  const isIOS =
+  if ((window as Window & { MSStream?: unknown }).MSStream) return false
+  return (
     /iPad|iPhone|iPod/.test(ua) ||
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
-  if (!isIOS) return false
-  if ((window as Window & { MSStream?: unknown }).MSStream) return false
+  )
+}
+
+/** iOS Safari specifically (for fine-tuned copy). */
+export function isIOSSafari(): boolean {
+  if (!isIOSDevice()) return false
+  const ua = navigator.userAgent
   return /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua)
 }
 
-export function canOfferInstall(deferred: BeforeInstallPromptEvent | null): boolean {
-  if (isStandaloneMode()) return false
-  if (deferred) return true
-  return isIOSSafari()
+export function isAndroidDevice(): boolean {
+  if (typeof navigator === 'undefined') return false
+  return /Android/i.test(navigator.userAgent)
+}
+
+/** True when we should surface any install UI (not already installed). */
+export function shouldShowInstallUI(): boolean {
+  return !isStandaloneMode()
+}
+
+/** Native one-tap install via beforeinstallprompt. */
+export function hasNativeInstallPrompt(deferred: BeforeInstallPromptEvent | null): boolean {
+  return !!deferred && !isStandaloneMode()
 }
 
 export function wasInstallPromptShownThisSession(): boolean {
@@ -53,6 +68,13 @@ export function markInstallPromptShownThisSession(): void {
 /** Custom event fired after the user's first-ever shadow log. */
 export const FIRST_SHADOW_LOG_EVENT = 'kage:first-shadow-log'
 
+/** Fired after any shadow log while install UI may still be shown. */
+export const SHADOW_LOGGED_EVENT = 'kage:shadow-logged'
+
 export function emitFirstShadowLog(): void {
   window.dispatchEvent(new CustomEvent(FIRST_SHADOW_LOG_EVENT))
+}
+
+export function emitShadowLogged(): void {
+  window.dispatchEvent(new CustomEvent(SHADOW_LOGGED_EVENT))
 }

@@ -50,7 +50,7 @@ import {
 } from '../lib/gamification'
 import { buildTrendForPeriod, generateInsights } from '../lib/insights'
 import { normalizeGoal, progressFromMilestones } from '../lib/goals'
-import { emitFirstShadowLog } from '../lib/pwa/installUtils'
+import { emitFirstShadowLog, emitShadowLogged } from '../lib/pwa/installUtils'
 import { isStreakMilestone } from '../lib/affirmations'
 import { LoadingScreen } from '../components/LoadingScreen'
 import { DAILY_QUESTS, evaluateQuests, QUEST_BONUSES } from '../lib/quests'
@@ -226,6 +226,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       }
       await refresh()
       if (wasFirstEver) emitFirstShadowLog()
+      if (!options?.silent) emitShadowLogged()
       return log
     },
     [applyGamificationXp, pushCelebration, refresh],

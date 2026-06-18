@@ -8,16 +8,20 @@ import {
 } from 'react'
 import {
   type BeforeInstallPromptEvent,
-  canOfferInstall,
   FIRST_SHADOW_LOG_EVENT,
-  isIOSSafari,
+  isAndroidDevice,
+  isIOSDevice,
   isStandaloneMode,
   markInstallPromptShownThisSession,
+  SHADOW_LOGGED_EVENT,
+  shouldShowInstallUI,
   wasInstallPromptShownThisSession,
 } from '../lib/pwa/installUtils'
 import { InstallPromptContext } from './installPromptContext'
 
-const ENGAGEMENT_DELAY_MS = 50_000
+const ENGAGEMENT_DELAY_MS = 45_000
+/** Floating pill appears quickly so install is never invisible. */
+const PILL_DELAY_MS = 6_000
 
 export function InstallPromptProvider({
   children,
@@ -31,22 +35,26 @@ export function InstallPromptProvider({
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null)
   const [standalone, setStandalone] = useState(isStandaloneMode)
   const [open, setOpen] = useState(false)
+  const [pillVisible, setPillVisible] = useState(false)
   const engagementTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const pillTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const triedAutoShow = useRef(false)
 
-  const isIOS = isIOSSafari()
-  const canInstall = canOfferInstall(deferred)
+  const isIOS = isIOSDevice()
+  const isAndroid = isAndroidDevice()
+  const showInstallUI = shouldShowInstallUI() && !standalone
+  const hasNativePrompt = !!deferred
 
   const dismissForSession = useCallback(() => {
     markInstallPromptShownThisSession()
     setOpen(false)
+    setPillVisible(false)
   }, [])
 
   const openInstallInvite = useCallback(() => {
     if (standalone) return
-    if (!canOfferInstall(deferred) && !isIOSSafari()) return
     setOpen(true)
-  }, [deferred, standalone])
+  }, [standalone])
 
   const closeInstallInvite = useCallback(() => {
     setOpen(false)
@@ -55,12 +63,13 @@ export function InstallPromptProvider({
   const maybeAutoShow = useCallback(() => {
     if (triedAutoShow.current) return
     if (standalone || wasInstallPromptShownThisSession()) return
-    if (!canOfferInstall(deferred) && !isIOSSafari()) return
+    if (!shouldShowInstallUI()) return
 
     triedAutoShow.current = true
     markInstallPromptShownThisSession()
+    setPillVisible(false)
     setOpen(true)
-  }, [deferred, standalone])
+  }, [standalone])
 
   useEffect(() => {
     const onBeforeInstall = (e: Event) => {
@@ -71,6 +80,7 @@ export function InstallPromptProvider({
       setStandalone(true)
       setDeferred(null)
       setOpen(false)
+      setPillVisible(false)
       markInstallPromptShownThisSession()
       onInstalled?.()
     }
@@ -84,9 +94,9 @@ export function InstallPromptProvider({
     }
   }, [onInstalled])
 
+  // Return visit: earned timing after engagement (no beforeinstallprompt required)
   useEffect(() => {
     if (!isReturnVisit || standalone || wasInstallPromptShownThisSession()) return
-    if (!canOfferInstall(deferred) && !isIOSSafari()) return
 
     engagementTimer.current = setTimeout(() => {
       maybeAutoShow()
@@ -95,8 +105,22 @@ export function InstallPromptProvider({
     return () => {
       if (engagementTimer.current) clearTimeout(engagementTimer.current)
     }
-  }, [deferred, isReturnVisit, maybeAutoShow, standalone])
+  }, [isReturnVisit, maybeAutoShow, standalone])
 
+  // Floating pill — always surfaces install within a few seconds if not standalone
+  useEffect(() => {
+    if (standalone || wasInstallPromptShownThisSession()) return
+
+    pillTimer.current = setTimeout(() => {
+      setPillVisible(true)
+    }, PILL_DELAY_MS)
+
+    return () => {
+      if (pillTimer.current) clearTimeout(pillTimer.current)
+    }
+  }, [standalone])
+
+  // First-ever shadow log
   useEffect(() => {
     const onFirstLog = () => {
       if (engagementTimer.current) clearTimeout(engagementTimer.current)
@@ -106,6 +130,17 @@ export function InstallPromptProvider({
     return () => window.removeEventListener(FIRST_SHADOW_LOG_EVENT, onFirstLog)
   }, [maybeAutoShow])
 
+  // Any shadow log — triggers invite if user hasn't dismissed this session (e.g. daily log)
+  useEffect(() => {
+    const onShadowLogged = () => {
+      if (!wasInstallPromptShownThisSession() && !triedAutoShow.current) {
+        maybeAutoShow()
+      }
+    }
+    window.addEventListener(SHADOW_LOGGED_EVENT, onShadowLogged)
+    return () => window.removeEventListener(SHADOW_LOGGED_EVENT, onShadowLogged)
+  }, [maybeAutoShow])
+
   const promptInstall = useCallback(async (): Promise<'accepted' | 'dismissed' | 'unavailable'> => {
     if (!deferred) return 'unavailable'
     await deferred.prompt()
@@ -113,6 +148,7 @@ export function InstallPromptProvider({
     setDeferred(null)
     markInstallPromptShownThisSession()
     setOpen(false)
+    setPillVisible(false)
     return outcome
   }, [deferred])
 
@@ -121,8 +157,11 @@ export function InstallPromptProvider({
       deferredPrompt: deferred,
       isStandalone: standalone,
       isIOS,
-      canInstall,
+      isAndroid,
+      showInstallUI,
+      hasNativePrompt,
       open,
+      pillVisible,
       openInstallInvite,
       closeInstallInvite,
       dismissForSession,
@@ -132,8 +171,11 @@ export function InstallPromptProvider({
       deferred,
       standalone,
       isIOS,
-      canInstall,
+      isAndroid,
+      showInstallUI,
+      hasNativePrompt,
       open,
+      pillVisible,
       openInstallInvite,
       closeInstallInvite,
       dismissForSession,

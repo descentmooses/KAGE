@@ -12,7 +12,7 @@ interface SettingsPanelProps {
 export function SettingsPanel({ open, onClose }: SettingsPanelProps) {
   const { tokens } = useTheme()
   const { exportData, resetDemoData } = useTracker()
-  const { isStandalone, canInstall, openInstallInvite } = useInstallPromptContext()
+  const { isStandalone, showInstallUI, openInstallInvite } = useInstallPromptContext()
   const [confirmReset, setConfirmReset] = useState(false)
 
   if (!open) return null
@@ -87,7 +87,7 @@ export function SettingsPanel({ open, onClose }: SettingsPanelProps) {
           <ThemeToggle />
         </div>
 
-        {!isStandalone && canInstall && (
+        {!isStandalone && showInstallUI && (
           <button
             type="button"
             onClick={openInstallInvite}

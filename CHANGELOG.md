@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.6.2] — 2026-06-18
+
+### Install prompt visibility fix
+
+- Install UI no longer requires `beforeinstallprompt` or iOS Safari to appear
+- Floating **Add to Home Screen** pill surfaces within 6s on all non-standalone visits
+- Platform-specific install steps for iOS (all browsers), Android Chrome, and desktop
+- Shadow log triggers install invite; header Install button always visible when not installed
+
 ## [0.6.1] — 2026-06-18
 
 ### PWA installability & install invitation
