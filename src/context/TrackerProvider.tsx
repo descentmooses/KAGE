@@ -32,7 +32,6 @@ import {
   getReflectionLogByDate,
   getSettings,
   importAllData,
-  putDailyLog,
   putGamification,
   putGoal,
   putSettings,
@@ -43,15 +42,12 @@ import { todayKey } from '../lib/dates'
 import {
   applyXpDelta,
   resetQuestsIfNewDay,
-  updateStreak,
-  xpForDailyLog,
   xpForMorning,
   xpForReflection,
 } from '../lib/gamification'
 import { buildTrendForPeriod, generateInsights } from '../lib/insights'
 import { normalizeGoal, progressFromMilestones } from '../lib/goals'
-import { emitFirstShadowLog, emitShadowLogged } from '../lib/pwa/installUtils'
-import { isStreakMilestone } from '../lib/affirmations'
+import { persistDailyLog } from '../lib/tracker/persistDailyLog'
 import { LoadingScreen } from '../components/LoadingScreen'
 import { DAILY_QUESTS, evaluateQuests, QUEST_BONUSES } from '../lib/quests'
 
@@ -193,40 +189,17 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       options?: { silent?: boolean; notes?: string },
     ) => {
       const date = todayKey()
-      const existingLog = await getDailyLog(date)
-      const priorLogs = await getAllDailyLogs()
-      const wasFirstEver = priorLogs.length === 0 && !existingLog
-      const log: DailyLog = {
-        date,
-        mind: patch.mind,
-        body: patch.body,
-        spirit: patch.spirit,
-        core: computeCore(patch.mind, patch.body, patch.spirit),
-        notes: options?.notes ?? patch.notes,
+      const g = resetQuestsIfNewDay(await getGamification(), date)
+      const log = await persistDailyLog({
+        patch,
         source,
-        loggedAt: new Date().toISOString(),
-      }
-      await putDailyLog(log)
-
-      let g = resetQuestsIfNewDay(await getGamification(), date)
-      if (!existingLog) {
-        g = updateStreak(g, date)
-        if (isStreakMilestone(g.currentStreak)) {
-          pushCelebration(`${g.currentStreak} days — the flame holds steady`, 'success')
-        }
-      }
-      if (log.core >= 85 && (!existingLog || existingLog.core < 85)) {
-        pushCelebration('Core ascendant — peak shadow state', 'success')
-      }
-      const xpGain = xpForDailyLog(log)
-      if (!options?.silent) {
-        await applyGamificationXp(g, xpGain, `Shadow logged — +${xpGain} XP`)
-      } else {
-        await putGamification(applyXpDelta(g, xpGain).state)
-      }
+        date,
+        gamification: g,
+        options,
+        onCelebration: (message) => pushCelebration(message, 'success'),
+        applyGamificationXp,
+      })
       await refresh()
-      if (wasFirstEver) emitFirstShadowLog()
-      if (!options?.silent) emitShadowLogged()
       return log
     },
     [applyGamificationXp, pushCelebration, refresh],

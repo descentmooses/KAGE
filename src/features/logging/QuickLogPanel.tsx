@@ -1,23 +1,11 @@
 import { useState } from 'react'
 import { useTheme } from '../../theme/useTheme'
-import { useTracker } from '../../context/trackerContext'
+import { ParkedSafetyBanner } from '../../components/ui/ParkedSafetyBanner'
+import { useShadowLogs } from '../../hooks/useShadowLogs'
 import { useSwipeGesture } from '../../hooks/useSwipeGesture'
+import { pillarAccentColor, tapHaptic } from '../../lib/pillars'
 import type { AreaConfig, AreaId } from '../../types'
 import { AREA_CONFIGS } from '../../types'
-
-function tapHaptic(pattern: number | number[] = 12) {
-  try {
-    navigator.vibrate?.(pattern)
-  } catch {
-    /* unsupported */
-  }
-}
-
-const QUICK_TAGS: { id: AreaId; label: string; kanji: string }[] = [
-  { id: 'mind', label: 'Mind', kanji: '心' },
-  { id: 'body', label: 'Body', kanji: '体' },
-  { id: 'spirit', label: 'Spirit', kanji: '魂' },
-]
 
 interface QuickLogPanelProps {
   onAdjust: (area: AreaConfig) => void
@@ -44,7 +32,7 @@ function SwipeableQuickLogButton({
 }) {
   const { tokens } = useTheme()
   const swipe = useSwipeGesture({ onSwipeLeft, onSwipeRight })
-  const accentColor = area.color === 'ember' ? tokens.ember : tokens.crimson
+  const accentColor = pillarAccentColor(tokens, area.color)
   const active = isPressed || isSwiping
 
   return (
@@ -106,7 +94,7 @@ function SwipeableQuickLogButton({
 
 export function QuickLogPanel({ onAdjust }: QuickLogPanelProps) {
   const { tokens } = useTheme()
-  const { ratings, quickBump, logRating } = useTracker()
+  const { ratings, quickBump, logRating } = useShadowLogs()
   const [pressedId, setPressedId] = useState<AreaId | null>(null)
   const [swipeState, setSwipeState] = useState<{ id: AreaId; dx: number } | null>(null)
   const [activeTag, setActiveTag] = useState<AreaId | null>(null)
@@ -149,31 +137,7 @@ export function QuickLogPanel({ onAdjust }: QuickLogPanelProps) {
 
   return (
     <div style={{ marginBottom: 20 }}>
-      <div
-        style={{
-          padding: '10px 12px',
-          borderRadius: 10,
-          border: `1px solid ${tokens.borderAccent}`,
-          background: tokens.bannerBg,
-          marginBottom: 12,
-        }}
-      >
-        <p
-          style={{
-            margin: 0,
-            fontFamily: '"Share Tech Mono", monospace',
-            fontSize: 9,
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase',
-            color: tokens.crimson,
-          }}
-        >
-          Parked only — safety first
-        </p>
-        <p style={{ margin: '4px 0 0', fontSize: 11, lineHeight: 1.45, color: tokens.textMuted }}>
-          Log only when safely parked. Never while driving or on Autopilot.
-        </p>
-      </div>
+      <ParkedSafetyBanner />
 
       <div
         style={{
@@ -239,7 +203,7 @@ export function QuickLogPanel({ onAdjust }: QuickLogPanelProps) {
         Quick tags
       </p>
       <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-        {QUICK_TAGS.map((tag) => (
+        {AREA_CONFIGS.map((tag) => (
           <button
             key={tag.id}
             type="button"
@@ -282,7 +246,7 @@ interface CompactPillarsProps {
 
 export function CompactPillars({ onAdjust }: CompactPillarsProps) {
   const { tokens } = useTheme()
-  const { ratings } = useTracker()
+  const { ratings } = useShadowLogs()
 
   return (
     <div
@@ -316,7 +280,7 @@ export function CompactPillars({ onAdjust }: CompactPillarsProps) {
               fontFamily: '"Share Tech Mono", monospace',
               fontSize: 16,
               fontWeight: 600,
-              color: area.color === 'ember' ? tokens.ember : tokens.crimson,
+              color: pillarAccentColor(tokens, area.color),
               marginTop: 4,
               display: 'block',
             }}

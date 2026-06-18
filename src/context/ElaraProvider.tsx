@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState, type ReactNode } from 'react'
 import { ElaraContext } from './elaraContext'
-import { ElaraWhispersModal } from '../components/elara/ElaraWhispersModal'
+import { ElaraWhispersModal } from '../features/whispers/ElaraWhispersModal'
 
 export function ElaraProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false)

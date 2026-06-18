@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTheme } from '../../theme/useTheme'
-import { useTracker } from '../../context/trackerContext'
+import { useFreedomGoals } from '../../hooks/useFreedomGoals'
 import type { Goal, GoalCategory } from '../../types'
 import { GOAL_CATEGORY_LABEL } from '../../lib/goals'
 import { GoalModal, type GoalFormData } from './GoalModal'
@@ -41,7 +41,7 @@ export function GoalPanel() {
     updateGoalProgress,
     toggleMilestone,
     removeGoal,
-  } = useTracker()
+  } = useFreedomGoals()
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<Goal | null>(null)
 

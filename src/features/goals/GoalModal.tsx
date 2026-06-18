@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTheme } from '../../theme/useTheme'
+import { ModalShell } from '../../components/ui/ModalShell'
 import type { Goal, GoalCategory, GoalMilestone } from '../../types'
 
 const CATEGORIES: { id: GoalCategory; label: string }[] = [
@@ -36,14 +37,6 @@ function GoalModalForm({ goal, onClose, onSave }: GoalModalFormProps) {
   const [targetDate, setTargetDate] = useState(goal?.targetDate ?? '')
   const [milestones, setMilestones] = useState<GoalMilestone[]>(goal?.milestones ?? [])
   const [milestoneInput, setMilestoneInput] = useState('')
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
 
   const addMilestone = () => {
     const label = milestoneInput.trim()
@@ -280,38 +273,11 @@ interface GoalModalProps {
 }
 
 export function GoalModal({ open, goal, onClose, onSave }: GoalModalProps) {
-  const { tokens } = useTheme()
-
-  if (!open) return null
-
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      className="animate-fade-in"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 100,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 20,
-      }}
-    >
-      <button
-        type="button"
-        aria-label="Close"
-        onClick={onClose}
-        style={{
-          position: 'absolute',
-          inset: 0,
-          border: 'none',
-          background: tokens.modalBackdrop,
-          cursor: 'pointer',
-        }}
-      />
-      <GoalModalForm key={goal?.id ?? 'new'} goal={goal} onClose={onClose} onSave={onSave} />
-    </div>
+    <ModalShell open={open} onClose={onClose} maxWidth={360}>
+      {open ? (
+        <GoalModalForm key={goal?.id ?? 'new'} goal={goal} onClose={onClose} onSave={onSave} />
+      ) : null}
+    </ModalShell>
   )
 }

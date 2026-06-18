@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { useTheme } from '../../theme/useTheme'
-import { useTracker } from '../../context/trackerContext'
+import { useParkedState } from '../../hooks/useParkedState'
 
 export function VoiceConfirmBanner() {
   const { tokens } = useTheme()
-  const { pendingVoiceNote, setPendingVoiceNote } = useTracker()
+  const { pendingVoiceNote, setPendingVoiceNote } = useParkedState()
   const [confirmedNote, setConfirmedNote] = useState<string | null>(null)
 
   const acknowledged =

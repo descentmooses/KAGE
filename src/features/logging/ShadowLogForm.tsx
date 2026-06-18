@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTheme } from '../../theme/useTheme'
-import { useTracker } from '../../context/trackerContext'
+import { useShadowLogs } from '../../hooks/useShadowLogs'
+import { pillarAccentColor } from '../../lib/pillars'
 import type { AreaId } from '../../types'
 import { AREA_CONFIGS } from '../../types'
 
@@ -13,7 +14,7 @@ interface ShadowLogFieldsProps {
 
 function ShadowLogFields({ mind, body, spirit, initialNote = '' }: ShadowLogFieldsProps) {
   const { tokens } = useTheme()
-  const { saveTodayShadow } = useTracker()
+  const { saveTodayShadow } = useShadowLogs()
   const [m, setM] = useState(mind)
   const [b, setB] = useState(body)
   const [s, setS] = useState(spirit)
@@ -56,7 +57,7 @@ function ShadowLogFields({ mind, body, spirit, initialNote = '' }: ShadowLogFiel
               <span
                 style={{
                   fontFamily: '"Share Tech Mono", monospace',
-                  color: area.color === 'ember' ? tokens.ember : tokens.crimson,
+                  color: pillarAccentColor(tokens, area.color),
                 }}
               >
                 {value}
@@ -125,7 +126,7 @@ function ShadowLogFields({ mind, body, spirit, initialNote = '' }: ShadowLogFiel
 
 export function ShadowLogForm() {
   const { tokens } = useTheme()
-  const { ratings, pendingVoiceNote } = useTracker()
+  const { ratings, pendingVoiceNote } = useShadowLogs()
 
   return (
     <div

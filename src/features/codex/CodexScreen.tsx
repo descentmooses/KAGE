@@ -1,5 +1,5 @@
 import { useMemo, useRef } from 'react'
-import { TabScreen } from '../TabScreen'
+import { TabScreen } from '../../components/TabScreen'
 import { useTheme } from '../../theme/useTheme'
 import { useTracker } from '../../context/trackerContext'
 import { useToast } from '../../hooks/useToast'

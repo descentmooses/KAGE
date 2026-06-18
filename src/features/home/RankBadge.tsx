@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTheme } from '../../theme/useTheme'
-import { useTracker } from '../../context/trackerContext'
+import { useStreakAndXP } from '../../hooks/useStreakAndXP'
 import { xpProgressInLevel } from '../../lib/gamification'
 import { isStreakMilestone } from '../../lib/affirmations'
 
@@ -8,7 +8,7 @@ const RANK_STORAGE_KEY = 'kage-last-rank'
 
 export function RankBadge() {
   const { tokens } = useTheme()
-  const { gamification } = useTracker()
+  const { gamification } = useStreakAndXP()
   const progress = xpProgressInLevel(gamification.xp, gamification.level)
   const milestone = isStreakMilestone(gamification.currentStreak)
   const [rankFlash, setRankFlash] = useState(false)
