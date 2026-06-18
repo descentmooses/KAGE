@@ -22,13 +22,13 @@ export function AppHeader() {
         transition: 'background-color 0.35s ease, border-color 0.35s ease',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
         <span
           style={{
             fontFamily: '"Orbitron", sans-serif',
-            fontSize: 14,
+            fontSize: 12,
             fontWeight: 600,
-            letterSpacing: '0.5em',
+            letterSpacing: '0.45em',
             color: tokens.text,
             textShadow: `0 0 16px ${tokens.cyanGlow}`,
             transition: 'color 0.35s ease',
@@ -39,7 +39,7 @@ export function AppHeader() {
         <span
           style={{
             width: 1,
-            height: 16,
+            height: 28,
             background: tokens.border,
             transition: 'background 0.35s ease',
           }}
@@ -47,9 +47,11 @@ export function AppHeader() {
         <span
           style={{
             fontFamily: '"Noto Sans JP", sans-serif',
-            fontSize: 20,
-            color: tokens.textSubtle,
-            textShadow: `0 0 12px ${tokens.cyanGlow}`,
+            fontSize: 34,
+            fontWeight: 500,
+            lineHeight: 1,
+            color: tokens.text,
+            textShadow: `0 0 14px ${tokens.cyanGlow}`,
             transition: 'color 0.35s ease',
           }}
         >
