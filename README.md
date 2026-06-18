@@ -25,6 +25,18 @@ npm run build
 npm run preview
 ```
 
+## GitHub Pages
+
+The app deploys automatically to GitHub Pages on every push to `main`.
+
+**Live URL:** https://descentmooses.github.io/KAGE/
+
+To build locally with the same base path used in production:
+
+```bash
+npm run build:pages
+```
+
 ## PWA
 
 The app registers a service worker and includes a web manifest for installability on supported devices. Icons are generated from `public/icons/icon.svg`:
