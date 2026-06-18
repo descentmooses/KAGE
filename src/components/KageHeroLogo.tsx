@@ -1,10 +1,9 @@
 import { NeonGlowText } from './NeonGlowText'
 import { useTheme } from '../theme/useTheme'
-import { THEME_TRANSITION } from '../theme/transitions'
+import { themeEffectTransition } from '../theme/transitions'
 
 export function KageHeroLogo() {
-  const { mode } = useTheme()
-  const isLight = mode === 'light'
+  const { showDarkEffects } = useTheme()
 
   return (
     <div
@@ -27,11 +26,11 @@ export function KageHeroLogo() {
           height: 'min(95vw, 480px)',
           background:
             'radial-gradient(circle, rgba(0,249,255,0.35) 0%, rgba(255,0,170,0.2) 35%, transparent 70%)',
-          opacity: isLight ? 0 : 0.5,
+          opacity: showDarkEffects ? 0.5 : 0,
           filter: 'blur(48px)',
           pointerEvents: 'none',
           transform: 'scale(1.6)',
-          transition: THEME_TRANSITION,
+          transition: themeEffectTransition(showDarkEffects),
         }}
       />
 
@@ -43,11 +42,11 @@ export function KageHeroLogo() {
           height: 'min(28vw, 120px)',
           bottom: '18%',
           background: 'radial-gradient(ellipse, rgba(0,0,0,0.4) 0%, transparent 70%)',
-          opacity: isLight ? 0 : 0.55,
+          opacity: showDarkEffects ? 0.55 : 0,
           filter: 'blur(20px)',
           pointerEvents: 'none',
           transform: 'scale(1.6)',
-          transition: THEME_TRANSITION,
+          transition: themeEffectTransition(showDarkEffects),
         }}
       />
 

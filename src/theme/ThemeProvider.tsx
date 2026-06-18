@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { ThemeContext } from './themeContext'
 import { getTokens, type ThemeMode } from './tokens'
-import { THEME_TRANSITION, withThemeTransition } from './transitions'
+import {
+  DARK_EFFECTS_DELAY_MS,
+  THEME_TRANSITION,
+  prefersReducedMotion,
+  withThemeTransition,
+} from './transitions'
 
 const STORAGE_KEY = 'kage-theme'
 
@@ -16,7 +21,9 @@ function readStoredTheme(): ThemeMode {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [mode, setModeState] = useState<ThemeMode>(readStoredTheme)
+  const initialMode = readStoredTheme()
+  const [mode, setModeState] = useState<ThemeMode>(initialMode)
+  const [showDarkEffects, setShowDarkEffects] = useState(initialMode === 'dark')
 
   const setMode = useCallback((next: ThemeMode) => {
     setModeState(next)
@@ -29,10 +36,29 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   const toggleTheme = useCallback(() => {
     const next = mode === 'dark' ? 'light' : 'dark'
-    withThemeTransition(() => setMode(next))
+    withThemeTransition(
+      () => setMode(next),
+      next === 'dark' ? 'to-dark' : 'to-light',
+    )
   }, [mode, setMode])
 
   const tokens = useMemo(() => getTokens(mode), [mode])
+
+  useEffect(() => {
+    if (mode === 'light') {
+      setShowDarkEffects(false)
+      return
+    }
+
+    if (prefersReducedMotion()) {
+      setShowDarkEffects(true)
+      return
+    }
+
+    setShowDarkEffects(false)
+    const timer = window.setTimeout(() => setShowDarkEffects(true), DARK_EFFECTS_DELAY_MS)
+    return () => window.clearTimeout(timer)
+  }, [mode])
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', mode)
@@ -47,8 +73,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [mode, tokens])
 
   const value = useMemo(
-    () => ({ mode, tokens, toggleTheme, setMode }),
-    [mode, tokens, toggleTheme, setMode],
+    () => ({ mode, tokens, showDarkEffects, toggleTheme, setMode }),
+    [mode, tokens, showDarkEffects, toggleTheme, setMode],
   )
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>

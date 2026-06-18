@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { useTheme } from '../theme/useTheme'
-import { THEME_TRANSITION } from '../theme/transitions'
+import { themeEffectTransition } from '../theme/transitions'
 
 /** Neon gradient fill + glow without background-clip/filter on the same layer (avoids light-mode square bug). */
 export const NEON_CORE_GRADIENT =
@@ -27,8 +27,7 @@ export function NeonGlowText({
   as: Tag = 'span',
   variant = 'default',
 }: NeonGlowTextProps) {
-  const { mode } = useTheme()
-  const isLight = mode === 'light'
+  const { showDarkEffects } = useTheme()
   const isHero = variant === 'hero'
 
   const textLayer: CSSProperties = {
@@ -88,8 +87,8 @@ export function NeonGlowText({
             color: 'rgba(0, 249, 255, 0.35)',
             transform: 'translateY(0.08em) scale(1.03)',
             filter: 'blur(10px)',
-            opacity: isLight ? 0 : 1,
-            transition: THEME_TRANSITION,
+            opacity: showDarkEffects ? 1 : 0,
+            transition: themeEffectTransition(showDarkEffects),
           }}
         >
           {children}
@@ -102,8 +101,8 @@ export function NeonGlowText({
           ...layerBase,
           color: '#00f9ff',
           filter: isHero ? NEON_HERO_GLOW_DARK : NEON_CORE_GLOW,
-          opacity: isLight ? 0 : 1,
-          transition: THEME_TRANSITION,
+          opacity: showDarkEffects ? 1 : 0,
+          transition: themeEffectTransition(showDarkEffects),
         }}
       >
         {children}

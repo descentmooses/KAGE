@@ -64,6 +64,16 @@ body {
     animation-duration: 500ms;
     animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
+
+  html[data-theme-entering='dark']::view-transition-old(root) {
+    animation-duration: 400ms;
+    animation-timing-function: cubic-bezier(0.4, 0, 1, 1);
+  }
+
+  html[data-theme-entering='dark']::view-transition-new(root) {
+    animation-duration: 650ms;
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
