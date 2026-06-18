@@ -34,7 +34,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', mode)
-    document.body.style.backgroundColor = tokens.bg
+    document.body.style.backgroundColor = tokens.surface
     document.body.style.color = tokens.text
   }, [mode, tokens])
 

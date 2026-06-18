@@ -3,6 +3,7 @@ import { KageHeroLogo } from './KageHeroLogo'
 import { CoreDisplay } from './CoreDisplay'
 import { NeonBar } from './NeonBar'
 import { RatingModal } from './RatingModal'
+import { useTheme } from '../theme/useTheme'
 import type { AreaConfig, AreaId, Ratings } from '../types'
 
 const AREAS: AreaConfig[] = [
@@ -20,6 +21,7 @@ export function HomeScreen({
   ratings: Ratings
   onLogRating: (area: AreaId, value: number) => void
 }) {
+  const { tokens } = useTheme()
   const [activeArea, setActiveArea] = useState<AreaConfig | null>(null)
 
   const stats = useMemo(
@@ -48,6 +50,7 @@ export function HomeScreen({
           height: '100%',
           overflowY: 'auto',
           WebkitOverflowScrolling: 'touch',
+          backgroundColor: tokens.surface,
         }}
       >
         <section
@@ -58,6 +61,7 @@ export function HomeScreen({
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
+            backgroundColor: tokens.surface,
           }}
         >
           <KageHeroLogo />

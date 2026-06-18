@@ -1,7 +1,10 @@
 import { useTheme } from '../theme/useTheme'
 
 export function CRTOverlay() {
-  const { tokens } = useTheme()
+  const { tokens, mode } = useTheme()
+
+  // CRT vignette/scanlines tint the content area in light mode — header/footer sit outside it
+  if (mode === 'light') return null
 
   return (
     <div

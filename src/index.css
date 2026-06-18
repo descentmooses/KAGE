@@ -25,6 +25,7 @@
 
 [data-theme="light"] {
   --kage-bg: #ffffff;
+  --kage-surface: #ffffff;
   --kage-text: #1c1c24;
   --kage-cyan: #0098a8;
   --kage-magenta: #c4007a;

@@ -1,5 +1,8 @@
 export type ThemeMode = 'dark' | 'light'
 
+/** Single white used for all light-mode surfaces (header, footer, content). */
+export const LIGHT_WHITE = '#ffffff'
+
 export interface ThemeTokens {
   bg: string
   text: string
@@ -111,12 +114,12 @@ export const darkTokens: ThemeTokens = {
 }
 
 export const lightTokens: ThemeTokens = {
-  bg: '#ffffff',
+  bg: LIGHT_WHITE,
   text: '#1c1c24',
   textMuted: '#6a6878',
   textSubtle: 'rgba(28,28,36,0.45)',
-  surface: '#ffffff',
-  surfaceElevated: '#ffffff',
+  surface: LIGHT_WHITE,
+  surfaceElevated: LIGHT_WHITE,
   border: 'rgba(28,28,36,0.1)',
   borderAccent: 'rgba(0,152,168,0.25)',
   cyan: '#0098a8',
@@ -129,7 +132,7 @@ export const lightTokens: ThemeTokens = {
   dividerGradient: 'linear-gradient(90deg, transparent, #0098a8, #c4007a, transparent)',
   neonFill: 'linear-gradient(90deg, rgba(0,152,168,0.35) 0%, #0098a8 70%, #c4007a 100%)',
   neonTrack: 'rgba(28,28,36,0.08)',
-  neonCap: '#ffffff',
+  neonCap: LIGHT_WHITE,
   headerShadow: '0 1px 16px rgba(0,152,168,0.08)',
   navShadow: '0 0 24px rgba(28,28,36,0.06)',
   navActiveBg: 'linear-gradient(180deg, rgba(0,152,168,0.1), transparent)',
@@ -158,7 +161,7 @@ export const lightTokens: ThemeTokens = {
   crtVignette: 'radial-gradient(ellipse at center, transparent 70%, rgba(28,28,36,0.04) 100%)',
   crtScanline:
     'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,152,168,0.04) 3px, rgba(0,152,168,0.04) 5px)',
-  crtOpacity: 0.5,
+  crtOpacity: 0,
   selectionBg: 'rgba(0,152,168,0.15)',
   selectionText: '#0098a8',
   toggleTrack: 'rgba(28,28,36,0.08)',

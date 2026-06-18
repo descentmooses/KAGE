@@ -38,7 +38,7 @@ function App() {
         height: '100%',
         width: '100%',
         overflow: 'hidden',
-        backgroundColor: tokens.bg,
+        backgroundColor: tokens.surface,
         color: tokens.text,
         transition: 'background-color 0.35s ease, color 0.35s ease',
       }}
