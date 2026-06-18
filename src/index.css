@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 @theme {
-  --color-void: #000000;
-  --color-ink: #0a0a0c;
-  --color-slate: #121218;
-  --color-cyan: #00f0ff;
-  --color-cyan-dim: #00f0ff33;
+  --color-void: #0a0a0a;
+  --color-ink: #0e0e0e;
+  --color-slate: #141414;
+  --color-cyan: #00f9ff;
+  --color-cyan-dim: #00f9ff33;
   --color-magenta: #ff00aa;
   --color-magenta-dim: #ff00aa33;
-  --color-ghost: #8a8a9a;
-  --color-mist: #4a4a5a;
+  --color-ghost: #7a7a8a;
+  --color-mist: #3a3a4a;
 
   --font-display: "Orbitron", sans-serif;
   --font-jp: "Noto Sans JP", sans-serif;
@@ -32,7 +32,7 @@ body,
 
 body {
   background-color: var(--color-void);
-  color: #e8e8f0;
+  color: #e0e0ea;
   font-family: var(--font-jp);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -47,7 +47,7 @@ body {
 @keyframes pulse-glow {
   0%,
   100% {
-    opacity: 0.4;
+    opacity: 0.5;
   }
   50% {
     opacity: 1;
@@ -63,61 +63,25 @@ body {
   }
 }
 
-@keyframes flicker {
+@keyframes core-breathe {
   0%,
   100% {
-    opacity: 1;
+    filter: brightness(1);
   }
-  92% {
-    opacity: 1;
-  }
-  93% {
-    opacity: 0.85;
-  }
-  94% {
-    opacity: 1;
-  }
-  97% {
-    opacity: 0.9;
-  }
-}
-
-@keyframes line-expand {
-  0% {
-    transform: scaleX(0);
-    opacity: 0;
-  }
-  100% {
-    transform: scaleX(1);
-    opacity: 1;
+  50% {
+    filter: brightness(1.08);
   }
 }
 
 @keyframes fade-up {
   0% {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(16px);
   }
   100% {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 4s ease-in-out infinite;
-}
-
-.animate-flicker {
-  animation: flicker 8s linear infinite;
-}
-
-.animate-line-expand {
-  animation: line-expand 1.2s ease-out forwards;
-}
-
-.animate-fade-up {
-  animation: fade-up 0.8s ease-out forwards;
 }
 
 @keyframes fade-in {
@@ -129,6 +93,26 @@ body {
   }
 }
 
+.animate-pulse-glow {
+  animation: pulse-glow 5s ease-in-out infinite;
+}
+
+.animate-core-breathe {
+  animation: core-breathe 6s ease-in-out infinite;
+}
+
+.animate-fade-up {
+  animation: fade-up 1s ease-out forwards;
+}
+
 .animate-fade-in {
-  animation: fade-in 0.3s ease-out forwards;
+  animation: fade-in 0.4s ease-out forwards;
+}
+
+.core-glow {
+  background: linear-gradient(135deg, #00f9ff 0%, #e8e8f0 45%, #ff00aa 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 24px #00f9ff66) drop-shadow(0 0 48px #ff00aa33);
 }

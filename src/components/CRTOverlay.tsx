@@ -4,36 +4,32 @@ export function CRTOverlay() {
       className="pointer-events-none fixed inset-0 z-50"
       aria-hidden="true"
     >
-      {/* Vignette */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            'radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.6) 100%)',
+            'radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%)',
         }}
       />
 
-      {/* Scanlines */}
       <div
-        className="absolute inset-0 opacity-[0.04]"
+        className="absolute inset-0 opacity-[0.035]"
         style={{
           backgroundImage:
-            'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,240,255,0.15) 2px, rgba(0,240,255,0.15) 4px)',
-          animation: 'scanline-drift 0.1s linear infinite',
+            'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,249,255,0.12) 2px, rgba(0,249,255,0.12) 4px)',
+          animation: 'scanline-drift 0.12s linear infinite',
         }}
       />
 
-      {/* Subtle screen curvature glow */}
       <div
-        className="absolute inset-0 opacity-30"
+        className="absolute inset-0 opacity-20"
         style={{
           background:
-            'radial-gradient(ellipse at 50% 0%, rgba(0,240,255,0.03) 0%, transparent 60%), radial-gradient(ellipse at 50% 100%, rgba(255,0,170,0.03) 0%, transparent 60%)',
+            'radial-gradient(ellipse at 50% 0%, rgba(0,249,255,0.04) 0%, transparent 55%), radial-gradient(ellipse at 50% 100%, rgba(255,0,170,0.03) 0%, transparent 55%)',
         }}
       />
 
-      {/* CRT edge glow */}
-      <div className="absolute inset-0 border border-white/[0.03] rounded-sm" />
+      <div className="absolute inset-0 border border-white/[0.02]" />
     </div>
   )
 }

@@ -31,7 +31,7 @@ function RatingModalContent({
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
 
-  const accent = area.color === 'cyan' ? '#00f0ff' : '#ff00aa'
+  const accent = area.color === 'cyan' ? '#00f9ff' : '#ff00aa'
 
   return (
     <div
@@ -114,7 +114,7 @@ function RatingModalContent({
           onClick={() => onLog(selected)}
           className="w-full py-3 font-display text-[10px] tracking-[0.4em] text-void uppercase transition-all duration-300 hover:brightness-110"
           style={{
-            background: `linear-gradient(90deg, ${accent}cc, ${area.color === 'cyan' ? '#ff00aa' : '#00f0ff'}cc)`,
+            background: `linear-gradient(90deg, ${accent}cc, ${area.color === 'cyan' ? '#ff00aa' : '#00f9ff'}cc)`,
             boxShadow: `0 0 20px ${accent}33`,
           }}
         >
