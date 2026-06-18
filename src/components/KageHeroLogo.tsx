@@ -35,20 +35,40 @@ export function KageHeroLogo() {
         />
       )}
 
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          width: 'min(70vw, 320px)',
-          height: 'min(28vw, 120px)',
-          bottom: '18%',
-          background: 'radial-gradient(ellipse, rgba(0,0,0,0.4) 0%, transparent 70%)',
-          opacity: isLight ? 0.22 : 0.55,
-          filter: 'blur(20px)',
-          pointerEvents: 'none',
-          transform: 'scale(1.6)',
-        }}
-      />
+      {!isLight && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            width: 'min(70vw, 320px)',
+            height: 'min(28vw, 120px)',
+            bottom: '18%',
+            background: 'radial-gradient(ellipse, rgba(0,0,0,0.4) 0%, transparent 70%)',
+            opacity: 0.55,
+            filter: 'blur(20px)',
+            pointerEvents: 'none',
+            transform: 'scale(1.6)',
+          }}
+        />
+      )}
+
+      {isLight && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            bottom: '6%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: 'min(68vw, 300px)',
+            height: 'clamp(16px, 4vw, 28px)',
+            background:
+              'radial-gradient(ellipse at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.08) 45%, transparent 72%)',
+            filter: 'blur(8px)',
+            pointerEvents: 'none',
+          }}
+        />
+      )}
 
       <NeonGlowText
         variant="hero"
@@ -66,6 +86,7 @@ export function KageHeroLogo() {
 
       <NeonGlowText
         variant="hero"
+        lightShadow={false}
         lightOutline
         as="h1"
         style={{

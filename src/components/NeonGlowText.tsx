@@ -19,7 +19,7 @@ interface NeonGlowTextProps {
   variant?: 'default' | 'hero'
   /** Light-mode depth shadows (hero only). Off for large kanji where blur reads as grey halo. */
   lightShadow?: boolean
-  /** Subtle black stroke in light mode (hero kanji). */
+  /** Black stroke in light mode (hero kanji). */
   lightOutline?: boolean
 }
 
@@ -36,8 +36,6 @@ export function NeonGlowText({
   const isLight = mode === 'light'
   const isHero = variant === 'hero'
   const isLightHeroShadow = isLight && isHero && lightShadow
-  const lightShadowFarOpacity = lightOutline ? 0.22 : 0.3
-  const lightShadowNearOpacity = lightOutline ? 0.32 : 0.45
 
   const textLayer: CSSProperties = {
     fontFamily: style?.fontFamily,
@@ -95,7 +93,7 @@ export function NeonGlowText({
             style={{
               ...layerBase,
               color: '#000000',
-              opacity: lightShadowFarOpacity,
+              opacity: 0.3,
               transform: 'translateY(0.14em) scale(1.02)',
               filter: 'blur(18px)',
             }}
@@ -107,7 +105,7 @@ export function NeonGlowText({
             style={{
               ...layerBase,
               color: '#000000',
-              opacity: lightShadowNearOpacity,
+              opacity: 0.45,
               transform: 'translateY(0.07em)',
               filter: 'blur(6px)',
             }}
