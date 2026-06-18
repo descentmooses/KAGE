@@ -1,13 +1,26 @@
 import { useTheme } from '../../theme/useTheme'
 import { useInstallPromptContext } from '../../context/installPromptContext'
+import { useToast } from '../../hooks/useToast'
 
 /** Persistent install affordance above bottom nav — visible until dismissed or installed. */
 export function InstallFloatingPill() {
   const { tokens } = useTheme()
-  const { showInstallUI, pillVisible, open, openInstallInvite, dismissForSession } =
+  const { showInstallUI, pillVisible, open, hasNativePrompt, tryNativeInstall, dismissForSession } =
     useInstallPromptContext()
+  const { showToast } = useToast()
 
   if (!showInstallUI || !pillVisible || open) return null
+
+  const handleClick = async () => {
+    if (hasNativePrompt) {
+      const outcome = await tryNativeInstall()
+      if (outcome === 'accepted') {
+        showToast('KAGE is now in your app drawer. The path continues with you.', 'success')
+      }
+      return
+    }
+    await tryNativeInstall()
+  }
 
   return (
     <div
@@ -26,9 +39,9 @@ export function InstallFloatingPill() {
     >
       <button
         type="button"
-        onClick={openInstallInvite}
+        onClick={() => void handleClick()}
         className="kage-touch-target animate-shadow-presence"
-        aria-label="Install KAGE on your home screen"
+        aria-label="Install KAGE app on your device"
         style={{
           flex: 1,
           minHeight: 52,
@@ -39,7 +52,7 @@ export function InstallFloatingPill() {
           color: tokens.crimson,
           fontFamily: '"Orbitron", sans-serif',
           fontSize: 10,
-          letterSpacing: '0.22em',
+          letterSpacing: '0.18em',
           cursor: 'pointer',
           boxShadow: `0 8px 32px rgba(0,0,0,0.4), 0 0 20px ${tokens.accentGlow}`,
         }}
@@ -47,7 +60,7 @@ export function InstallFloatingPill() {
         <span style={{ marginRight: 8, fontFamily: '"Noto Sans JP", sans-serif' }} aria-hidden>
           影
         </span>
-        ADD TO HOME SCREEN
+        {hasNativePrompt ? 'INSTALL APP' : 'HOW TO INSTALL'}
       </button>
       <button
         type="button"

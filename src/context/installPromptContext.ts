@@ -6,16 +6,16 @@ export interface InstallPromptContextValue {
   isStandalone: boolean
   isIOS: boolean
   isAndroid: boolean
-  /** Show install affordances (header, pill, settings) — false when already installed. */
   showInstallUI: boolean
-  /** Chromium native install prompt available. */
   hasNativePrompt: boolean
+  sessionDismissed: boolean
   pillVisible: boolean
   open: boolean
   openInstallInvite: () => void
   closeInstallInvite: () => void
   dismissForSession: () => void
   promptInstall: () => Promise<'accepted' | 'dismissed' | 'unavailable'>
+  tryNativeInstall: () => Promise<'accepted' | 'dismissed' | 'unavailable'>
 }
 
 export const InstallPromptContext = createContext<InstallPromptContextValue | null>(null)

@@ -5,16 +5,31 @@ import { VitePWA } from 'vite-plugin-pwa'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import pkg from './package.json' with { type: 'json' }
 
+const GH_PAGES_ORIGIN = 'https://descentmooses.github.io'
+
 // GitHub Pages project site — always build with /KAGE/ base for production
 const base = process.env.GITHUB_PAGES === 'true' || process.env.NODE_ENV === 'production'
   ? '/KAGE/'
   : '/'
 
-const scope = base
-const startUrl = base
+const isGhPagesBuild =
+  process.env.GITHUB_PAGES === 'true' || process.env.NODE_ENV === 'production'
 
-function asset(path: string) {
-  return `${base}${path.replace(/^\//, '')}`
+function pwaManifestUrl(path: string): string {
+  const clean = path.replace(/^\//, '')
+  if (isGhPagesBuild) {
+    return `${GH_PAGES_ORIGIN}/KAGE/${clean}`
+  }
+  const b = base.endsWith('/') ? base : `${base}/`
+  return `${b}${clean}`
+}
+
+const scope = pwaManifestUrl('')
+const startUrl = pwaManifestUrl('?source=pwa')
+const manifestId = pwaManifestUrl('')
+
+function m(path: string) {
+  return pwaManifestUrl(path)
 }
 
 // Unique per build — used for cache busting on GitHub Pages
@@ -100,7 +115,8 @@ export default defineConfig({
     cacheBustAssetsPlugin(),
     VitePWA({
       registerType: 'autoUpdate',
-      injectRegister: 'auto',
+      injectRegister: 'inline',
+      manifestFilename: 'manifest.json',
       includeAssets: [
         'favicon.svg',
         'icons/icon-192.png',
@@ -110,7 +126,7 @@ export default defineConfig({
         'screenshots/wide.png',
       ],
       manifest: {
-        id: scope,
+        id: manifestId,
         name: 'KAGE — Shadow Mastery',
         short_name: 'KAGE',
         description:
@@ -118,27 +134,29 @@ export default defineConfig({
         theme_color: '#050505',
         background_color: '#050505',
         display: 'standalone',
+        display_override: ['standalone', 'minimal-ui'],
         orientation: 'portrait',
         start_url: startUrl,
         scope,
         lang: 'en',
         dir: 'ltr',
+        prefer_related_applications: false,
         categories: ['health', 'lifestyle', 'productivity'],
         icons: [
           {
-            src: asset('icons/icon-192.png'),
+            src: m('icons/icon-192.png'),
             sizes: '192x192',
             type: 'image/png',
             purpose: 'any',
           },
           {
-            src: asset('icons/icon-512.png'),
+            src: m('icons/icon-512.png'),
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any',
           },
           {
-            src: asset('icons/icon-maskable-512.png'),
+            src: m('icons/icon-maskable-512.png'),
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable',
@@ -146,14 +164,14 @@ export default defineConfig({
         ],
         screenshots: [
           {
-            src: asset('screenshots/narrow.png'),
+            src: m('screenshots/narrow.png'),
             sizes: '540x720',
             type: 'image/png',
             form_factor: 'narrow',
             label: 'KAGE daily triad and quick log',
           },
           {
-            src: asset('screenshots/wide.png'),
+            src: m('screenshots/wide.png'),
             sizes: '1280x720',
             type: 'image/png',
             form_factor: 'wide',
@@ -162,7 +180,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        navigateFallback: asset('index.html'),
+        navigateFallback: `${base}index.html`,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json,woff2,webmanifest}'],
         runtimeCaching: [
           {

@@ -18,16 +18,6 @@ function ShareIcon() {
   )
 }
 
-function MenuIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <circle cx="12" cy="6" r="1.5" fill="currentColor" />
-      <circle cx="12" cy="12" r="1.5" fill="currentColor" />
-      <circle cx="12" cy="18" r="1.5" fill="currentColor" />
-    </svg>
-  )
-}
-
 function StepRow({
   n,
   title,
@@ -86,7 +76,7 @@ export function InstallInviteSheet() {
     if (deferredPrompt) {
       const outcome = await promptInstall()
       if (outcome === 'accepted') {
-        showToast('KAGE is now on your home screen. The path continues with you.', 'success')
+        showToast('KAGE is now in your app drawer. The path continues with you.', 'success')
       } else if (outcome === 'dismissed') {
         dismissForSession()
       }
@@ -221,31 +211,37 @@ export function InstallInviteSheet() {
 
         {showAndroidSteps && (
           <div style={{ marginBottom: 20 }}>
-            <StepRow n="1" title="Open the browser menu">
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  padding: '8px 12px',
-                  borderRadius: 10,
-                  border: `1px solid ${tokens.border}`,
-                  color: tokens.crimson,
-                  background: tokens.surfaceElevated,
-                }}
-              >
-                <MenuIcon />
-                <span style={{ fontSize: 12, color: tokens.textMuted }}>⋮ top-right in Chrome</span>
-              </div>
-            </StepRow>
-            <StepRow n="2" title='Tap “Install app” or “Add to Home screen”'>
+            <p
+              style={{
+                margin: '0 0 14px',
+                padding: '10px 12px',
+                borderRadius: 8,
+                border: `1px solid ${tokens.borderAccent}`,
+                background: tokens.bannerBg,
+                fontSize: 12,
+                lineHeight: 1.55,
+                color: tokens.textMuted,
+              }}
+            >
+              Do <strong style={{ color: tokens.crimson }}>not</strong> save a link or download a
+              .io file — that is only a bookmark. Use Chrome&apos;s{' '}
+              <strong style={{ color: tokens.text }}>Install app</strong> to get KAGE in your app
+              drawer with the 影 icon.
+            </p>
+            <StepRow n="1" title="Open Chrome menu ⋮">
               <p style={{ margin: 0, fontSize: 13, color: tokens.textMuted, lineHeight: 1.5 }}>
-                Wording varies by Chrome version — both install KAGE to your home screen.
+                Top-right corner of Chrome — not the page share button.
               </p>
             </StepRow>
-            <StepRow n="3" title="Confirm">
+            <StepRow n="2" title='Tap “Install app”'>
               <p style={{ margin: 0, fontSize: 13, color: tokens.textMuted, lineHeight: 1.5 }}>
-                Launch from your home screen like any app — fully offline.
+                You may also see “Install KAGE” or an install banner at the bottom of Chrome. Avoid
+                “Download page” — that creates a useless file.
+              </p>
+            </StepRow>
+            <StepRow n="3" title="Confirm install">
+              <p style={{ margin: 0, fontSize: 13, color: tokens.textMuted, lineHeight: 1.5 }}>
+                KAGE appears in your app drawer like a real app — offline, full-screen, crimson icon.
               </p>
             </StepRow>
           </div>

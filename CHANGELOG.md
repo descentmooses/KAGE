@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.6.3] — 2026-06-18
+
+### Android WebAPK install fix
+
+- Manifest uses absolute `https://descentmooses.github.io/KAGE/` URLs for `id`, `scope`, `start_url`, and icons
+- Service worker registers inline (before app bundle) for Chrome installability
+- Manifest served as `manifest.json`; PNG favicons for shortcut icons
+- Native `beforeinstallprompt` opens one-tap **Install KAGE** sheet (real app drawer install)
+- Android guidance warns against .io bookmark files vs **Install app**
+
 ## [0.6.2] — 2026-06-18
 
 ### Install prompt visibility fix

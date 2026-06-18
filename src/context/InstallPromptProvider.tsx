@@ -20,8 +20,8 @@ import {
 import { InstallPromptContext } from './installPromptContext'
 
 const ENGAGEMENT_DELAY_MS = 45_000
-/** Floating pill appears quickly so install is never invisible. */
 const PILL_DELAY_MS = 6_000
+const ANDROID_NATIVE_WAIT_MS = 5_000
 
 export function InstallPromptProvider({
   children,
@@ -38,12 +38,19 @@ export function InstallPromptProvider({
   const [pillVisible, setPillVisible] = useState(false)
   const engagementTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pillTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const nativeWaitTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const triedAutoShow = useRef(false)
+  const deferredRef = useRef<BeforeInstallPromptEvent | null>(null)
+
+  useEffect(() => {
+    deferredRef.current = deferred
+  }, [deferred])
 
   const isIOS = isIOSDevice()
   const isAndroid = isAndroidDevice()
   const showInstallUI = shouldShowInstallUI() && !standalone
   const hasNativePrompt = !!deferred
+  const sessionDismissed = wasInstallPromptShownThisSession()
 
   const dismissForSession = useCallback(() => {
     markInstallPromptShownThisSession()
@@ -60,21 +67,40 @@ export function InstallPromptProvider({
     setOpen(false)
   }, [])
 
-  const maybeAutoShow = useCallback(() => {
-    if (triedAutoShow.current) return
-    if (standalone || wasInstallPromptShownThisSession()) return
-    if (!shouldShowInstallUI()) return
-
+  const openAutoInvite = useCallback(() => {
+    if (triedAutoShow.current || standalone || wasInstallPromptShownThisSession()) return
     triedAutoShow.current = true
-    markInstallPromptShownThisSession()
     setPillVisible(false)
     setOpen(true)
   }, [standalone])
 
+  const maybeAutoShow = useCallback(() => {
+    if (triedAutoShow.current || standalone || wasInstallPromptShownThisSession()) return
+
+    if (isAndroidDevice() && !deferred) {
+      if (nativeWaitTimer.current) clearTimeout(nativeWaitTimer.current)
+      nativeWaitTimer.current = setTimeout(() => {
+        if (!deferredRef.current && !standalone && !wasInstallPromptShownThisSession()) {
+          openAutoInvite()
+        }
+      }, ANDROID_NATIVE_WAIT_MS)
+      return
+    }
+
+    openAutoInvite()
+  }, [deferred, openAutoInvite, standalone])
+
   useEffect(() => {
     const onBeforeInstall = (e: Event) => {
       e.preventDefault()
-      setDeferred(e as BeforeInstallPromptEvent)
+      const prompt = e as BeforeInstallPromptEvent
+      setDeferred(prompt)
+      if (!isStandaloneMode() && !wasInstallPromptShownThisSession()) {
+        if (nativeWaitTimer.current) clearTimeout(nativeWaitTimer.current)
+        setPillVisible(false)
+        setOpen(true)
+        triedAutoShow.current = true
+      }
     }
     const onInstalled = () => {
       setStandalone(true)
@@ -94,7 +120,6 @@ export function InstallPromptProvider({
     }
   }, [onInstalled])
 
-  // Return visit: earned timing after engagement (no beforeinstallprompt required)
   useEffect(() => {
     if (!isReturnVisit || standalone || wasInstallPromptShownThisSession()) return
 
@@ -107,7 +132,6 @@ export function InstallPromptProvider({
     }
   }, [isReturnVisit, maybeAutoShow, standalone])
 
-  // Floating pill — always surfaces install within a few seconds if not standalone
   useEffect(() => {
     if (standalone || wasInstallPromptShownThisSession()) return
 
@@ -120,7 +144,6 @@ export function InstallPromptProvider({
     }
   }, [standalone])
 
-  // First-ever shadow log
   useEffect(() => {
     const onFirstLog = () => {
       if (engagementTimer.current) clearTimeout(engagementTimer.current)
@@ -130,7 +153,6 @@ export function InstallPromptProvider({
     return () => window.removeEventListener(FIRST_SHADOW_LOG_EVENT, onFirstLog)
   }, [maybeAutoShow])
 
-  // Any shadow log — triggers invite if user hasn't dismissed this session (e.g. daily log)
   useEffect(() => {
     const onShadowLogged = () => {
       if (!wasInstallPromptShownThisSession() && !triedAutoShow.current) {
@@ -152,6 +174,14 @@ export function InstallPromptProvider({
     return outcome
   }, [deferred])
 
+  const tryNativeInstall = useCallback(async () => {
+    if (deferred) {
+      return promptInstall()
+    }
+    openInstallInvite()
+    return 'unavailable' as const
+  }, [deferred, openInstallInvite, promptInstall])
+
   const value = useMemo(
     () => ({
       deferredPrompt: deferred,
@@ -160,12 +190,14 @@ export function InstallPromptProvider({
       isAndroid,
       showInstallUI,
       hasNativePrompt,
+      sessionDismissed,
       open,
       pillVisible,
       openInstallInvite,
       closeInstallInvite,
       dismissForSession,
       promptInstall,
+      tryNativeInstall,
     }),
     [
       deferred,
@@ -174,12 +206,14 @@ export function InstallPromptProvider({
       isAndroid,
       showInstallUI,
       hasNativePrompt,
+      sessionDismissed,
       open,
       pillVisible,
       openInstallInvite,
       closeInstallInvite,
       dismissForSession,
       promptInstall,
+      tryNativeInstall,
     ],
   )
 
