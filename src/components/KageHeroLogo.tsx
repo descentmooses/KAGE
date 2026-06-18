@@ -2,7 +2,7 @@ import { NeonGlowText } from './NeonGlowText'
 import { useTheme } from '../theme/useTheme'
 
 export function KageHeroLogo() {
-  const { tokens, mode } = useTheme()
+  const { mode } = useTheme()
   const isLight = mode === 'light'
 
   return (
@@ -24,8 +24,10 @@ export function KageHeroLogo() {
           position: 'absolute',
           width: 'min(95vw, 480px)',
           height: 'min(95vw, 480px)',
-          background: `radial-gradient(circle, ${tokens.cyanGlow} 0%, ${tokens.magentaGlow} 35%, transparent 70%)`,
-          opacity: isLight ? 0.55 : 0.5,
+          background: isLight
+            ? 'radial-gradient(circle, rgba(0,0,0,0.06) 0%, transparent 70%)'
+            : 'radial-gradient(circle, rgba(0,249,255,0.35) 0%, rgba(255,0,170,0.2) 35%, transparent 70%)',
+          opacity: isLight ? 1 : 0.5,
           filter: 'blur(48px)',
           pointerEvents: 'none',
         }}
@@ -38,8 +40,8 @@ export function KageHeroLogo() {
           width: 'min(70vw, 320px)',
           height: 'min(28vw, 120px)',
           bottom: '18%',
-          background: 'radial-gradient(ellipse, rgba(0,0,0,0.35) 0%, transparent 70%)',
-          opacity: isLight ? 0.25 : 0.55,
+          background: 'radial-gradient(ellipse, rgba(0,0,0,0.4) 0%, transparent 70%)',
+          opacity: isLight ? 0.35 : 0.55,
           filter: 'blur(20px)',
           pointerEvents: 'none',
         }}
