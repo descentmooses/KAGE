@@ -14,7 +14,7 @@ interface BottomNavProps {
 }
 
 export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
-  const { tokens } = useTheme()
+  const { tokens, mode } = useTheme()
 
   return (
     <nav
@@ -67,7 +67,7 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
                     width: 48,
                     height: 2,
                     background: `linear-gradient(90deg, ${tokens.cyan}, ${tokens.magenta})`,
-                    boxShadow: `0 0 8px ${tokens.cyan}`,
+                    boxShadow: mode === 'dark' ? 'none' : `0 0 8px ${tokens.cyan}`,
                     transition: 'background 0.35s ease',
                   }}
                 />

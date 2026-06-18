@@ -11,6 +11,15 @@ export function NeonBar({ area, value, onTap }: NeonBarProps) {
   const { tokens, mode } = useTheme()
   const fillPercent = (value / 10) * 100
   const accentColor = area.color === 'magenta' ? tokens.magenta : tokens.cyan
+  const fillGlow =
+    mode === 'dark'
+      ? 'none'
+      : `0 0 14px ${tokens.cyan}, 0 0 28px ${tokens.cyanGlow}`
+  const capGlow =
+    mode === 'dark'
+      ? '0 0 6px #fff'
+      : `0 0 6px #fff, 0 0 14px ${tokens.cyan}, 0 0 22px ${tokens.magenta}`
+  const valueGlow = mode === 'dark' ? 'none' : `0 0 10px ${accentColor}`
 
   return (
     <button
@@ -74,7 +83,7 @@ export function NeonBar({ area, value, onTap }: NeonBarProps) {
             fontFamily: '"Share Tech Mono", monospace',
             fontSize: 11,
             color: accentColor,
-            textShadow: `0 0 10px ${accentColor}`,
+            textShadow: valueGlow,
             transition: 'color 0.35s ease',
           }}
         >
@@ -103,7 +112,7 @@ export function NeonBar({ area, value, onTap }: NeonBarProps) {
             width: `${fillPercent}%`,
             borderRadius: 999,
             background: tokens.neonFill,
-            boxShadow: `0 0 14px ${tokens.cyan}, 0 0 28px ${tokens.cyanGlow}`,
+            boxShadow: fillGlow,
             transition: 'width 0.4s ease, background 0.35s ease',
           }}
         />
@@ -119,7 +128,7 @@ export function NeonBar({ area, value, onTap }: NeonBarProps) {
               height: 10,
               borderRadius: '50%',
               background: tokens.neonCap,
-              boxShadow: `0 0 6px #fff, 0 0 14px ${tokens.cyan}, 0 0 22px ${tokens.magenta}`,
+              boxShadow: capGlow,
               transition: 'left 0.4s ease',
             }}
           />

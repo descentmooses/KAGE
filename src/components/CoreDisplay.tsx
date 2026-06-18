@@ -1,13 +1,12 @@
 import { NeonGlowText } from './NeonGlowText'
 import { useTheme } from '../theme/useTheme'
-import { themeEffectTransition } from '../theme/transitions'
 
 interface CoreDisplayProps {
   value: number
 }
 
 export function CoreDisplay({ value }: CoreDisplayProps) {
-  const { tokens, showDarkEffects } = useTheme()
+  const { tokens } = useTheme()
 
   return (
     <div style={{ textAlign: 'center', padding: '8px 0' }}>
@@ -32,18 +31,6 @@ export function CoreDisplay({ value }: CoreDisplayProps) {
           display: 'inline-block',
         }}
       >
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            inset: '-20%',
-            background: `radial-gradient(circle, ${tokens.cyanGlow} 0%, transparent 70%)`,
-            opacity: showDarkEffects ? 0.4 : 0,
-            filter: 'blur(20px)',
-            pointerEvents: 'none',
-            transition: themeEffectTransition(showDarkEffects),
-          }}
-        />
         <NeonGlowText
           as="p"
           style={{
@@ -62,7 +49,6 @@ export function CoreDisplay({ value }: CoreDisplayProps) {
           height: 1,
           width: 100,
           background: tokens.dividerGradient,
-          boxShadow: `0 0 12px ${tokens.cyanGlow}`,
           transition: 'background 0.35s ease',
         }}
       />

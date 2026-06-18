@@ -33,7 +33,7 @@ export function ThemeToggle() {
           borderRadius: '50%',
           background: tokens.toggleThumb,
           boxShadow: isDark
-            ? '0 0 10px rgba(0,249,255,0.5)'
+            ? '0 2px 8px rgba(0,0,0,0.35)'
             : '0 2px 8px rgba(28,28,36,0.15)',
           transition: 'left 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease',
           display: 'flex',
