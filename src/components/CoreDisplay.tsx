@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import { NeonGlowText } from './NeonGlowText'
 import { useTheme } from '../theme/useTheme'
 
 interface CoreDisplayProps {
@@ -6,31 +6,7 @@ interface CoreDisplayProps {
 }
 
 export function CoreDisplay({ value }: CoreDisplayProps) {
-  const { tokens, mode } = useTheme()
-  const isLight = mode === 'light'
-
-  const numberStyle: CSSProperties = {
-    position: 'relative',
-    fontFamily: '"Orbitron", sans-serif',
-    fontSize: 'clamp(3.25rem, 15vw, 5rem)',
-    fontWeight: 700,
-    lineHeight: 1,
-    margin: 0,
-    transition: 'color 0.35s ease, text-shadow 0.35s ease, filter 0.35s ease',
-    ...(isLight
-      ? {
-          color: tokens.cyan,
-          textShadow: `0 0 18px ${tokens.cyanGlow}, 0 2px 12px ${tokens.magentaGlow}`,
-        }
-      : {
-          background: tokens.coreGradient,
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
-          color: 'transparent',
-          filter: tokens.coreGlow,
-        }),
-  }
+  const { tokens } = useTheme()
 
   return (
     <div style={{ textAlign: 'center', padding: '8px 0' }}>
@@ -61,12 +37,21 @@ export function CoreDisplay({ value }: CoreDisplayProps) {
             position: 'absolute',
             inset: '-20%',
             background: `radial-gradient(circle, ${tokens.cyanGlow} 0%, transparent 70%)`,
-            opacity: isLight ? 0.25 : 0.4,
+            opacity: 0.4,
             filter: 'blur(20px)',
             pointerEvents: 'none',
           }}
         />
-        <p style={numberStyle}>{value}</p>
+        <NeonGlowText
+          as="p"
+          style={{
+            fontFamily: '"Orbitron", sans-serif',
+            fontSize: 'clamp(3.25rem, 15vw, 5rem)',
+            fontWeight: 700,
+          }}
+        >
+          {value}
+        </NeonGlowText>
       </div>
 
       <div

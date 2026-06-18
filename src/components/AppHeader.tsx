@@ -10,60 +10,25 @@ export function AppHeader() {
     <header
       style={{
         flexShrink: 0,
-        height: 56,
+        height: 48,
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'flex-end',
         position: 'relative',
         backgroundColor: tokens.surface,
         borderBottom: `1px solid ${tokens.border}`,
         boxShadow: tokens.headerShadow,
         paddingTop: 'env(safe-area-inset-top, 0px)',
+        paddingRight: 16,
+        paddingLeft: 16,
         transition: 'background-color 0.35s ease, border-color 0.35s ease',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-        <span
-          style={{
-            fontFamily: '"Orbitron", sans-serif',
-            fontSize: 12,
-            fontWeight: 600,
-            letterSpacing: '0.45em',
-            color: tokens.text,
-            textShadow: `0 0 16px ${tokens.cyanGlow}`,
-            transition: 'color 0.35s ease',
-          }}
-        >
-          KAGE
-        </span>
-        <span
-          style={{
-            width: 1,
-            height: 28,
-            background: tokens.border,
-            transition: 'background 0.35s ease',
-          }}
-        />
-        <span
-          style={{
-            fontFamily: '"Noto Sans JP", sans-serif',
-            fontSize: 34,
-            fontWeight: 500,
-            lineHeight: 1,
-            color: tokens.text,
-            textShadow: `0 0 14px ${tokens.cyanGlow}`,
-            transition: 'color 0.35s ease',
-          }}
-        >
-          影
-        </span>
-      </div>
-
       {build && (
         <div
           style={{
             position: 'absolute',
-            left: 12,
+            left: 16,
             top: '50%',
             transform: 'translateY(-50%)',
             fontFamily: '"Share Tech Mono", monospace',
@@ -78,17 +43,7 @@ export function AppHeader() {
         </div>
       )}
 
-      <div
-        style={{
-          position: 'absolute',
-          right: 16,
-          top: '50%',
-          transform: 'translateY(-50%)',
-          paddingTop: 'env(safe-area-inset-top, 0px)',
-        }}
-      >
-        <ThemeToggle />
-      </div>
+      <ThemeToggle />
     </header>
   )
 }

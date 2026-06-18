@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { KageHeroLogo } from './KageHeroLogo'
 import { CoreDisplay } from './CoreDisplay'
 import { NeonBar } from './NeonBar'
 import { RatingModal } from './RatingModal'
@@ -46,13 +47,30 @@ export function HomeScreen({
         style={{
           height: '100%',
           overflowY: 'auto',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '16px 20px',
+          WebkitOverflowScrolling: 'touch',
         }}
       >
-        <div style={{ width: '100%', maxWidth: 340 }}>
+        <section
+          style={{
+            position: 'relative',
+            minHeight: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+          }}
+        >
+          <KageHeroLogo />
+        </section>
+
+        <section
+          style={{
+            padding: '32px 20px 40px',
+            maxWidth: 340,
+            margin: '0 auto',
+            width: '100%',
+          }}
+        >
           <CoreDisplay value={core} />
           <div style={{ marginTop: 32 }}>
             {AREAS.map((area) => (
@@ -64,7 +82,7 @@ export function HomeScreen({
               />
             ))}
           </div>
-        </div>
+        </section>
       </main>
 
       <RatingModal
