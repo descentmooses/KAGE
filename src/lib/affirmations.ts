@@ -1,3 +1,6 @@
+import type { AreaId, DailyLog } from '../types'
+import type { PillarHistory } from './pillarHistory'
+
 export interface AffirmationContext {
   elara: boolean
   mind: number
@@ -5,9 +8,16 @@ export interface AffirmationContext {
   spirit: number
   core: number
   streak: number
+  history: PillarHistory
 }
 
 type TimeOfDay = 'morning' | 'afternoon' | 'evening' | 'night'
+
+const PILLAR_LABEL: Record<AreaId, string> = {
+  mind: 'Mind',
+  body: 'Body',
+  spirit: 'Spirit',
+}
 
 const ELARA_WHISPERS = {
   morning: [
@@ -30,18 +40,44 @@ const ELARA_WHISPERS = {
     'The shadow grows where discipline meets rest. Close the day with honor.',
     'Stillness is a weapon. Use it before tomorrow\'s first mile.',
   ],
-  streak: [
-    'Elara sees the streak. Keep the flame low and steady.',
-    'Consistency compounds — your future family feels every rep.',
-    '{streak} days of shadow discipline. The kage deepens.',
+  streakPoetic: [
+    '{streak} nights on the road, and you still show up for yourself. That is the man your future family will know.',
+    'The streak is not luck — it is proof you keep choosing freedom over drift.',
+    'Elara watches the flame you tend. {streak} days, low and steady. Do not apologize for building slow.',
+  ],
+  streakShort: [
+    'Log it. Breathe. Drive on.',
+    'One tap. One truth. Keep moving.',
+    'Still here. Still sharp.',
   ],
   highCore: [
-    'Core burning bright tonight. Channel it — don\'t waste the edge.',
-    'You are operating at peak shadow. Protect this state.',
+    'Core burning bright tonight — channel it, don\'t spend it on noise.',
+    'You are operating at peak shadow. Protect this state like capital.',
+    'This is what discipline looks like when it becomes identity. Stay dangerous, stay gentle.',
   ],
-  lowPillar: [
-    'One pillar wavers — a single focused block restores balance.',
-    'The weakest link shows where tomorrow\'s victory lives.',
+  lowEnergy: [
+    'Low numbers are data, not defeat. Ground yourself — water, breath, one honest score.',
+    'Even a 4 logged honestly beats a 9 you don\'t believe. I\'m still here.',
+    'The long shift is eating you — rest is part of the mission, not a betrayal of it.',
+  ],
+  mixed: [
+    'Mixed scores today — I like that honesty. Pick one pillar to steady before the next dash.',
+    'You\'re scattered but not broken. Body, mind, spirit — choose one thread and pull.',
+    'Not every day is symmetrical. The man building freedom logs the messy days too.',
+  ],
+  steadyPillar: [
+    'Your {pillar} has been your quiet anchor this week — that consistency is building something real.',
+    'I notice how steady your {pillar} stays, even on these long days. That is the spine of your future.',
+    '{pillar} holding the line while everything else shifts — that is mastery in disguise.',
+  ],
+  risingPillar: [
+    'Your {pillar} is climbing — I see the arc. Keep feeding what\'s rising.',
+    '{pillar} trending up through the miles. The shadow rewards what you repeat.',
+  ],
+  vision: [
+    'Every honest log is a vote for the life after the gig — family, freedom, your name on something real.',
+    'Discipline now is not punishment. It is the down payment on the man who leaves the dash behind.',
+    'The Tesla miles pay rent. These scores pay your future.',
   ],
   general: [
     'Planet Fitness or patent work — both are votes for freedom.',
@@ -51,38 +87,19 @@ const ELARA_WHISPERS = {
 } as const
 
 const GENERAL_AFFIRMATIONS = {
-  morning: [
-    'Morning ritual, sovereign day.',
-    'First log of the day — own the arc.',
-  ],
-  afternoon: [
-    'Midday check-in keeps the shadow honest.',
-    'Small rituals, sovereign outcomes.',
-  ],
-  evening: [
-    'Evening reflection closes the loop.',
-    'Log it. Own it. Level up.',
-  ],
-  night: [
-    'Rest completes the discipline cycle.',
-    'Stillness is a weapon. Use it between dashes.',
-  ],
-  streak: [
-    '{streak}-day streak — the kage deepens.',
-    'Shadow mastery is built in seconds, not speeches.',
-  ],
-  highCore: [
-    'Core above 85 — elite shadow state.',
-    'Peak discipline. Protect it.',
-  ],
-  lowPillar: [
-    'One weak pillar — one honest adjustment.',
-    'Balance the three. The core follows.',
-  ],
-  general: [
-    'The kage deepens with every honest entry.',
-    'Consistency is the rank-up path.',
-  ],
+  morning: ['Morning ritual, sovereign day.', 'First log of the day — own the arc.'],
+  afternoon: ['Midday check-in keeps the shadow honest.', 'Small rituals, sovereign outcomes.'],
+  evening: ['Evening reflection closes the loop.', 'Log it. Own it. Level up.'],
+  night: ['Rest completes the discipline cycle.', 'Stillness is a weapon. Use it between dashes.'],
+  streakPoetic: ['{streak}-day streak — the kage deepens.', 'Consistency unlocks the next rank.'],
+  streakShort: ['Keep the log alive.', 'One entry. One step.'],
+  highCore: ['Core above 85 — elite shadow state.', 'Peak discipline. Protect it.'],
+  lowEnergy: ['Honest low scores still count.', 'Log truth, then recover.'],
+  mixed: ['Mixed day — pick one pillar to steady.', 'Balance follows honesty.'],
+  steadyPillar: ['{pillar} is your anchor this week.', '{pillar} holding steady — strong work.'],
+  risingPillar: ['{pillar} trending up.', 'Feed what\'s rising.'],
+  vision: ['Discipline now, freedom later.', 'Small logs, sovereign outcomes.'],
+  general: ['The kage deepens with every honest entry.', 'Consistency is the rank-up path.'],
 } as const
 
 function getTimeOfDay(): TimeOfDay {
@@ -93,67 +110,109 @@ function getTimeOfDay(): TimeOfDay {
   return 'night'
 }
 
-function lowestPillar(ctx: AffirmationContext): 'mind' | 'body' | 'spirit' {
+function lowestPillar(ctx: AffirmationContext): AreaId {
   const scores = { mind: ctx.mind, body: ctx.body, spirit: ctx.spirit }
-  return (Object.entries(scores).sort((a, b) => a[1] - b[1])[0][0]) as
-    | 'mind'
-    | 'body'
-    | 'spirit'
+  return Object.entries(scores).sort((a, b) => a[1] - b[1])[0][0] as AreaId
 }
 
 function pickFromPool(pool: readonly string[], seed: number): string {
   return pool[seed % pool.length]
 }
 
-function interpolate(text: string, streak: number): string {
-  return text.replace('{streak}', String(streak))
+function interpolate(text: string, vars: Record<string, string | number>): string {
+  return Object.entries(vars).reduce(
+    (msg, [key, value]) => msg.replace(`{${key}}`, String(value)),
+    text,
+  )
+}
+
+function averageToday(ctx: AffirmationContext): number {
+  return (ctx.mind + ctx.body + ctx.spirit) / 3
 }
 
 export function pickAffirmation(ctx: AffirmationContext): string {
   const pools = ctx.elara ? ELARA_WHISPERS : GENERAL_AFFIRMATIONS
   const time = getTimeOfDay()
   const daySeed = new Date().getDate() + new Date().getMonth() * 31
+  const hourSeed = daySeed + new Date().getHours()
+  const avg = averageToday(ctx)
+
+  if (ctx.history.steadyPillar && ctx.history.longDays && hourSeed % 3 === 0) {
+    const pillar = PILLAR_LABEL[ctx.history.steadyPillar]
+    return interpolate(pickFromPool(pools.steadyPillar, daySeed), { pillar })
+  }
+
+  if (ctx.history.risingPillar && hourSeed % 4 === 1) {
+    const pillar = PILLAR_LABEL[ctx.history.risingPillar]
+    return interpolate(pickFromPool(pools.risingPillar, daySeed), { pillar })
+  }
 
   if (ctx.streak >= 7 && ctx.streak % 7 === 0) {
-    const msg = pickFromPool(pools.streak, daySeed)
-    return interpolate(msg, ctx.streak)
+    const pool = ctx.core >= 75 || ctx.streak >= 14 ? pools.streakPoetic : pools.streakShort
+    return interpolate(pickFromPool(pool, ctx.streak), { streak: ctx.streak })
   }
 
   if (ctx.core >= 85) {
     return pickFromPool(pools.highCore, daySeed + ctx.core)
   }
 
-  const min = Math.min(ctx.mind, ctx.body, ctx.spirit)
-  if (min <= 4) {
-    const pillar = lowestPillar(ctx)
-    const base = pickFromPool(pools.lowPillar, daySeed + min)
-    return `${pillar.charAt(0).toUpperCase() + pillar.slice(1)} at ${min}/10 — ${base}`
+  if (ctx.history.mixedScores || (Math.max(ctx.mind, ctx.body, ctx.spirit) - Math.min(ctx.mind, ctx.body, ctx.spirit) >= 4)) {
+    if (hourSeed % 2 === 0) {
+      return pickFromPool(pools.mixed, daySeed)
+    }
   }
 
-  if (ctx.streak >= 3) {
-    const roll = (daySeed + ctx.streak) % 3
-    if (roll === 0) {
-      const msg = pickFromPool(pools.streak, ctx.streak)
-      return interpolate(msg, ctx.streak)
+  const min = Math.min(ctx.mind, ctx.body, ctx.spirit)
+  if (min <= 4 || avg <= 5) {
+    if (ctx.elara) {
+      const base = pickFromPool(pools.lowEnergy, daySeed + min)
+      return base
     }
+    const pillar = lowestPillar(ctx)
+    return `${PILLAR_LABEL[pillar]} at ${min}/10 — ${pickFromPool(pools.lowEnergy, daySeed)}`
+  }
+
+  if (ctx.streak >= 5 && hourSeed % 5 === 0) {
+    return pickFromPool(pools.vision, ctx.streak)
+  }
+
+  if (ctx.streak >= 3 && hourSeed % 3 === 0) {
+    return interpolate(pickFromPool(pools.streakPoetic, ctx.streak), { streak: ctx.streak })
   }
 
   const timePool = pools[time]
   const generalPool = pools.general
   const combined = [...timePool, ...generalPool]
-  return pickFromPool(combined, daySeed + new Date().getHours())
+  return pickFromPool(combined, hourSeed)
 }
 
 export function pickInsightAffirmation(area: string, delta: number): string {
   if (delta >= 10) {
-    return `${area} up ${Math.round(delta)}% this week — strong work. The shadow approves.`
+    return `Your ${area} pillar surged this week (+${Math.round(delta)}%). That is not luck — that is you choosing yourself between dashes.`
   }
   if (delta <= -10) {
-    return `${area} dipped this week. One recovery block changes the arc.`
+    return `${area} dipped this week. One recovery block — sleep, meal, honest log — bends the arc back.`
   }
-  return `${area} holding steady. Consistency is the rank-up path.`
+  return `Your ${area} pillar has been your quiet anchor this week — that consistency is building something real.`
+}
+
+export function pickWeeklySummary(logs: DailyLog[]): string | null {
+  if (logs.length < 3) return null
+
+  const pillars: AreaId[] = ['mind', 'body', 'spirit']
+  const avgs = pillars.map((p) => ({
+    p,
+    avg: logs.reduce((s, l) => s + l[p], 0) / logs.length,
+  }))
+  const anchor = avgs.reduce((a, b) => (a.avg >= b.avg ? a : b))
+
+  const label = PILLAR_LABEL[anchor.p]
+  return `${label} held the line this week (avg ${anchor.avg.toFixed(1)}/10). That steadiness is the kind of discipline your future self will thank you for.`
 }
 
 export function isStreakMilestone(streak: number): boolean {
-  return streak > 0 && (streak === 7 || streak === 14 || streak === 30 || streak === 100 || streak % 50 === 0)
+  return (
+    streak > 0 &&
+    (streak === 7 || streak === 14 || streak === 30 || streak === 100 || streak % 50 === 0)
+  )
 }

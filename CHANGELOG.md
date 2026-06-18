@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.5.0] — 2026-06-18
+
+### Irreplaceable companion polish
+
+- **Driving-first Home** — compact header (core + shadow presence + streak), quick-log above the fold, collapsible “Deeper shadow” section
+- **Swipe quick-log** — swipe right for a “good” score (7+), swipe left to open rating modal; lightweight touch hook (no extra deps)
+- **Larger touch targets** — 56px minimum, 96px quick-log cards, enhanced press glow
+- **Elara depth** — whispers use 7-day pillar history (steady/rising/soft pillars, mixed days, vision, poetic vs grounding tone)
+- **Shadow presence** — orb grows with logging consistency and streak
+- **Rank & streak moments** — gold rank-up flash, milestone aura tiers, XP surge animation
+- **Actionable insights** — weekly shadow read on Home and Codex
+- **PWA polish** — premium install pill and offline banner with crimson accent
+
 ## [0.4.0] — 2026-06-18
 
 ### Crimson standard — full palette unification

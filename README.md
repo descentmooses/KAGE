@@ -41,6 +41,14 @@ Pushes to `main` deploy automatically via GitHub Actions to the `gh-pages` branc
 1. [Repository Settings → Pages](https://github.com/descentmooses/KAGE/settings/pages)
 2. Source: **Deploy from a branch** → `gh-pages` → `/ (root)`
 
+### Post-merge deploy checklist
+
+1. Merge the feature PR into `main` (or push directly to `main`).
+2. Open **Actions** and wait for the `pages-build-deployment` workflow to finish green.
+3. Visit https://descentmooses.github.io/KAGE/
+4. Hard-refresh (`Ctrl+Shift+R` / `Cmd+Shift+R`) or open in a private tab.
+5. If the UI still looks stale, append `?bust=<version>` (e.g. `?bust=0.5.0`) — `version.json` and `cacheBust.ts` reload when the deploy version changes.
+
 After deploy, hard-refresh or open in a private tab if you still see an old version.
 
 ## PWA icons

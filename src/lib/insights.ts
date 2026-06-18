@@ -74,7 +74,8 @@ export function generateInsights(logs: DailyLog[]): Insight[] {
   if (insights.length === 0 && thisWeek.length > 0) {
     insights.push({
       id: 'steady',
-      message: 'Steady week in the shadow log. Consistency unlocks the next rank.',
+      message:
+        'Steady week in the shadow log. Every honest entry is a brick in the life you are building after the dash.',
     })
   }
 

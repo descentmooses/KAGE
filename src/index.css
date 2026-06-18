@@ -234,7 +234,81 @@ body {
 }
 
 .kage-touch-target {
-  min-height: 48px;
-  min-width: 48px;
+  min-height: 56px;
+  min-width: 56px;
   -webkit-tap-highlight-color: transparent;
+}
+
+@keyframes shadow-presence {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.75;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+@keyframes rank-flash {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(201, 162, 39, 0);
+  }
+  30% {
+    box-shadow: 0 0 32px 4px rgba(201, 162, 39, 0.35);
+  }
+}
+
+@keyframes rank-emblem {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes streak-aura {
+  0%,
+  100% {
+    box-shadow: 0 0 12px rgba(196, 30, 58, 0.08);
+  }
+  50% {
+    box-shadow: 0 0 28px rgba(201, 162, 39, 0.2);
+  }
+}
+
+@keyframes xp-surge {
+  0% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.35);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
+.animate-shadow-presence {
+  animation: shadow-presence 3.5s ease-in-out infinite;
+}
+
+.animate-rank-flash {
+  animation: rank-flash 2.4s ease-out;
+}
+
+.animate-rank-emblem {
+  animation: rank-emblem 1.2s ease-out;
+}
+
+.animate-streak-aura {
+  animation: streak-aura 3s ease-in-out infinite;
+}
+
+.animate-xp-surge {
+  animation: xp-surge 1.4s ease-out;
 }

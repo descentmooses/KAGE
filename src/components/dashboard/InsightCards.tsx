@@ -1,26 +1,61 @@
+import { useMemo } from 'react'
 import { useTheme } from '../../theme/useTheme'
 import { useTracker } from '../../context/trackerContext'
+import { filterLogsByPeriod } from '../../lib/insights'
+import { pickWeeklySummary } from '../../lib/affirmations'
 
 export function InsightCards() {
   const { tokens } = useTheme()
-  const { insights } = useTracker()
+  const { insights, allLogs } = useTracker()
 
-  if (insights.length === 0) return null
+  const weeklySummary = useMemo(() => {
+    const week = filterLogsByPeriod(allLogs, 'weekly')
+    return pickWeeklySummary(week)
+  }, [allLogs])
+
+  if (insights.length === 0 && !weeklySummary) return null
 
   return (
     <div style={{ marginBottom: 20 }}>
+      {weeklySummary && (
+        <div
+          style={{
+            padding: '14px 16px',
+            borderRadius: 10,
+            border: `1px solid ${tokens.borderAccent}`,
+            background: tokens.bannerBg,
+            marginBottom: 10,
+          }}
+        >
+          <p
+            style={{
+              margin: '0 0 6px',
+              fontFamily: '"Share Tech Mono", monospace',
+              fontSize: 9,
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase',
+              color: tokens.crimson,
+            }}
+          >
+            Weekly shadow read
+          </p>
+          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: tokens.text }}>
+            {weeklySummary}
+          </p>
+        </div>
+      )}
       {insights.map((insight) => (
         <div
           key={insight.id}
           style={{
-            padding: '12px 14px',
-            borderRadius: 8,
+            padding: '14px 16px',
+            borderRadius: 10,
             border: `1px solid ${tokens.border}`,
             background: tokens.surfaceElevated,
             marginBottom: 8,
           }}
         >
-          <p style={{ margin: 0, fontSize: 13, lineHeight: 1.5, color: tokens.text }}>
+          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: tokens.text }}>
             {insight.message}
           </p>
         </div>
@@ -69,8 +104,8 @@ export function QuestList() {
         >
           <span
             style={{
-              width: 22,
-              height: 22,
+              width: 24,
+              height: 24,
               borderRadius: 4,
               border: `1px solid ${quest.done ? tokens.crimson : tokens.border}`,
               background: quest.done ? tokens.bannerBg : 'transparent',
@@ -93,7 +128,7 @@ export function QuestList() {
             style={{
               fontFamily: '"Share Tech Mono", monospace',
               fontSize: 10,
-              color: tokens.crimson,
+              color: tokens.gold,
             }}
           >
             +{quest.xp}

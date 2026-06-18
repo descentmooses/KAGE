@@ -11,24 +11,24 @@ export function InstallPrompt() {
     <button
       type="button"
       onClick={() => void promptInstall()}
-      className="kage-touch-target"
+      className="kage-touch-target animate-fade-in"
       aria-label="Install KAGE as an app"
       style={{
         position: 'fixed',
-        bottom: 80,
+        bottom: 'calc(80px + env(safe-area-inset-bottom, 0px))',
         left: '50%',
         transform: 'translateX(-50%)',
         zIndex: 20,
-        padding: '10px 18px',
+        padding: '12px 22px',
         borderRadius: 999,
         border: `1px solid ${tokens.crimson}`,
-        background: tokens.modalBg,
+        background: `linear-gradient(180deg, ${tokens.modalBg}, ${tokens.surfaceElevated})`,
         color: tokens.crimson,
         fontFamily: '"Orbitron", sans-serif',
-        fontSize: 9,
-        letterSpacing: '0.25em',
+        fontSize: 10,
+        letterSpacing: '0.28em',
         cursor: 'pointer',
-        boxShadow: tokens.modalShadow,
+        boxShadow: `0 8px 28px rgba(0,0,0,0.3), 0 0 16px ${tokens.accentGlow}`,
       }}
     >
       INSTALL KAGE

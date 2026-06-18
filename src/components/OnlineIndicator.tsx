@@ -30,6 +30,7 @@ export function OnlineIndicator() {
   return (
     <div
       role="status"
+      aria-live="polite"
       style={{
         position: 'fixed',
         top: 'max(52px, calc(48px + env(safe-area-inset-top)))',
@@ -39,40 +40,41 @@ export function OnlineIndicator() {
         display: 'flex',
         alignItems: 'center',
         gap: 10,
-        padding: '8px 14px',
+        padding: '10px 16px',
         borderRadius: 999,
-        border: `1px solid ${tokens.crimson}`,
+        border: `1px solid ${tokens.borderAccent}`,
         background: tokens.modalBg,
-        boxShadow: tokens.modalShadow,
+        boxShadow: `0 8px 32px rgba(0,0,0,0.35), 0 0 0 1px ${tokens.accentGlow}`,
         maxWidth: 'min(92vw, 360px)',
       }}
     >
       <span
         aria-hidden
+        className="animate-shadow-presence"
         style={{
-          width: 8,
-          height: 8,
+          width: 10,
+          height: 10,
           borderRadius: '50%',
           background: tokens.crimson,
           flexShrink: 0,
+          boxShadow: `0 0 8px ${tokens.accentGlow}`,
         }}
       />
-      <p style={{ margin: 0, fontSize: 11, color: tokens.text, lineHeight: 1.4 }}>
-        Offline — logs save locally and sync when you reconnect.
+      <p style={{ margin: 0, fontSize: 12, color: tokens.text, lineHeight: 1.45 }}>
+        Offline — your logs stay safe on this device until you reconnect.
       </p>
       <button
         type="button"
         onClick={() => setDismissed(true)}
         aria-label="Dismiss offline notice"
+        className="kage-touch-target"
         style={{
-          minWidth: 44,
-          minHeight: 44,
           margin: -8,
           border: 'none',
           background: 'transparent',
           color: tokens.textMuted,
           cursor: 'pointer',
-          fontSize: 16,
+          fontSize: 18,
         }}
       >
         ×

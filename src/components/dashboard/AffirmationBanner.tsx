@@ -1,10 +1,14 @@
+import { useMemo } from 'react'
 import { useTheme } from '../../theme/useTheme'
 import { pickAffirmation } from '../../lib/affirmations'
+import { buildPillarHistory } from '../../lib/pillarHistory'
 import { useTracker } from '../../context/trackerContext'
 
 export function AffirmationBanner() {
   const { tokens } = useTheme()
-  const { settings, ratings, core, gamification } = useTracker()
+  const { settings, ratings, core, gamification, allLogs } = useTracker()
+
+  const history = useMemo(() => buildPillarHistory(allLogs), [allLogs])
 
   if (!settings.affirmationsEnabled) return null
 
@@ -15,17 +19,20 @@ export function AffirmationBanner() {
     spirit: ratings.spirit,
     core,
     streak: gamification.currentStreak,
+    history,
   })
+
+  const isPoetic = message.length > 90
 
   return (
     <div
       className="animate-fade-in"
       style={{
         padding: '16px 18px',
-        borderRadius: 10,
+        borderRadius: 12,
         border: `1px solid ${tokens.borderAccent}`,
         background: tokens.bannerBg,
-        marginBottom: 20,
+        marginBottom: 16,
         boxShadow: tokens.cardShadowAlt,
       }}
     >
@@ -45,9 +52,10 @@ export function AffirmationBanner() {
       <p
         style={{
           margin: 0,
-          fontSize: 14,
-          lineHeight: 1.6,
+          fontSize: isPoetic ? 15 : 14,
+          lineHeight: isPoetic ? 1.65 : 1.55,
           color: tokens.text,
+          fontStyle: settings.elaraWhispers && isPoetic ? 'italic' : 'normal',
         }}
       >
         {message}

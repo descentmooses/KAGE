@@ -1,9 +1,11 @@
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { TabScreen } from '../TabScreen'
 import { useTheme } from '../../theme/useTheme'
 import { useTracker } from '../../context/trackerContext'
 import { useToast } from '../../hooks/useToast'
 import { RANKS } from '../../lib/gamification'
+import { filterLogsByPeriod } from '../../lib/insights'
+import { pickWeeklySummary } from '../../lib/affirmations'
 
 const PROTOCOLS = [
   {
@@ -40,9 +42,14 @@ const PROTOCOLS = [
 
 export function CodexScreen() {
   const { tokens } = useTheme()
-  const { gamification, settings, updateSettings, importData } = useTracker()
+  const { gamification, settings, updateSettings, importData, allLogs } = useTracker()
   const { showToast } = useToast()
   const fileRef = useRef<HTMLInputElement>(null)
+
+  const weeklySummary = useMemo(() => {
+    const week = filterLogsByPeriod(allLogs, 'weekly')
+    return pickWeeklySummary(week)
+  }, [allLogs])
 
   const handleImport = async (file: File) => {
     try {
@@ -62,6 +69,34 @@ export function CodexScreen() {
       title="Bushido Protocols"
       subtitle="典籍 — shadow ranks, protocols, and settings"
     >
+      {weeklySummary && (
+        <section
+          style={{
+            marginBottom: 28,
+            padding: '16px 18px',
+            borderRadius: 10,
+            border: `1px solid ${tokens.borderAccent}`,
+            background: tokens.bannerBg,
+          }}
+        >
+          <p
+            style={{
+              margin: '0 0 8px',
+              fontFamily: '"Share Tech Mono", monospace',
+              fontSize: 9,
+              letterSpacing: '0.25em',
+              textTransform: 'uppercase',
+              color: tokens.crimson,
+            }}
+          >
+            This week in the shadow
+          </p>
+          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.65, color: tokens.text }}>
+            {weeklySummary}
+          </p>
+        </section>
+      )}
+
       <section style={{ marginBottom: 32 }}>
         <p
           style={{
