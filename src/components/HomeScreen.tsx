@@ -61,7 +61,7 @@ export function HomeScreen() {
 
         <section
           style={{
-            padding: '24px 20px 48px',
+            padding: '28px 20px 56px',
             maxWidth: 400,
             margin: '0 auto',
             width: '100%',
