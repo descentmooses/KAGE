@@ -47,7 +47,7 @@ body {
 @keyframes pulse-glow {
   0%,
   100% {
-    opacity: 0.45;
+    opacity: 0.5;
   }
   50% {
     opacity: 1;
@@ -66,23 +66,12 @@ body {
 @keyframes core-breathe {
   0%,
   100% {
-    opacity: 1;
     transform: scale(1);
+    filter: brightness(1);
   }
   50% {
-    opacity: 0.92;
-    transform: scale(1.015);
-  }
-}
-
-@keyframes fade-up {
-  0% {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
+    transform: scale(1.012);
+    filter: brightness(1.06);
   }
 }
 
@@ -98,55 +87,132 @@ body {
 @keyframes modal-in {
   0% {
     opacity: 0;
-    transform: scale(0.96) translateY(8px);
+    transform: translateY(20px) scale(0.97);
   }
   100% {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes bar-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
 .animate-pulse-glow {
-  animation: pulse-glow 5s ease-in-out infinite;
+  animation: pulse-glow 5.5s ease-in-out infinite;
 }
 
 .animate-core-breathe {
   animation: core-breathe 5s ease-in-out infinite;
 }
 
-.animate-fade-up {
-  animation: fade-up 0.9s ease-out forwards;
-}
-
 .animate-fade-in {
-  animation: fade-in 0.25s ease-out forwards;
+  animation: fade-in 0.18s ease-out forwards;
 }
 
 .animate-modal-in {
-  animation: modal-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: modal-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.neon-bar {
+  animation: bar-enter 0.55s ease-out forwards;
+  opacity: 0;
+}
+
+.core-halo {
+  background: radial-gradient(
+    circle,
+    rgba(0, 249, 255, 0.14) 0%,
+    rgba(255, 0, 170, 0.07) 38%,
+    transparent 68%
+  );
+  animation: pulse-glow 5s ease-in-out infinite;
 }
 
 .core-glow {
-  background: linear-gradient(160deg, #00f9ff 0%, #f0f0f8 42%, #ff00aa 100%);
+  background: linear-gradient(155deg, #00f9ff 0%, #eef0f8 38%, #ff00aa 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 28px #00f9ff88) drop-shadow(0 0 56px #00f9ff44)
-    drop-shadow(0 0 80px #ff00aa44);
+  filter: drop-shadow(0 0 32px #00f9ff99) drop-shadow(0 0 64px #00f9ff44)
+    drop-shadow(0 0 96px #ff00aa44);
 }
 
 .glass-panel {
-  background: rgba(8, 8, 10, 0.82);
-  backdrop-filter: blur(24px) saturate(1.2);
-  -webkit-backdrop-filter: blur(24px) saturate(1.2);
+  background: rgba(6, 6, 8, 0.88);
+  backdrop-filter: blur(28px) saturate(1.25);
+  -webkit-backdrop-filter: blur(28px) saturate(1.25);
 }
 
-.scanline-fill {
+.modal-border-glow {
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 249, 255, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 48px rgba(0, 249, 255, 0.1),
+    0 0 80px rgba(255, 0, 170, 0.05);
+}
+
+.neon-track {
+  background: rgba(255, 255, 255, 0.035);
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.neon-bar:hover .neon-track {
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(0, 249, 255, 0.12),
+    0 0 20px rgba(0, 249, 255, 0.12);
+}
+
+.neon-fill {
+  background: linear-gradient(90deg, #00f9ff66 0%, #00f9ff 72%, #ff00aa 100%);
+  box-shadow:
+    0 0 16px #00f9ff99,
+    0 0 32px #00f9ff44,
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+.neon-cap {
+  width: 12px;
+  height: 12px;
+  background: radial-gradient(circle, #fff 0%, #00f9ff 45%, transparent 72%);
+  box-shadow:
+    0 0 6px #fff,
+    0 0 16px #00f9ff,
+    0 0 28px #ff00aa88;
+}
+
+.crt-bar-texture {
   background-image: repeating-linear-gradient(
     0deg,
     transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.15) 2px,
-    rgba(0, 0, 0, 0.15) 4px
+    transparent 1px,
+    rgba(0, 0, 0, 0.22) 1px,
+    rgba(0, 0, 0, 0.22) 3px
   );
+}
+
+.crt-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+}
+
+.log-rating-btn {
+  background: linear-gradient(95deg, #00f9ff, #ff00aa);
+  box-shadow:
+    0 0 32px #00f9ff55,
+    0 6px 28px rgba(0, 0, 0, 0.45);
+}
+
+.log-rating-btn:hover {
+  filter: brightness(1.08);
 }

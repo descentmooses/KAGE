@@ -51,29 +51,27 @@ export function HomeScreen({ ratings, onLogRating }: HomeScreenProps) {
 
   return (
     <>
-      <main className="relative flex h-full w-full items-center justify-center overflow-y-auto px-6 py-4 sm:px-10">
+      <main className="relative flex h-full w-full items-center justify-center overflow-y-auto px-5 pt-2 pb-4 sm:px-8">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div
-            className="absolute top-1/2 left-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-[0.06]"
+            className="absolute top-[38%] left-1/2 h-[min(520px,70vw)] w-[min(520px,70vw)] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-[0.07]"
             style={{
-              background:
-                'radial-gradient(circle, #00f9ff 0%, transparent 65%)',
+              background: 'radial-gradient(circle, #00f9ff 0%, transparent 68%)',
             }}
           />
           <div
-            className="absolute bottom-0 right-0 h-[300px] w-[300px] rounded-full opacity-[0.04]"
+            className="absolute right-0 bottom-0 h-64 w-64 rounded-full opacity-[0.035]"
             style={{
-              background:
-                'radial-gradient(circle, #ff00aa 0%, transparent 70%)',
+              background: 'radial-gradient(circle, #ff00aa 0%, transparent 72%)',
             }}
           />
         </div>
 
-        <div className="relative z-10 flex w-full max-w-sm flex-col items-center sm:max-w-md">
+        <div className="relative z-10 flex w-full max-w-[20rem] flex-col items-center sm:max-w-xs">
           <CoreDisplay value={core} />
 
           <section
-            className="mt-10 w-full sm:mt-12"
+            className="mt-8 w-full space-y-1 sm:mt-10"
             aria-label="Mind, Body, Spirit"
           >
             {AREAS.map((area, i) => (
@@ -81,7 +79,7 @@ export function HomeScreen({ ratings, onLogRating }: HomeScreenProps) {
                 key={area.id}
                 area={area}
                 value={stats[area.id]}
-                delay={600 + i * 120}
+                delay={i * 80}
                 onTap={() => setActiveArea(area)}
               />
             ))}

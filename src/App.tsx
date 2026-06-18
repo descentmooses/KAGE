@@ -17,7 +17,7 @@ function App() {
     <div className="relative flex h-full w-full flex-col overflow-hidden bg-void">
       <AppHeader />
 
-      <div className="relative min-h-0 flex-1 overflow-hidden">
+      <div className="relative min-h-0 flex-1 overflow-hidden pt-14">
         {activeTab === 'home' && (
           <HomeScreen ratings={ratings} onLogRating={logRating} />
         )}
