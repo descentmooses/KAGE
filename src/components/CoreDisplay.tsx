@@ -1,8 +1,12 @@
+import { useTheme } from '../theme/useTheme'
+
 interface CoreDisplayProps {
   value: number
 }
 
 export function CoreDisplay({ value }: CoreDisplayProps) {
+  const { tokens } = useTheme()
+
   return (
     <div style={{ textAlign: 'center', padding: '8px 0' }}>
       <p
@@ -10,36 +14,61 @@ export function CoreDisplay({ value }: CoreDisplayProps) {
           fontFamily: '"Orbitron", sans-serif',
           fontSize: 9,
           letterSpacing: '0.6em',
-          color: '#8a8a9a',
+          color: tokens.textMuted,
           textTransform: 'uppercase',
           marginBottom: 16,
+          transition: 'color 0.35s ease',
         }}
       >
         Core
       </p>
-      <p
+
+      <div
+        className="animate-core-breathe"
         style={{
-          fontFamily: '"Orbitron", sans-serif',
-          fontSize: 'clamp(5rem, 22vw, 8rem)',
-          fontWeight: 700,
-          lineHeight: 1,
-          margin: 0,
-          background: 'linear-gradient(155deg, #00f9ff, #eef0f8 40%, #ff00aa)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
-          filter: 'drop-shadow(0 0 24px rgba(0,249,255,0.8)) drop-shadow(0 0 48px rgba(255,0,170,0.4))',
+          position: 'relative',
+          display: 'inline-block',
         }}
       >
-        {value}
-      </p>
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: '-20%',
+            background: `radial-gradient(circle, ${tokens.cyanGlow} 0%, transparent 70%)`,
+            opacity: 0.4,
+            filter: 'blur(20px)',
+            pointerEvents: 'none',
+          }}
+        />
+        <p
+          style={{
+            position: 'relative',
+            fontFamily: '"Orbitron", sans-serif',
+            fontSize: 'clamp(5rem, 22vw, 8rem)',
+            fontWeight: 700,
+            lineHeight: 1,
+            margin: 0,
+            background: tokens.coreGradient,
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            filter: tokens.coreGlow,
+            transition: 'filter 0.35s ease',
+          }}
+        >
+          {value}
+        </p>
+      </div>
+
       <div
         style={{
           margin: '28px auto 0',
           height: 1,
           width: 120,
-          background: 'linear-gradient(90deg, transparent, #00f9ff, #ff00aa, transparent)',
-          boxShadow: '0 0 12px rgba(0,249,255,0.5)',
+          background: tokens.dividerGradient,
+          boxShadow: `0 0 12px ${tokens.cyanGlow}`,
+          transition: 'background 0.35s ease',
         }}
       />
     </div>

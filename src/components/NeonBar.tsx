@@ -1,7 +1,5 @@
+import { useTheme } from '../theme/useTheme'
 import type { AreaConfig } from '../types'
-
-const CYAN = '#00f9ff'
-const MAGENTA = '#ff00aa'
 
 interface NeonBarProps {
   area: AreaConfig
@@ -10,7 +8,9 @@ interface NeonBarProps {
 }
 
 export function NeonBar({ area, value, onTap }: NeonBarProps) {
+  const { tokens, mode } = useTheme()
   const fillPercent = (value / 10) * 100
+  const accentColor = area.color === 'magenta' ? tokens.magenta : tokens.cyan
 
   return (
     <button
@@ -26,6 +26,15 @@ export function NeonBar({ area, value, onTap }: NeonBarProps) {
         cursor: 'pointer',
         textAlign: 'left',
         fontFamily: 'inherit',
+        borderRadius: 4,
+        transition: 'background 0.15s ease',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background =
+          mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(28,28,36,0.03)'
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = 'transparent'
       }}
       aria-label={`${area.label} ${value} of 10. Tap to adjust.`}
     >
@@ -38,14 +47,23 @@ export function NeonBar({ area, value, onTap }: NeonBarProps) {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-          <span style={{ fontSize: 24, color: 'rgba(255,255,255,0.5)' }}>{area.kanji}</span>
+          <span
+            style={{
+              fontSize: 24,
+              color: tokens.textSubtle,
+              transition: 'color 0.35s ease',
+            }}
+          >
+            {area.kanji}
+          </span>
           <span
             style={{
               fontFamily: '"Orbitron", sans-serif',
               fontSize: 8,
               letterSpacing: '0.4em',
-              color: '#8a8a9a',
+              color: tokens.textMuted,
               textTransform: 'uppercase',
+              transition: 'color 0.35s ease',
             }}
           >
             {area.label}
@@ -55,8 +73,9 @@ export function NeonBar({ area, value, onTap }: NeonBarProps) {
           style={{
             fontFamily: '"Share Tech Mono", monospace',
             fontSize: 11,
-            color: CYAN,
-            textShadow: `0 0 10px ${CYAN}`,
+            color: accentColor,
+            textShadow: `0 0 10px ${accentColor}`,
+            transition: 'color 0.35s ease',
           }}
         >
           {String(value).padStart(2, '0')}
@@ -69,9 +88,10 @@ export function NeonBar({ area, value, onTap }: NeonBarProps) {
           height: 12,
           width: '100%',
           borderRadius: 999,
-          background: 'rgba(255,255,255,0.06)',
-          boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.5)',
+          background: tokens.neonTrack,
+          boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.15)',
           overflow: 'hidden',
+          transition: 'background 0.35s ease',
         }}
       >
         <div
@@ -82,11 +102,28 @@ export function NeonBar({ area, value, onTap }: NeonBarProps) {
             bottom: 0,
             width: `${fillPercent}%`,
             borderRadius: 999,
-            background: `linear-gradient(90deg, rgba(0,249,255,0.5), ${CYAN} 70%, ${MAGENTA})`,
-            boxShadow: `0 0 14px ${CYAN}, 0 0 28px rgba(0,249,255,0.35)`,
-            transition: 'width 0.4s ease',
+            background: tokens.neonFill,
+            boxShadow: `0 0 14px ${tokens.cyan}, 0 0 28px ${tokens.cyanGlow}`,
+            transition: 'width 0.4s ease, background 0.35s ease',
           }}
         />
+        {fillPercent > 2 && (
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: `calc(${fillPercent}% - 5px)`,
+              transform: 'translateY(-50%)',
+              width: 10,
+              height: 10,
+              borderRadius: '50%',
+              background: tokens.neonCap,
+              boxShadow: `0 0 6px #fff, 0 0 14px ${tokens.cyan}, 0 0 22px ${tokens.magenta}`,
+              transition: 'left 0.4s ease',
+            }}
+          />
+        )}
       </div>
     </button>
   )

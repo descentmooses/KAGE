@@ -1,3 +1,6 @@
+import type { CSSProperties, FocusEvent as ReactFocusEvent } from 'react'
+import { useTheme } from '../../theme/useTheme'
+
 interface NeonInputProps {
   label: string
   value: string
@@ -13,17 +16,44 @@ export function NeonInput({
   placeholder,
   multiline = false,
 }: NeonInputProps) {
-  const fieldStyle = {
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderColor: 'rgba(255,255,255,0.1)',
-    color: '#e8e8f0',
+  const { tokens } = useTheme()
+
+  const fieldStyle: CSSProperties = {
+    width: '100%',
+    backgroundColor: tokens.inputBg,
+    border: `1px solid ${tokens.inputBorder}`,
+    color: tokens.text,
+    borderRadius: 2,
+    padding: '10px 12px',
+    fontFamily: '"Noto Sans JP", sans-serif',
+    fontSize: 14,
+    outline: 'none',
+    transition: 'border-color 0.2s ease, box-shadow 0.2s ease, background 0.35s ease',
+  }
+
+  const handleFocus = (e: ReactFocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    e.currentTarget.style.borderColor = tokens.cyan
+    e.currentTarget.style.boxShadow = tokens.inputFocusShadow
+  }
+
+  const handleBlur = (e: ReactFocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    e.currentTarget.style.borderColor = tokens.inputBorder
+    e.currentTarget.style.boxShadow = 'none'
   }
 
   return (
-    <label className="block">
+    <label style={{ display: 'block' }}>
       <span
-        className="mb-2 block font-mono text-[8px] tracking-[0.35em] uppercase"
-        style={{ color: 'rgba(138,138,154,0.95)' }}
+        style={{
+          display: 'block',
+          marginBottom: 8,
+          fontFamily: '"Share Tech Mono", monospace',
+          fontSize: 8,
+          letterSpacing: '0.35em',
+          textTransform: 'uppercase',
+          color: tokens.textMuted,
+          transition: 'color 0.35s ease',
+        }}
       >
         {label}
       </span>
@@ -33,8 +63,9 @@ export function NeonInput({
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           rows={3}
-          className="w-full resize-none rounded-sm border px-3 py-2.5 font-jp text-sm outline-none focus:border-cyan/50 focus:shadow-[0_0_16px_rgba(0,249,255,0.12)]"
-          style={fieldStyle}
+          style={{ ...fieldStyle, resize: 'none' }}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
         />
       ) : (
         <input
@@ -42,8 +73,9 @@ export function NeonInput({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="w-full rounded-sm border px-3 py-2.5 font-jp text-sm outline-none focus:border-cyan/50 focus:shadow-[0_0_16px_rgba(0,249,255,0.12)]"
           style={fieldStyle}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
         />
       )}
     </label>

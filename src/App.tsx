@@ -7,11 +7,13 @@ import { ActivateScreen } from './components/screens/ActivateScreen'
 import { ReflectScreen } from './components/screens/ReflectScreen'
 import { CodexScreen } from './components/screens/CodexScreen'
 import { useRatings } from './hooks/useRatings'
+import { useTheme } from './theme/useTheme'
 import type { TabId } from './types'
 
 function App() {
   const [activeTab, setActiveTab] = useState<TabId>('home')
   const { ratings, logRating } = useRatings()
+  const { tokens } = useTheme()
 
   const renderScreen = () => {
     switch (activeTab) {
@@ -36,8 +38,9 @@ function App() {
         height: '100%',
         width: '100%',
         overflow: 'hidden',
-        backgroundColor: '#0a0a0a',
-        color: '#e8e8f0',
+        backgroundColor: tokens.bg,
+        color: tokens.text,
+        transition: 'background-color 0.35s ease, color 0.35s ease',
       }}
     >
       <AppHeader />

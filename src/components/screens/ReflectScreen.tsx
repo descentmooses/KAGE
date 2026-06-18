@@ -5,6 +5,7 @@ import { RatingModal } from '../RatingModal'
 import { NeonInput } from '../ui/NeonInput'
 import { NeonButton } from '../ui/NeonButton'
 import { useReflectionLog } from '../../hooks/useReflectionLog'
+import { useTheme } from '../../theme/useTheme'
 import type { AreaConfig, AreaId } from '../../types'
 
 const AREAS: AreaConfig[] = [
@@ -14,6 +15,7 @@ const AREAS: AreaConfig[] = [
 ]
 
 export function ReflectScreen() {
+  const { tokens } = useTheme()
   const { saveReflection } = useReflectionLog()
   const [saved, setSaved] = useState(false)
   const [mind, setMind] = useState(7)
@@ -48,7 +50,16 @@ export function ReflectScreen() {
         {saved && <ConfirmBanner message="Reflection logged. Archive updated." />}
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-          <p style={{ fontFamily: '"Share Tech Mono", monospace', fontSize: 9, color: '#8a8a9a', letterSpacing: '0.3em', textTransform: 'uppercase' }}>
+          <p
+            style={{
+              fontFamily: '"Share Tech Mono", monospace',
+              fontSize: 9,
+              letterSpacing: '0.3em',
+              textTransform: 'uppercase',
+              margin: 0,
+              color: tokens.textMuted,
+            }}
+          >
             How did you do today?
           </p>
 

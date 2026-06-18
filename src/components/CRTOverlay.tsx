@@ -1,4 +1,8 @@
+import { useTheme } from '../theme/useTheme'
+
 export function CRTOverlay() {
+  const { tokens } = useTheme()
+
   return (
     <div
       aria-hidden="true"
@@ -7,7 +11,9 @@ export function CRTOverlay() {
         position: 'fixed',
         inset: 0,
         zIndex: 5,
-        background: 'radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.55) 100%)',
+        background: tokens.crtVignette,
+        opacity: tokens.crtOpacity,
+        transition: 'opacity 0.35s ease, background 0.35s ease',
       }}
     >
       <div
@@ -15,8 +21,8 @@ export function CRTOverlay() {
           position: 'absolute',
           inset: 0,
           opacity: 0.05,
-          backgroundImage:
-            'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,249,255,0.15) 2px, rgba(0,249,255,0.15) 4px)',
+          backgroundImage: tokens.crtScanline,
+          transition: 'background-image 0.35s ease',
         }}
       />
     </div>
