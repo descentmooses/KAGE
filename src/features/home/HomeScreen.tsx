@@ -12,7 +12,7 @@ import { QuickLogPanel, CompactPillars } from '../logging/QuickLogPanel'
 import { GoalPanel } from '../goals/GoalPanel'
 import { RatingModal } from '../logging/RatingModal'
 import { HomeHeroSection } from './HomeHeroSection'
-import { TrendSection } from './TrendSection'
+import { LazyTrendSection } from './LazyTrendSection'
 import { DeepShadowSection } from './DeepShadowSection'
 import type { AreaConfig } from '../../types'
 
@@ -64,7 +64,7 @@ export function HomeScreen() {
           <QuickLogPanel onAdjust={openAdjust} />
           <CompactPillars onAdjust={openAdjust} />
 
-          <TrendSection />
+          <LazyTrendSection />
           <GoalPanel />
           <DeepShadowSection onAdjust={openAdjust} />
         </section>

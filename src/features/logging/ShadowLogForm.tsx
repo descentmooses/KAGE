@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { useTheme } from '../../theme/useTheme'
 import { useShadowLogs } from '../../hooks/useShadowLogs'
 import { pillarAccentColor } from '../../lib/pillars'
-import type { AreaId } from '../../types'
-import { AREA_CONFIGS } from '../../types'
+import { NeonCard } from '../../components/ui/NeonCard'
+import { orbitronCaps } from '../../theme/componentStyles'
+import { AREA_CONFIGS, type AreaId } from '../../types'
 
 interface ShadowLogFieldsProps {
   mind: number
@@ -129,27 +130,8 @@ export function ShadowLogForm() {
   const { ratings, pendingVoiceNote } = useShadowLogs()
 
   return (
-    <div
-      style={{
-        padding: '16px 14px',
-        borderRadius: 12,
-        border: `1px solid ${tokens.border}`,
-        background: tokens.cardBg,
-        marginBottom: 16,
-      }}
-    >
-      <p
-        style={{
-          margin: '0 0 4px',
-          fontFamily: '"Orbitron", sans-serif',
-          fontSize: 9,
-          letterSpacing: '0.35em',
-          textTransform: 'uppercase',
-          color: tokens.textMuted,
-        }}
-      >
-        Full shadow log
-      </p>
+    <NeonCard style={{ marginBottom: 16 }}>
+      <p style={orbitronCaps(tokens)}>Full shadow log</p>
       <p style={{ margin: '0 0 14px', fontSize: 11, color: tokens.textSubtle }}>
         Parked only — sliders for an honest daily seal
       </p>
@@ -161,6 +143,6 @@ export function ShadowLogForm() {
         spirit={ratings.spirit}
         initialNote={pendingVoiceNote ?? ''}
       />
-    </div>
+    </NeonCard>
   )
 }

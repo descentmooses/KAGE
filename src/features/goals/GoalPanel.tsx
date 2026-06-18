@@ -5,30 +5,20 @@ import type { Goal, GoalCategory } from '../../types'
 import { GOAL_CATEGORY_LABEL } from '../../lib/goals'
 import { GoalModal, type GoalFormData } from './GoalModal'
 import { SeedBonsai } from './SeedBonsai'
+import { NeonCard } from '../../components/ui/NeonCard'
+import { NeonProgress } from '../../components/ui/NeonProgress'
+import { orbitronCaps } from '../../theme/componentStyles'
 
 function GrowthBar({ progress, color }: { progress: number; color: string }) {
   return (
-    <div
-      style={{
-        height: 6,
-        borderRadius: 3,
-        background: 'rgba(255,255,255,0.06)',
-        overflow: 'hidden',
-        marginTop: 8,
-      }}
-    >
-      <div
-        className="animate-growth-fill"
-        style={{
-          height: '100%',
-          width: `${progress}%`,
-          borderRadius: 3,
-          background: `linear-gradient(90deg, ${color}88, ${color})`,
-          boxShadow: progress >= 75 ? `0 0 12px ${color}55` : 'none',
-          transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-        }}
-      />
-    </div>
+    <NeonProgress
+      value={progress}
+      variant="growth"
+      color={color}
+      fillClassName="animate-growth-fill"
+      trackStyle={{ marginTop: 8 }}
+      aria-label="Goal progress"
+    />
   )
 }
 
@@ -70,16 +60,7 @@ export function GoalPanel() {
   }, {})
 
   return (
-    <div
-      style={{
-        padding: '16px 14px',
-        borderRadius: 12,
-        border: `1px solid ${tokens.border}`,
-        background: tokens.cardBg,
-        marginBottom: 24,
-        boxShadow: tokens.cardShadow,
-      }}
-    >
+    <NeonCard style={{ marginBottom: 24 }}>
       <div
         style={{
           display: 'flex',
@@ -90,18 +71,7 @@ export function GoalPanel() {
       >
         <SeedBonsai goals={goals} />
         <div style={{ flex: 1 }}>
-          <p
-            style={{
-              margin: '0 0 4px',
-              fontFamily: '"Orbitron", sans-serif',
-              fontSize: 9,
-              letterSpacing: '0.35em',
-              textTransform: 'uppercase',
-              color: tokens.textMuted,
-            }}
-          >
-            Freedom goals
-          </p>
+          <p style={orbitronCaps(tokens)}>Freedom goals</p>
           <p style={{ margin: 0, fontSize: 12, lineHeight: 1.5, color: tokens.textSubtle }}>
             Wealth · health · family · craft — seeds for life after the dash
           </p>
@@ -304,6 +274,6 @@ export function GoalPanel() {
         onClose={() => setModalOpen(false)}
         onSave={handleSave}
       />
-    </div>
+    </NeonCard>
   )
 }

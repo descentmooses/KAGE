@@ -1,0 +1,39 @@
+import { clearAllData, exportAllData, importAllData } from '../../../lib/db'
+import { todayKey } from '../../../lib/dates'
+import type { CelebrationHandler, RefreshHandler } from './types'
+
+export interface DataActionDeps {
+  refresh: RefreshHandler
+  onCelebrate: CelebrationHandler
+}
+
+export function createDataActions(deps: DataActionDeps) {
+  const exportData = async () => {
+    const data = await exportAllData()
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `kage-export-${todayKey()}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const importData = async (file: File) => {
+    const text = await file.text()
+    const payload = JSON.parse(text) as Awaited<ReturnType<typeof exportAllData>>
+    if (!payload?.dailyLogs || !Array.isArray(payload.dailyLogs)) {
+      throw new Error('Invalid KAGE backup file')
+    }
+    await importAllData(payload)
+    await deps.refresh()
+  }
+
+  const resetDemoData = async () => {
+    await clearAllData()
+    await deps.refresh()
+    deps.onCelebrate('Demo data reset — your shadow slate is clean.', 'info')
+  }
+
+  return { exportData, importData, resetDemoData }
+}

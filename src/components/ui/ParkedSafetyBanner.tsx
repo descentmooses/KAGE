@@ -1,4 +1,5 @@
 import { useTheme } from '../../theme/useTheme'
+import { monoCaps, bannerSurface } from '../../theme/componentStyles'
 
 interface ParkedSafetyBannerProps {
   /** Short headline (defaults to standard safety copy). */
@@ -15,28 +16,8 @@ export function ParkedSafetyBanner({
   const { tokens } = useTheme()
 
   return (
-    <div
-      role="note"
-      style={{
-        marginBottom: 14,
-        padding: '10px 12px',
-        borderRadius: 10,
-        border: `1px solid ${tokens.borderAccent}`,
-        background: tokens.bannerBg,
-      }}
-    >
-      <p
-        style={{
-          margin: 0,
-          fontFamily: '"Share Tech Mono", monospace',
-          fontSize: 9,
-          letterSpacing: '0.2em',
-          textTransform: 'uppercase',
-          color: tokens.crimson,
-        }}
-      >
-        {title}
-      </p>
+    <div role="note" style={bannerSurface(tokens)}>
+      <p style={monoCaps(tokens)}>{title}</p>
       <p style={{ margin: '4px 0 0', fontSize: 11, lineHeight: 1.45, color: tokens.textMuted }}>
         {detail}
       </p>

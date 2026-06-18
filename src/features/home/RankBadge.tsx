@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useTheme } from '../../theme/useTheme'
 import { useStreakAndXP } from '../../hooks/useStreakAndXP'
+import { cardSurface } from '../../theme/componentStyles'
+import { NeonProgress } from '../../components/ui/NeonProgress'
 import { xpProgressInLevel } from '../../lib/gamification'
 import { isStreakMilestone } from '../../lib/affirmations'
 
@@ -47,18 +49,16 @@ export function RankBadge() {
       ]
         .filter(Boolean)
         .join(' ') || undefined}
-      style={{
+      style={cardSurface(tokens, {
         display: 'flex',
         alignItems: 'center',
         gap: 16,
         padding: '18px 20px',
-        borderRadius: 12,
-        border: `1px solid ${milestone || rankFlash ? tokens.gold : tokens.border}`,
-        background: tokens.cardBg,
         marginBottom: 20,
+        border: `1px solid ${milestone || rankFlash ? tokens.gold : tokens.border}`,
         boxShadow: rankFlash ? `0 0 28px ${tokens.accentGlow}` : tokens.cardShadow,
         transition: 'border-color 0.4s ease, box-shadow 0.4s ease',
-      }}
+      })}
     >
       <div
         className={rankFlash ? 'animate-rank-emblem' : undefined}
@@ -102,30 +102,13 @@ export function RankBadge() {
         >
           Level {gamification.level} · {gamification.xp} XP
         </p>
-        <div
-          style={{
-            marginTop: 10,
-            height: 6,
-            borderRadius: 999,
-            background: tokens.neonTrack,
-            overflow: 'hidden',
-          }}
-          role="progressbar"
-          aria-valuenow={Math.round(progress * 100)}
-          aria-valuemin={0}
-          aria-valuemax={100}
+        <NeonProgress
+          value={Math.round(progress * 100)}
+          variant="xp"
+          fillClassName={rankFlash ? 'animate-xp-surge' : undefined}
+          trackStyle={{ marginTop: 10 }}
           aria-label="XP progress to next level"
-        >
-          <div
-            className={rankFlash ? 'animate-xp-surge' : undefined}
-            style={{
-              width: `${Math.round(progress * 100)}%`,
-              height: '100%',
-              background: tokens.xpGradient,
-              transition: 'width 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-            }}
-          />
-        </div>
+        />
       </div>
       <div style={{ textAlign: 'right' }}>
         <p
