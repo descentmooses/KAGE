@@ -17,9 +17,7 @@ interface NeonGlowTextProps {
   style?: CSSProperties
   as?: 'span' | 'p' | 'h1' | 'div'
   variant?: 'default' | 'hero'
-  /** Light-mode depth shadows (hero only). Off for large kanji where blur reads as grey halo. */
-  lightShadow?: boolean
-  /** Black stroke in light mode (hero kanji). */
+  /** Black stroke ring in light mode (hero kanji). Uses px so it stays thin at large sizes. */
   lightOutline?: boolean
 }
 
@@ -29,13 +27,11 @@ export function NeonGlowText({
   style,
   as: Tag = 'span',
   variant = 'default',
-  lightShadow = true,
   lightOutline = false,
 }: NeonGlowTextProps) {
   const { mode } = useTheme()
   const isLight = mode === 'light'
   const isHero = variant === 'hero'
-  const isLightHeroShadow = isLight && isHero && lightShadow
 
   const textLayer: CSSProperties = {
     fontFamily: style?.fontFamily,
@@ -69,6 +65,12 @@ export function NeonGlowText({
         backgroundClip: 'text',
         color: 'transparent',
         whiteSpace: 'nowrap',
+        ...(isLight && isHero && lightOutline
+          ? {
+              WebkitTextStroke: '3px #000000',
+              paintOrder: 'stroke fill',
+            }
+          : undefined),
       }}
     >
       {children}
@@ -86,35 +88,6 @@ export function NeonGlowText({
         marginLeft: style?.marginLeft,
       }}
     >
-      {isLightHeroShadow && (
-        <>
-          <span
-            aria-hidden
-            style={{
-              ...layerBase,
-              color: '#000000',
-              opacity: 0.3,
-              transform: 'translateY(0.14em) scale(1.02)',
-              filter: 'blur(18px)',
-            }}
-          >
-            {children}
-          </span>
-          <span
-            aria-hidden
-            style={{
-              ...layerBase,
-              color: '#000000',
-              opacity: 0.45,
-              transform: 'translateY(0.07em)',
-              filter: 'blur(6px)',
-            }}
-          >
-            {children}
-          </span>
-        </>
-      )}
-
       {!isLight && isHero && (
         <span
           aria-hidden
@@ -136,20 +109,6 @@ export function NeonGlowText({
             ...layerBase,
             color: '#00f9ff',
             filter: isHero ? NEON_HERO_GLOW_DARK : NEON_CORE_GLOW,
-          }}
-        >
-          {children}
-        </span>
-      )}
-
-      {isLight && isHero && lightOutline && (
-        <span
-          aria-hidden
-          style={{
-            ...layerBase,
-            color: 'transparent',
-            WebkitTextStroke: '1em #000000',
-            paintOrder: 'stroke fill',
           }}
         >
           {children}
