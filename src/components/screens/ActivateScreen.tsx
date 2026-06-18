@@ -29,12 +29,8 @@ export function ActivateScreen() {
     >
       {message && <ConfirmBanner message={message} />}
 
-      <div className="space-y-6">
-        <SegmentedControl
-          label="Current Energy (1–10)"
-          value={energy}
-          onChange={setEnergy}
-        />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <SegmentedControl label="Current Energy (1–10)" value={energy} onChange={setEnergy} />
 
         <NeonInput
           label="One Intention for Today"

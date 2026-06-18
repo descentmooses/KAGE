@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { TabScreen, ConfirmBanner } from '../TabScreen'
-import { StatBar } from '../StatBar'
+import { NeonBar } from '../NeonBar'
 import { RatingModal } from '../RatingModal'
 import { NeonInput } from '../ui/NeonInput'
 import { NeonButton } from '../ui/NeonButton'
@@ -45,28 +45,21 @@ export function ReflectScreen() {
         title="Evening Reflection"
         subtitle="内省 — review the shadow you cast today"
       >
-        {saved && (
-          <ConfirmBanner message="Reflection logged. Archive updated." />
-        )}
+        {saved && <ConfirmBanner message="Reflection logged. Archive updated." />}
 
-        <div className="space-y-6">
-          <p
-            className="font-mono text-[8px] tracking-[0.35em] uppercase"
-            style={{ color: 'rgba(138,138,154,0.9)' }}
-          >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <p style={{ fontFamily: '"Share Tech Mono", monospace', fontSize: 9, color: '#8a8a9a', letterSpacing: '0.3em', textTransform: 'uppercase' }}>
             How did you do today?
           </p>
 
-          <div className="space-y-2">
-            {AREAS.map((area) => (
-              <StatBar
-                key={area.id}
-                area={area}
-                value={ratings[area.id as AreaId]}
-                onTap={() => setActiveArea(area)}
-              />
-            ))}
-          </div>
+          {AREAS.map((area) => (
+            <NeonBar
+              key={area.id}
+              area={area}
+              value={ratings[area.id as AreaId]}
+              onTap={() => setActiveArea(area)}
+            />
+          ))}
 
           <NeonInput
             label="What did you learn or overcome today?"

@@ -15,61 +15,76 @@ interface BottomNavProps {
 export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
   return (
     <nav
-      className="relative z-50 border-t border-white/10"
-      style={{
-        backgroundColor: 'rgba(10, 10, 10, 0.96)',
-        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-        boxShadow: '0 -1px 0 rgba(255, 0, 170, 0.12), 0 -8px 32px rgba(0, 0, 0, 0.45)',
-      }}
       aria-label="Main navigation"
+      style={{
+        flexShrink: 0,
+        backgroundColor: 'rgba(10,10,10,0.97)',
+        borderTop: '1px solid rgba(255,255,255,0.08)',
+        boxShadow: '0 -4px 24px rgba(0,0,0,0.5)',
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+      }}
     >
-      <ul className="mx-auto grid h-16 max-w-md grid-cols-4">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', height: 64, maxWidth: 480, margin: '0 auto' }}>
         {TABS.map((tab) => {
-          const isActive = activeTab === tab.id
+          const active = activeTab === tab.id
           return (
-            <li key={tab.id}>
-              <button
-                type="button"
-                onClick={() => onTabChange(tab.id)}
-                aria-current={isActive ? 'page' : undefined}
-                className="relative flex h-full w-full flex-col items-center justify-center gap-0.5 transition-transform active:scale-95"
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => onTabChange(tab.id)}
+              aria-current={active ? 'page' : undefined}
+              style={{
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 2,
+                border: 'none',
+                background: active
+                  ? 'linear-gradient(180deg, rgba(0,249,255,0.12), transparent)'
+                  : 'transparent',
+                cursor: 'pointer',
+                padding: 0,
+              }}
+            >
+              {active && (
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    width: 48,
+                    height: 2,
+                    background: 'linear-gradient(90deg, #00f9ff, #ff00aa)',
+                    boxShadow: '0 0 8px #00f9ff',
+                  }}
+                />
+              )}
+              <span
                 style={{
-                  background: isActive
-                    ? 'linear-gradient(180deg, rgba(0,249,255,0.1) 0%, transparent 100%)'
-                    : 'transparent',
+                  fontFamily: '"Noto Sans JP", sans-serif',
+                  fontSize: 18,
+                  color: active ? '#00f9ff' : 'rgba(255,255,255,0.45)',
+                  textShadow: active ? '0 0 12px rgba(0,249,255,0.9)' : 'none',
                 }}
               >
-                {isActive && (
-                  <span
-                    className="absolute top-0 h-0.5 w-12 rounded-full"
-                    style={{
-                      background: 'linear-gradient(90deg, #00f9ff, #ff00aa)',
-                      boxShadow: '0 0 10px rgba(0, 249, 255, 0.7)',
-                    }}
-                  />
-                )}
-
-                <span
-                  className="font-jp text-lg font-light"
-                  style={{
-                    color: isActive ? '#00f9ff' : 'rgba(255,255,255,0.4)',
-                    textShadow: isActive ? '0 0 14px rgba(0,249,255,0.8)' : 'none',
-                  }}
-                >
-                  {tab.kanji}
-                </span>
-
-                <span
-                  className="font-display text-[7px] tracking-[0.32em] uppercase"
-                  style={{ color: isActive ? '#ffffff' : 'rgba(138,138,154,0.7)' }}
-                >
-                  {tab.label}
-                </span>
-              </button>
-            </li>
+                {tab.kanji}
+              </span>
+              <span
+                style={{
+                  fontFamily: '"Orbitron", sans-serif',
+                  fontSize: 7,
+                  letterSpacing: '0.28em',
+                  textTransform: 'uppercase',
+                  color: active ? '#fff' : '#8a8a9a',
+                }}
+              >
+                {tab.label}
+              </span>
+            </button>
           )
         })}
-      </ul>
+      </div>
     </nav>
   )
 }

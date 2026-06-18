@@ -1,59 +1,56 @@
 import type { ReactNode } from 'react'
 
-interface TabScreenProps {
+export function TabScreen({
+  kanji,
+  title,
+  subtitle,
+  children,
+}: {
   kanji: string
   title: string
   subtitle: string
   children: ReactNode
-}
-
-export function TabScreen({ kanji, title, subtitle, children }: TabScreenProps) {
+}) {
   return (
-    <main className="h-full overflow-y-auto pb-4">
-      <div className="relative mx-auto max-w-md px-5 py-6">
-        <header className="mb-7 text-center">
-          <span
-            className="mb-2 block font-jp text-4xl font-extralight"
-            style={{ color: 'rgba(255,255,255,0.2)' }}
-          >
+    <main style={{ height: '100%', overflowY: 'auto', padding: '20px 20px 24px' }}>
+      <div style={{ maxWidth: 420, margin: '0 auto' }}>
+        <header style={{ textAlign: 'center', marginBottom: 28 }}>
+          <span style={{ fontSize: 40, color: 'rgba(255,255,255,0.2)', fontFamily: '"Noto Sans JP", sans-serif' }}>
             {kanji}
           </span>
           <h2
-            className="font-display text-[10px] tracking-[0.5em] uppercase"
-            style={{ color: 'rgba(255,255,255,0.75)' }}
+            style={{
+              fontFamily: '"Orbitron", sans-serif',
+              fontSize: 10,
+              letterSpacing: '0.45em',
+              color: 'rgba(255,255,255,0.8)',
+              textTransform: 'uppercase',
+              marginTop: 8,
+            }}
           >
             {title}
           </h2>
-          <p className="mt-2 font-jp text-xs" style={{ color: 'rgba(138,138,154,0.95)' }}>
-            {subtitle}
-          </p>
-          <div
-            className="mx-auto mt-4 h-px w-20"
-            style={{
-              background: 'linear-gradient(90deg, transparent, #00f9ff, #ff00aa, transparent)',
-            }}
-          />
+          <p style={{ fontSize: 12, color: '#8a8a9a', marginTop: 8 }}>{subtitle}</p>
         </header>
-
         {children}
       </div>
     </main>
   )
 }
 
-interface ConfirmBannerProps {
-  message: string
-}
-
-export function ConfirmBanner({ message }: ConfirmBannerProps) {
+export function ConfirmBanner({ message }: { message: string }) {
   return (
     <div
-      className="mb-5 border px-4 py-3 text-center font-mono text-[10px] tracking-wider"
       style={{
+        marginBottom: 20,
+        padding: '12px 16px',
+        textAlign: 'center',
+        fontFamily: '"Share Tech Mono", monospace',
+        fontSize: 11,
         color: '#00f9ff',
-        borderColor: 'rgba(0, 249, 255, 0.35)',
-        backgroundColor: 'rgba(0, 249, 255, 0.08)',
-        boxShadow: '0 0 20px rgba(0, 249, 255, 0.15)',
+        border: '1px solid rgba(0,249,255,0.35)',
+        background: 'rgba(0,249,255,0.08)',
+        boxShadow: '0 0 16px rgba(0,249,255,0.15)',
       }}
     >
       {message}

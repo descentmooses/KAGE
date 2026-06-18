@@ -4,28 +4,42 @@ interface CoreDisplayProps {
 
 export function CoreDisplay({ value }: CoreDisplayProps) {
   return (
-    <div className="relative flex flex-col items-center py-2">
-      <div className="core-halo pointer-events-none absolute h-64 w-64 rounded-full sm:h-80 sm:w-80" />
-
-      <span
-        className="relative mb-4 font-display text-[8px] tracking-[0.7em] uppercase"
-        style={{ color: 'rgba(138,138,154,0.9)' }}
+    <div style={{ textAlign: 'center', padding: '8px 0' }}>
+      <p
+        style={{
+          fontFamily: '"Orbitron", sans-serif',
+          fontSize: 9,
+          letterSpacing: '0.6em',
+          color: '#8a8a9a',
+          textTransform: 'uppercase',
+          marginBottom: 16,
+        }}
       >
         Core
-      </span>
-
-      <span
-        className="core-glow animate-core-breathe font-display text-[9rem] font-bold leading-none tabular-nums sm:text-[11rem]"
-        aria-label={`Core score ${value}`}
+      </p>
+      <p
+        style={{
+          fontFamily: '"Orbitron", sans-serif',
+          fontSize: 'clamp(5rem, 22vw, 8rem)',
+          fontWeight: 700,
+          lineHeight: 1,
+          margin: 0,
+          background: 'linear-gradient(155deg, #00f9ff, #eef0f8 40%, #ff00aa)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
+          filter: 'drop-shadow(0 0 24px rgba(0,249,255,0.8)) drop-shadow(0 0 48px rgba(255,0,170,0.4))',
+        }}
       >
         {value}
-      </span>
-
+      </p>
       <div
-        className="mt-8 h-px w-32"
         style={{
+          margin: '28px auto 0',
+          height: 1,
+          width: 120,
           background: 'linear-gradient(90deg, transparent, #00f9ff, #ff00aa, transparent)',
-          boxShadow: '0 0 16px rgba(0, 249, 255, 0.4)',
+          boxShadow: '0 0 12px rgba(0,249,255,0.5)',
         }}
       />
     </div>

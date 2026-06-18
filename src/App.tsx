@@ -13,20 +13,40 @@ function App() {
   const [activeTab, setActiveTab] = useState<TabId>('home')
   const { ratings, logRating } = useRatings()
 
+  const renderScreen = () => {
+    switch (activeTab) {
+      case 'home':
+        return <HomeScreen ratings={ratings} onLogRating={logRating} />
+      case 'activate':
+        return <ActivateScreen />
+      case 'reflect':
+        return <ReflectScreen />
+      case 'codex':
+        return <CodexScreen />
+      default:
+        return <HomeScreen ratings={ratings} onLogRating={logRating} />
+    }
+  }
+
   return (
     <div
-      className="app-shell grid h-full w-full grid-rows-[auto_1fr_auto] overflow-hidden text-white"
-      style={{ backgroundColor: '#0a0a0a' }}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        width: '100%',
+        overflow: 'hidden',
+        backgroundColor: '#0a0a0a',
+        color: '#e8e8f0',
+      }}
     >
       <AppHeader />
 
-      <div className="relative min-h-0 overflow-hidden">
-        {activeTab === 'home' && (
-          <HomeScreen ratings={ratings} onLogRating={logRating} />
-        )}
-        {activeTab === 'activate' && <ActivateScreen />}
-        {activeTab === 'reflect' && <ReflectScreen />}
-        {activeTab === 'codex' && <CodexScreen />}
+      <div
+        style={{ position: 'relative', flex: 1, minHeight: 0, overflow: 'hidden' }}
+        key={activeTab}
+      >
+        {renderScreen()}
         <CRTOverlay />
       </div>
 

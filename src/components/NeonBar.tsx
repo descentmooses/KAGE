@@ -1,62 +1,90 @@
 import type { AreaConfig } from '../types'
 
+const CYAN = '#00f9ff'
+const MAGENTA = '#ff00aa'
+
 interface NeonBarProps {
   area: AreaConfig
-  rating: number | null
-  delay?: number
+  value: number
   onTap: () => void
 }
 
-export function NeonBar({ area, rating, delay = 0, onTap }: NeonBarProps) {
-  const fillPercent = rating !== null ? (rating / 10) * 100 : 0
-  const accent = area.color === 'cyan' ? '#00f0ff' : '#ff00aa'
-  const accentDim = area.color === 'cyan' ? '#00f0ff33' : '#ff00aa33'
+export function NeonBar({ area, value, onTap }: NeonBarProps) {
+  const fillPercent = (value / 10) * 100
 
   return (
     <button
       type="button"
       onClick={onTap}
-      className="group relative w-full px-1 py-3 text-left opacity-0 animate-fade-up transition-colors duration-300 hover:bg-white/[0.02]"
-      style={{ animationDelay: `${delay}ms`, animationFillMode: 'forwards' }}
-      aria-label={`Rate ${area.label}, current ${rating ?? 'unrated'}`}
+      style={{
+        display: 'block',
+        width: '100%',
+        padding: '14px 6px',
+        margin: 0,
+        border: 'none',
+        background: 'transparent',
+        cursor: 'pointer',
+        textAlign: 'left',
+        fontFamily: 'inherit',
+      }}
+      aria-label={`${area.label} ${value} of 10. Tap to adjust.`}
     >
-      <div className="mb-2 flex items-baseline justify-between">
-        <div className="flex items-baseline gap-3">
-          <span className="font-jp text-xl font-light text-white/25 transition-colors duration-300 group-hover:text-white/50">
-            {area.kanji}
-          </span>
-          <span className="font-display text-[10px] tracking-[0.35em] text-ghost uppercase transition-colors duration-300 group-hover:text-white">
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'baseline',
+          marginBottom: 10,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+          <span style={{ fontSize: 24, color: 'rgba(255,255,255,0.5)' }}>{area.kanji}</span>
+          <span
+            style={{
+              fontFamily: '"Orbitron", sans-serif',
+              fontSize: 8,
+              letterSpacing: '0.4em',
+              color: '#8a8a9a',
+              textTransform: 'uppercase',
+            }}
+          >
             {area.label}
           </span>
         </div>
         <span
-          className="font-mono text-[10px] tracking-widest transition-colors duration-300"
-          style={{ color: rating !== null ? accent : undefined }}
+          style={{
+            fontFamily: '"Share Tech Mono", monospace',
+            fontSize: 11,
+            color: CYAN,
+            textShadow: `0 0 10px ${CYAN}`,
+          }}
         >
-          {rating !== null ? (
-            <span className="text-ghost">
-              <span style={{ color: accent }}>{rating}</span>
-              <span className="text-mist/40"> / 10</span>
-            </span>
-          ) : (
-            <span className="text-mist/40">—</span>
-          )}
+          {String(value).padStart(2, '0')}
         </span>
       </div>
 
-      <div className="relative h-px w-full bg-white/[0.06]">
+      <div
+        style={{
+          position: 'relative',
+          height: 12,
+          width: '100%',
+          borderRadius: 999,
+          background: 'rgba(255,255,255,0.06)',
+          boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.5)',
+          overflow: 'hidden',
+        }}
+      >
         <div
-          className="absolute inset-y-0 left-0 transition-all duration-500 ease-out"
           style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            bottom: 0,
             width: `${fillPercent}%`,
-            background: `linear-gradient(90deg, ${accentDim}, ${accent})`,
-            boxShadow: `0 0 12px ${accentDim}, 0 0 4px ${accent}`,
-          }}
-        />
-        <div
-          className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-          style={{
-            background: `linear-gradient(90deg, transparent, ${accent}44, transparent)`,
+            borderRadius: 999,
+            background: `linear-gradient(90deg, rgba(0,249,255,0.5), ${CYAN} 70%, ${MAGENTA})`,
+            boxShadow: `0 0 14px ${CYAN}, 0 0 28px rgba(0,249,255,0.35)`,
+            transition: 'width 0.4s ease',
           }}
         />
       </div>

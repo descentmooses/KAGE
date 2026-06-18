@@ -1,27 +1,39 @@
 export function AppHeader() {
   return (
     <header
-      className="relative z-50 border-b border-white/10"
       style={{
-        backgroundColor: 'rgba(10, 10, 10, 0.96)',
+        flexShrink: 0,
+        height: 56,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'rgba(10,10,10,0.97)',
+        borderBottom: '1px solid rgba(255,255,255,0.08)',
+        boxShadow: '0 1px 20px rgba(0,249,255,0.1)',
         paddingTop: 'env(safe-area-inset-top, 0px)',
-        boxShadow: '0 1px 0 rgba(0, 249, 255, 0.15), 0 4px 24px rgba(0, 0, 0, 0.4)',
       }}
     >
-      <div className="mx-auto flex h-14 max-w-md items-center justify-center gap-3 px-6">
-        <h1
-          className="font-display text-sm font-semibold tracking-[0.55em]"
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <span
           style={{
+            fontFamily: '"Orbitron", sans-serif',
+            fontSize: 14,
+            fontWeight: 600,
+            letterSpacing: '0.5em',
             color: '#f0f0f8',
-            textShadow: '0 0 20px rgba(0, 249, 255, 0.5)',
+            textShadow: '0 0 16px rgba(0,249,255,0.6)',
           }}
         >
           KAGE
-        </h1>
-        <span className="h-4 w-px bg-white/20" aria-hidden="true" />
+        </span>
+        <span style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.2)' }} />
         <span
-          className="font-jp text-xl font-extralight"
-          style={{ color: 'rgba(255,255,255,0.55)', textShadow: '0 0 16px rgba(0,249,255,0.35)' }}
+          style={{
+            fontFamily: '"Noto Sans JP", sans-serif',
+            fontSize: 20,
+            color: 'rgba(255,255,255,0.55)',
+            textShadow: '0 0 12px rgba(0,249,255,0.4)',
+          }}
         >
           影
         </span>

@@ -34,58 +34,73 @@ function RatingModalContent({
 
   return (
     <div
-      className="fixed inset-0 z-[70] flex items-end justify-center px-4 pb-6 sm:items-center sm:px-5 sm:pb-0"
       role="dialog"
       aria-modal="true"
       aria-labelledby="rating-modal-title"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 100,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 20,
+      }}
     >
       <button
         type="button"
-        className="absolute inset-0 bg-black/78 backdrop-blur-xl animate-fade-in"
         onClick={onClose}
         aria-label="Close"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          border: 'none',
+          background: 'rgba(0,0,0,0.8)',
+          cursor: 'pointer',
+        }}
       />
 
-      <div className="glass-panel relative w-full max-w-sm animate-modal-in overflow-hidden border border-white/[0.09] px-6 py-8 sm:px-8 sm:py-9">
-        <div className="modal-border-glow pointer-events-none absolute inset-0" />
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          maxWidth: 380,
+          padding: '28px 24px',
+          background: 'rgba(8,8,10,0.95)',
+          border: '1px solid rgba(0,249,255,0.2)',
+          boxShadow: '0 0 40px rgba(0,249,255,0.15)',
+        }}
+      >
 
-        <header className="relative mb-6 text-center">
-          <span
-            className="mb-1.5 block font-jp text-[3.25rem] font-extralight leading-none text-cyan"
-            style={{ textShadow: '0 0 40px #00f9ff66' }}
-          >
+        <header style={{ textAlign: 'center', marginBottom: 20 }}>
+          <span style={{ fontSize: 48, color: '#00f9ff', textShadow: '0 0 30px rgba(0,249,255,0.6)', fontFamily: '"Noto Sans JP", sans-serif' }}>
             {area.kanji}
           </span>
-          <h2
-            id="rating-modal-title"
-            className="font-display text-[9px] tracking-[0.55em] text-white/70 uppercase"
-          >
+          <h2 id="rating-modal-title" style={{ fontFamily: '"Orbitron", sans-serif', fontSize: 9, letterSpacing: '0.5em', color: 'rgba(255,255,255,0.8)', textTransform: 'uppercase', marginTop: 8 }}>
             {area.label}
           </h2>
         </header>
 
-        <div className="relative mb-6 flex flex-col items-center">
+        <div style={{ textAlign: 'center', marginBottom: 20 }}>
           <span
-            className="core-glow font-display text-[5.5rem] font-bold leading-none tabular-nums sm:text-8xl"
-            aria-live="polite"
+            style={{
+              fontFamily: '"Orbitron", sans-serif',
+              fontSize: 72,
+              fontWeight: 700,
+              background: 'linear-gradient(155deg, #00f9ff, #ff00aa)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
           >
             {selected}
           </span>
-          <span className="mt-2 font-mono text-[7px] tracking-[0.45em] text-mist/60 uppercase">
-            Current Rating
-          </span>
         </div>
 
-        <div className="neon-track relative mb-6 h-2 w-full overflow-hidden rounded-full">
-          <div
-            className="neon-fill absolute inset-y-0 left-0 overflow-hidden rounded-full transition-[width] duration-150 ease-out"
-            style={{ width: `${fillPercent}%` }}
-          >
-            <div className="crt-bar-texture absolute inset-0 opacity-60" />
-          </div>
+        <div style={{ marginBottom: 20, height: 8, borderRadius: 999, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+          <div style={{ height: '100%', width: `${fillPercent}%`, background: 'linear-gradient(90deg, #00f9ff, #ff00aa)', boxShadow: '0 0 12px #00f9ff' }} />
         </div>
 
-        <div className="mb-6 grid grid-cols-5 gap-1.5">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6, marginBottom: 20 }}>
           {Array.from({ length: 10 }, (_, i) => i + 1).map((value) => {
             const isSelected = selected === value
             return (
@@ -93,14 +108,14 @@ function RatingModalContent({
                 key={value}
                 type="button"
                 onClick={() => setSelected(value)}
-                className="py-2.5 font-mono text-[11px] transition-all duration-100 active:scale-90"
                 style={{
-                  color: isSelected ? '#0a0a0a' : 'rgba(138,138,154,0.48)',
-                  background: isSelected
-                    ? 'linear-gradient(145deg, #00f9ff, #ff00aa)'
-                    : 'rgba(255,255,255,0.03)',
-                  border: `1px solid ${isSelected ? 'transparent' : 'rgba(255,255,255,0.07)'}`,
-                  boxShadow: isSelected ? '0 0 20px #00f9ff55' : 'none',
+                  padding: '10px 0',
+                  fontFamily: '"Share Tech Mono", monospace',
+                  fontSize: 12,
+                  cursor: 'pointer',
+                  color: isSelected ? '#0a0a0a' : '#8a8a9a',
+                  background: isSelected ? 'linear-gradient(145deg, #00f9ff, #ff00aa)' : 'rgba(255,255,255,0.04)',
+                  border: `1px solid ${isSelected ? 'transparent' : 'rgba(255,255,255,0.08)'}`,
                 }}
               >
                 {value}
@@ -112,7 +127,20 @@ function RatingModalContent({
         <button
           type="button"
           onClick={() => onSave(selected)}
-          className="log-rating-btn w-full py-3.5 font-display text-[9px] tracking-[0.55em] text-void uppercase transition-transform duration-100 active:scale-[0.96]"
+          style={{
+            width: '100%',
+            padding: '14px 0',
+            border: 'none',
+            cursor: 'pointer',
+            fontFamily: '"Orbitron", sans-serif',
+            fontSize: 10,
+            letterSpacing: '0.45em',
+            textTransform: 'uppercase',
+            color: '#0a0a0a',
+            fontWeight: 600,
+            background: 'linear-gradient(95deg, #00f9ff, #ff00aa)',
+            boxShadow: '0 0 24px rgba(0,249,255,0.45)',
+          }}
         >
           LOG RATING
         </button>
