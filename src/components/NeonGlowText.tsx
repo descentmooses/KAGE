@@ -106,28 +106,6 @@ export function NeonGlowText({
           >
             {children}
           </span>
-          <span
-            aria-hidden
-            style={{
-              ...layerBase,
-              color: 'transparent',
-              WebkitTextStroke: '0.11em rgba(0,0,0,0.45)',
-              paintOrder: 'stroke fill',
-            }}
-          >
-            {children}
-          </span>
-          <span
-            aria-hidden
-            style={{
-              ...layerBase,
-              color: 'transparent',
-              WebkitTextStroke: '0.065em #000000',
-              paintOrder: 'stroke fill',
-            }}
-          >
-            {children}
-          </span>
         </>
       ) : (
         <>
@@ -139,20 +117,6 @@ export function NeonGlowText({
                 color: 'rgba(0, 249, 255, 0.35)',
                 transform: 'translateY(0.08em) scale(1.03)',
                 filter: 'blur(10px)',
-              }}
-            >
-              {children}
-            </span>
-          )}
-
-          {isHero && (
-            <span
-              aria-hidden
-              style={{
-                ...layerBase,
-                color: 'transparent',
-                WebkitTextStroke: '0.035em #000000',
-                paintOrder: 'stroke fill',
               }}
             >
               {children}
