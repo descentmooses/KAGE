@@ -45,6 +45,8 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        navigateFallback: isGitHubPages ? '/KAGE/index.html' : '/index.html',
+        navigateFallbackDenylist: isGitHubPages ? [/^\/KAGE\/assets\//] : [/^\/assets\//],
       },
     }),
   ],

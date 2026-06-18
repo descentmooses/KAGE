@@ -14,20 +14,23 @@ function App() {
   const { ratings, logRating } = useRatings()
 
   return (
-    <div className="relative flex h-full w-full flex-col overflow-hidden bg-void text-white">
+    <div
+      className="app-shell grid h-full w-full grid-rows-[auto_1fr_auto] overflow-hidden text-white"
+      style={{ backgroundColor: '#0a0a0a' }}
+    >
       <AppHeader />
 
-      <div className="relative z-10 min-h-0 flex-1 overflow-hidden pt-14">
+      <div className="relative min-h-0 overflow-hidden">
         {activeTab === 'home' && (
           <HomeScreen ratings={ratings} onLogRating={logRating} />
         )}
         {activeTab === 'activate' && <ActivateScreen />}
         {activeTab === 'reflect' && <ReflectScreen />}
         {activeTab === 'codex' && <CodexScreen />}
+        <CRTOverlay />
       </div>
 
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
-      <CRTOverlay />
     </div>
   )
 }

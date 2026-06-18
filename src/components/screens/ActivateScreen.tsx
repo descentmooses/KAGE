@@ -6,19 +6,19 @@ import { NeonButton } from '../ui/NeonButton'
 import { useMorningLog, useConfirmMessage } from '../../hooks/useMorningLog'
 
 export function ActivateScreen() {
-  const { lastLog, saveMorning } = useMorningLog()
+  const { saveMorning } = useMorningLog()
   const { message, show } = useConfirmMessage()
-  const [energy, setEnergy] = useState(lastLog?.energy ?? 7)
-  const [intention, setIntention] = useState(lastLog?.intention ?? '')
-  const [discipline, setDiscipline] = useState(lastLog?.discipline ?? '')
+  const [energy, setEnergy] = useState(7)
+  const [intention, setIntention] = useState('')
+  const [discipline, setDiscipline] = useState('')
 
   const handleLog = () => {
     if (!intention.trim() || !discipline.trim()) {
-      show('Fill in intention and discipline to log.')
+      show('Enter your intention and discipline to continue.')
       return
     }
     saveMorning(energy, intention, discipline)
-    show('Morning activation logged. Protocol engaged.')
+    show('Morning logged — protocol engaged.')
   }
 
   return (
@@ -29,9 +29,9 @@ export function ActivateScreen() {
     >
       {message && <ConfirmBanner message={message} />}
 
-      <div className="space-y-7">
+      <div className="space-y-6">
         <SegmentedControl
-          label="Current Energy"
+          label="Current Energy (1–10)"
           value={energy}
           onChange={setEnergy}
         />

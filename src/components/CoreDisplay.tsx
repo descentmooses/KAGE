@@ -4,33 +4,28 @@ interface CoreDisplayProps {
 
 export function CoreDisplay({ value }: CoreDisplayProps) {
   return (
-    <div className="relative flex flex-col items-center">
-      <div
-        className="core-halo pointer-events-none absolute top-1/2 left-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full sm:h-96 sm:w-96"
-        aria-hidden="true"
-      />
+    <div className="relative flex flex-col items-center py-2">
+      <div className="core-halo pointer-events-none absolute h-64 w-64 rounded-full sm:h-80 sm:w-80" />
 
       <span
-        className="relative mb-6 font-display text-[8px] tracking-[0.75em] text-mist/70 uppercase"
+        className="relative mb-4 font-display text-[8px] tracking-[0.7em] uppercase"
+        style={{ color: 'rgba(138,138,154,0.9)' }}
       >
         Core
       </span>
 
-      <div className="relative">
-        <span
-          className="core-glow animate-core-breathe font-display text-[9.5rem] leading-[0.82] font-bold tabular-nums sm:text-[12.5rem]"
-          aria-label={`Core score ${value}`}
-        >
-          {value}
-        </span>
-      </div>
+      <span
+        className="core-glow animate-core-breathe font-display text-[9rem] font-bold leading-none tabular-nums sm:text-[11rem]"
+        aria-label={`Core score ${value}`}
+      >
+        {value}
+      </span>
 
       <div
-        className="relative mt-12 h-px w-36 sm:w-44"
+        className="mt-8 h-px w-32"
         style={{
-          background:
-            'linear-gradient(90deg, transparent, #00f9ff, #ff00aa, transparent)',
-          boxShadow: '0 0 20px #00f9ff55, 0 0 32px #ff00aa33',
+          background: 'linear-gradient(90deg, transparent, #00f9ff, #ff00aa, transparent)',
+          boxShadow: '0 0 16px rgba(0, 249, 255, 0.4)',
         }}
       />
     </div>

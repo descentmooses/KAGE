@@ -51,7 +51,7 @@ export function HomeScreen({ ratings, onLogRating }: HomeScreenProps) {
 
   return (
     <>
-      <main className="relative flex h-full w-full items-center justify-center overflow-y-auto px-5 pt-2 pb-4 sm:px-8">
+      <main className="relative flex h-full w-full items-center justify-center overflow-y-auto px-5 py-4 sm:px-8">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div
             className="absolute top-[38%] left-1/2 h-[min(520px,70vw)] w-[min(520px,70vw)] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-[0.07]"
@@ -74,12 +74,11 @@ export function HomeScreen({ ratings, onLogRating }: HomeScreenProps) {
             className="mt-8 w-full space-y-1 sm:mt-10"
             aria-label="Mind, Body, Spirit"
           >
-            {AREAS.map((area, i) => (
+            {AREAS.map((area) => (
               <StatBar
                 key={area.id}
                 area={area}
                 value={stats[area.id]}
-                delay={i * 80}
                 onTap={() => setActiveArea(area)}
               />
             ))}

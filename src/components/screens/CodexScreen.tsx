@@ -11,25 +11,25 @@ const PROTOCOLS = [
     kanji: '勇',
     title: 'Yu — Courage',
     description:
-      'Act when resistance peaks. The neural path of least resistance is rarely the one worth logging.',
+      'Act when resistance peaks. The path of least resistance is rarely the one worth logging.',
   },
   {
     kanji: '仁',
     title: 'Jin — Compassion',
     description:
-      'Strength without mercy is noise. Sharpen the self, but do not sever the thread that binds you to others.',
+      'Strength without mercy is noise. Sharpen yourself without severing the thread to others.',
   },
   {
     kanji: '礼',
     title: 'Rei — Respect',
     description:
-      'Every interaction leaves a trace. Move through systems and relationships as if the archive is always watching.',
+      'Every interaction leaves a trace. Move through systems as if the archive is always watching.',
   },
   {
     kanji: '誠',
     title: 'Makoto — Honesty',
     description:
-      'The shadow knows when you lie to yourself. Rate truthfully. Reflect without performance. Log what is real.',
+      'The shadow knows when you lie to yourself. Rate truthfully. Reflect without performance.',
   },
 ] as const
 
@@ -38,15 +38,19 @@ export function CodexScreen() {
     <TabScreen
       kanji="典"
       title="Bushido Protocols"
-      subtitle="典籍 — fragments for the shadow operative"
+      subtitle="典籍 — five fragments for the shadow operative"
     >
-      <ul className="space-y-4 pb-4">
-        {PROTOCOLS.map((protocol, i) => (
+      <ul className="space-y-3 pb-6">
+        {PROTOCOLS.map((p, i) => (
           <li
-            key={protocol.title}
-            className="border border-white/[0.06] bg-white/[0.02] px-4 py-4"
+            key={p.title}
+            className="border px-4 py-4"
             style={{
-              boxShadow: i % 2 === 0 ? '0 0 20px #00f9ff08' : '0 0 20px #ff00aa08',
+              borderColor: 'rgba(255,255,255,0.08)',
+              backgroundColor: 'rgba(255,255,255,0.02)',
+              boxShadow: i % 2 === 0
+                ? '0 0 16px rgba(0,249,255,0.06)'
+                : '0 0 16px rgba(255,0,170,0.06)',
             }}
           >
             <div className="mb-2 flex items-center gap-3">
@@ -54,17 +58,20 @@ export function CodexScreen() {
                 className="font-jp text-2xl font-extralight"
                 style={{
                   color: i % 2 === 0 ? '#00f9ff' : '#ff00aa',
-                  textShadow: `0 0 16px ${i % 2 === 0 ? '#00f9ff44' : '#ff00aa44'}`,
+                  textShadow: `0 0 12px ${i % 2 === 0 ? 'rgba(0,249,255,0.5)' : 'rgba(255,0,170,0.5)'}`,
                 }}
               >
-                {protocol.kanji}
+                {p.kanji}
               </span>
-              <h3 className="font-display text-[9px] tracking-[0.35em] text-white/75 uppercase">
-                {protocol.title}
+              <h3
+                className="font-display text-[8px] tracking-[0.35em] uppercase"
+                style={{ color: 'rgba(255,255,255,0.8)' }}
+              >
+                {p.title}
               </h3>
             </div>
-            <p className="font-jp text-xs leading-relaxed text-ghost/90">
-              {protocol.description}
+            <p className="font-jp text-xs leading-relaxed" style={{ color: 'rgba(138,138,154,0.95)' }}>
+              {p.description}
             </p>
           </li>
         ))}

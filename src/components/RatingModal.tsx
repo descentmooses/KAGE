@@ -114,7 +114,7 @@ function RatingModalContent({
           onClick={() => onSave(selected)}
           className="log-rating-btn w-full py-3.5 font-display text-[9px] tracking-[0.55em] text-void uppercase transition-transform duration-100 active:scale-[0.96]"
         >
-          Log Rating
+          LOG RATING
         </button>
       </div>
     </div>
