@@ -34,20 +34,22 @@ export function KageHeroLogo() {
         }}
       />
 
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          width: 'min(70vw, 320px)',
-          height: 'min(28vw, 120px)',
-          bottom: '18%',
-          background: 'radial-gradient(ellipse, rgba(0,0,0,0.4) 0%, transparent 70%)',
-          opacity: isLight ? 0.35 : 0.55,
-          filter: 'blur(20px)',
-          pointerEvents: 'none',
-          transform: 'scale(1.6)',
-        }}
-      />
+      {!isLight && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            width: 'min(70vw, 320px)',
+            height: 'min(28vw, 120px)',
+            bottom: '18%',
+            background: 'radial-gradient(ellipse, rgba(0,0,0,0.4) 0%, transparent 70%)',
+            opacity: 0.55,
+            filter: 'blur(20px)',
+            pointerEvents: 'none',
+            transform: 'scale(1.6)',
+          }}
+        />
+      )}
 
       <NeonGlowText
         variant="hero"
@@ -65,6 +67,7 @@ export function KageHeroLogo() {
 
       <NeonGlowText
         variant="hero"
+        lightShadow={false}
         as="h1"
         style={{
           fontFamily: '"Noto Sans JP", sans-serif',

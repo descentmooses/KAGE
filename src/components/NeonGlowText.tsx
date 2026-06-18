@@ -17,6 +17,8 @@ interface NeonGlowTextProps {
   style?: CSSProperties
   as?: 'span' | 'p' | 'h1' | 'div'
   variant?: 'default' | 'hero'
+  /** Light-mode depth shadows (hero only). Off for large kanji where blur reads as grey halo. */
+  lightShadow?: boolean
 }
 
 export function NeonGlowText({
@@ -25,11 +27,12 @@ export function NeonGlowText({
   style,
   as: Tag = 'span',
   variant = 'default',
+  lightShadow = true,
 }: NeonGlowTextProps) {
   const { mode } = useTheme()
   const isLight = mode === 'light'
   const isHero = variant === 'hero'
-  const isLightHero = isLight && isHero
+  const isLightHero = isLight && isHero && lightShadow
 
   const textLayer: CSSProperties = {
     fontFamily: style?.fontFamily,
