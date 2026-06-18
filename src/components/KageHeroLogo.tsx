@@ -69,6 +69,7 @@ export function KageHeroLogo() {
       <NeonGlowText
         variant="hero"
         lightShadow={false}
+        lightOutline
         as="h1"
         style={{
           fontFamily: '"Noto Sans JP", sans-serif',

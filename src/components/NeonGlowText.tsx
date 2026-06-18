@@ -19,6 +19,8 @@ interface NeonGlowTextProps {
   variant?: 'default' | 'hero'
   /** Light-mode depth shadows (hero only). Off for large kanji where blur reads as grey halo. */
   lightShadow?: boolean
+  /** Subtle black stroke in light mode (hero kanji). */
+  lightOutline?: boolean
 }
 
 export function NeonGlowText({
@@ -28,11 +30,12 @@ export function NeonGlowText({
   as: Tag = 'span',
   variant = 'default',
   lightShadow = true,
+  lightOutline = false,
 }: NeonGlowTextProps) {
   const { mode } = useTheme()
   const isLight = mode === 'light'
   const isHero = variant === 'hero'
-  const isLightHero = isLight && isHero && lightShadow
+  const isLightHeroShadow = isLight && isHero && lightShadow
 
   const textLayer: CSSProperties = {
     fontFamily: style?.fontFamily,
@@ -83,7 +86,7 @@ export function NeonGlowText({
         marginLeft: style?.marginLeft,
       }}
     >
-      {isLightHero ? (
+      {isLightHeroShadow && (
         <>
           <span
             aria-hidden
@@ -110,33 +113,47 @@ export function NeonGlowText({
             {children}
           </span>
         </>
-      ) : (
-        <>
-          {isHero && (
-            <span
-              aria-hidden
-              style={{
-                ...layerBase,
-                color: 'rgba(0, 249, 255, 0.35)',
-                transform: 'translateY(0.08em) scale(1.03)',
-                filter: 'blur(10px)',
-              }}
-            >
-              {children}
-            </span>
-          )}
+      )}
 
-          <span
-            aria-hidden
-            style={{
-              ...layerBase,
-              color: '#00f9ff',
-              filter: isHero ? NEON_HERO_GLOW_DARK : NEON_CORE_GLOW,
-            }}
-          >
-            {children}
-          </span>
-        </>
+      {!isLight && isHero && (
+        <span
+          aria-hidden
+          style={{
+            ...layerBase,
+            color: 'rgba(0, 249, 255, 0.35)',
+            transform: 'translateY(0.08em) scale(1.03)',
+            filter: 'blur(10px)',
+          }}
+        >
+          {children}
+        </span>
+      )}
+
+      {!isLight && (
+        <span
+          aria-hidden
+          style={{
+            ...layerBase,
+            color: '#00f9ff',
+            filter: isHero ? NEON_HERO_GLOW_DARK : NEON_CORE_GLOW,
+          }}
+        >
+          {children}
+        </span>
+      )}
+
+      {isLight && isHero && lightOutline && (
+        <span
+          aria-hidden
+          style={{
+            ...layerBase,
+            color: 'transparent',
+            WebkitTextStroke: '0.028em #000000',
+            paintOrder: 'stroke fill',
+          }}
+        >
+          {children}
+        </span>
       )}
 
       {gradientLayer}
