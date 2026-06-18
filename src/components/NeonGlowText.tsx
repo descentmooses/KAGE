@@ -11,9 +11,6 @@ export const NEON_CORE_GLOW =
 export const NEON_HERO_GLOW_DARK =
   'drop-shadow(0 6px 28px rgba(0,0,0,0.55)) drop-shadow(0 14px 48px rgba(0,0,0,0.35)) drop-shadow(0 0 36px rgba(0,249,255,0.95)) drop-shadow(0 0 72px rgba(0,249,255,0.55)) drop-shadow(0 0 110px rgba(255,0,170,0.45))'
 
-export const NEON_HERO_GLOW_LIGHT =
-  'drop-shadow(0 6px 24px rgba(0,0,0,0.5)) drop-shadow(0 12px 40px rgba(0,0,0,0.35)) drop-shadow(0 20px 56px rgba(0,0,0,0.2))'
-
 interface NeonGlowTextProps {
   children: ReactNode
   className?: string
@@ -32,12 +29,7 @@ export function NeonGlowText({
   const { mode } = useTheme()
   const isLight = mode === 'light'
   const isHero = variant === 'hero'
-
-  const glowFilter = isHero
-    ? isLight
-      ? NEON_HERO_GLOW_LIGHT
-      : NEON_HERO_GLOW_DARK
-    : NEON_CORE_GLOW
+  const isLightHero = isLight && isHero
 
   const textLayer: CSSProperties = {
     fontFamily: style?.fontFamily,
@@ -59,6 +51,24 @@ export function NeonGlowText({
     whiteSpace: 'nowrap',
   }
 
+  const gradientLayer = (
+    <span
+      style={{
+        ...textLayer,
+        position: 'relative',
+        display: 'inline-block',
+        background: NEON_CORE_GRADIENT,
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text',
+        color: 'transparent',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {children}
+    </span>
+  )
+
   return (
     <Tag
       className={className}
@@ -70,68 +80,99 @@ export function NeonGlowText({
         marginLeft: style?.marginLeft,
       }}
     >
-      {isHero && (
-        <span
-          aria-hidden
-          style={{
-            ...layerBase,
-            color: isLight ? 'rgba(0, 0, 0, 0.4)' : 'rgba(0, 249, 255, 0.35)',
-            transform: 'translateY(0.08em) scale(1.03)',
-            filter: 'blur(10px)',
-          }}
-        >
-          {children}
-        </span>
-      )}
+      {isLightHero ? (
+        <>
+          <span
+            aria-hidden
+            style={{
+              ...layerBase,
+              color: '#000000',
+              opacity: 0.3,
+              transform: 'translateY(0.14em) scale(1.02)',
+              filter: 'blur(18px)',
+            }}
+          >
+            {children}
+          </span>
+          <span
+            aria-hidden
+            style={{
+              ...layerBase,
+              color: '#000000',
+              opacity: 0.45,
+              transform: 'translateY(0.07em)',
+              filter: 'blur(6px)',
+            }}
+          >
+            {children}
+          </span>
+          <span
+            aria-hidden
+            style={{
+              ...layerBase,
+              color: 'transparent',
+              WebkitTextStroke: '0.22em rgba(0,0,0,0.45)',
+              paintOrder: 'stroke fill',
+            }}
+          >
+            {children}
+          </span>
+          <span
+            aria-hidden
+            style={{
+              ...layerBase,
+              color: 'transparent',
+              WebkitTextStroke: '0.13em #000000',
+              paintOrder: 'stroke fill',
+            }}
+          >
+            {children}
+          </span>
+        </>
+      ) : (
+        <>
+          {isHero && (
+            <span
+              aria-hidden
+              style={{
+                ...layerBase,
+                color: 'rgba(0, 249, 255, 0.35)',
+                transform: 'translateY(0.08em) scale(1.03)',
+                filter: 'blur(10px)',
+              }}
+            >
+              {children}
+            </span>
+          )}
 
-      {isHero && (
-        <span
-          aria-hidden
-          style={{
-            ...layerBase,
-            color: 'transparent',
-            WebkitTextStroke: isLight ? '0.06em #000000' : '0.04em #000000',
-            paintOrder: 'stroke fill',
-          }}
-        >
-          {children}
-        </span>
-      )}
-
-      <span
-        aria-hidden
-        style={{
-          ...layerBase,
-          ...(isLight && isHero
-            ? {
+          {isHero && (
+            <span
+              aria-hidden
+              style={{
+                ...layerBase,
                 color: 'transparent',
-                textShadow:
-                  '0 6px 24px rgba(0,0,0,0.5), 0 12px 40px rgba(0,0,0,0.35), 0 20px 56px rgba(0,0,0,0.2)',
-              }
-            : {
-                color: '#00f9ff',
-                filter: glowFilter,
-              }),
-        }}
-      >
-        {children}
-      </span>
+                WebkitTextStroke: '0.07em #000000',
+                paintOrder: 'stroke fill',
+              }}
+            >
+              {children}
+            </span>
+          )}
 
-      <span
-        style={{
-          ...textLayer,
-          position: 'relative',
-          display: 'inline-block',
-          background: NEON_CORE_GRADIENT,
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
-          color: 'transparent',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {children}
-      </span>
+          <span
+            aria-hidden
+            style={{
+              ...layerBase,
+              color: '#00f9ff',
+              filter: isHero ? NEON_HERO_GLOW_DARK : NEON_CORE_GLOW,
+            }}
+          >
+            {children}
+          </span>
+        </>
+      )}
+
+      {gradientLayer}
     </Tag>
   )
 }
