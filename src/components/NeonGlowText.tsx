@@ -17,8 +17,6 @@ interface NeonGlowTextProps {
   style?: CSSProperties
   as?: 'span' | 'p' | 'h1' | 'div'
   variant?: 'default' | 'hero'
-  /** Black stroke ring in light mode (hero kanji). Uses px so it stays thin at large sizes. */
-  lightOutline?: boolean
 }
 
 export function NeonGlowText({
@@ -27,7 +25,6 @@ export function NeonGlowText({
   style,
   as: Tag = 'span',
   variant = 'default',
-  lightOutline = false,
 }: NeonGlowTextProps) {
   const { mode } = useTheme()
   const isLight = mode === 'light'
@@ -65,12 +62,6 @@ export function NeonGlowText({
         backgroundClip: 'text',
         color: 'transparent',
         whiteSpace: 'nowrap',
-        ...(isLight && isHero && lightOutline
-          ? {
-              WebkitTextStroke: '3px #000000',
-              paintOrder: 'stroke fill',
-            }
-          : undefined),
       }}
     >
       {children}
