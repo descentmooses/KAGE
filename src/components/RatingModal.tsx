@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTheme } from '../theme/useTheme'
 import type { AreaConfig } from '../types'
 
 interface RatingModalProps {
@@ -21,7 +22,9 @@ function RatingModalContent({
   onClose,
   onSave,
 }: RatingModalContentProps) {
+  const { tokens } = useTheme()
   const [selected, setSelected] = useState(initialValue ?? 5)
+  const [saving, setSaving] = useState(false)
   const fillPercent = (selected / 10) * 100
 
   useEffect(() => {
@@ -32,11 +35,17 @@ function RatingModalContent({
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
 
+  const handleSave = () => {
+    setSaving(true)
+    onSave(selected)
+  }
+
   return (
     <div
       role="dialog"
       aria-modal="true"
       aria-labelledby="rating-modal-title"
+      className="animate-fade-in"
       style={{
         position: 'fixed',
         inset: 0,
@@ -55,28 +64,49 @@ function RatingModalContent({
           position: 'absolute',
           inset: 0,
           border: 'none',
-          background: 'rgba(0,0,0,0.8)',
+          background: tokens.modalBackdrop,
           cursor: 'pointer',
+          transition: 'background 0.35s ease',
         }}
       />
 
       <div
+        className="animate-modal-in"
         style={{
           position: 'relative',
           width: '100%',
           maxWidth: 380,
           padding: '28px 24px',
-          background: 'rgba(8,8,10,0.95)',
-          border: '1px solid rgba(0,249,255,0.2)',
-          boxShadow: '0 0 40px rgba(0,249,255,0.15)',
+          background: tokens.modalBg,
+          border: `1px solid ${tokens.modalBorder}`,
+          boxShadow: tokens.modalShadow,
+          transition: 'background 0.35s ease, border-color 0.35s ease',
         }}
       >
-
         <header style={{ textAlign: 'center', marginBottom: 20 }}>
-          <span style={{ fontSize: 48, color: '#00f9ff', textShadow: '0 0 30px rgba(0,249,255,0.6)', fontFamily: '"Noto Sans JP", sans-serif' }}>
+          <span
+            style={{
+              fontSize: 48,
+              color: tokens.cyan,
+              textShadow: `0 0 30px ${tokens.cyanGlow}`,
+              fontFamily: '"Noto Sans JP", sans-serif',
+              transition: 'color 0.35s ease',
+            }}
+          >
             {area.kanji}
           </span>
-          <h2 id="rating-modal-title" style={{ fontFamily: '"Orbitron", sans-serif', fontSize: 9, letterSpacing: '0.5em', color: 'rgba(255,255,255,0.8)', textTransform: 'uppercase', marginTop: 8 }}>
+          <h2
+            id="rating-modal-title"
+            style={{
+              fontFamily: '"Orbitron", sans-serif',
+              fontSize: 9,
+              letterSpacing: '0.5em',
+              color: tokens.text,
+              textTransform: 'uppercase',
+              marginTop: 8,
+              transition: 'color 0.35s ease',
+            }}
+          >
             {area.label}
           </h2>
         </header>
@@ -87,20 +117,46 @@ function RatingModalContent({
               fontFamily: '"Orbitron", sans-serif',
               fontSize: 72,
               fontWeight: 700,
-              background: 'linear-gradient(155deg, #00f9ff, #ff00aa)',
+              background: tokens.coreGradient,
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
+              filter: tokens.coreGlow,
+              transition: 'filter 0.35s ease',
             }}
           >
             {selected}
           </span>
         </div>
 
-        <div style={{ marginBottom: 20, height: 8, borderRadius: 999, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
-          <div style={{ height: '100%', width: `${fillPercent}%`, background: 'linear-gradient(90deg, #00f9ff, #ff00aa)', boxShadow: '0 0 12px #00f9ff' }} />
+        <div
+          style={{
+            marginBottom: 20,
+            height: 8,
+            borderRadius: 999,
+            background: tokens.neonTrack,
+            overflow: 'hidden',
+            transition: 'background 0.35s ease',
+          }}
+        >
+          <div
+            style={{
+              height: '100%',
+              width: `${fillPercent}%`,
+              background: tokens.neonFill,
+              boxShadow: `0 0 12px ${tokens.cyan}`,
+              transition: 'width 0.2s ease, background 0.35s ease',
+            }}
+          />
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6, marginBottom: 20 }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(5, 1fr)',
+            gap: 6,
+            marginBottom: 20,
+          }}
+        >
           {Array.from({ length: 10 }, (_, i) => i + 1).map((value) => {
             const isSelected = selected === value
             return (
@@ -113,9 +169,12 @@ function RatingModalContent({
                   fontFamily: '"Share Tech Mono", monospace',
                   fontSize: 12,
                   cursor: 'pointer',
-                  color: isSelected ? '#0a0a0a' : '#8a8a9a',
-                  background: isSelected ? 'linear-gradient(145deg, #00f9ff, #ff00aa)' : 'rgba(255,255,255,0.04)',
-                  border: `1px solid ${isSelected ? 'transparent' : 'rgba(255,255,255,0.08)'}`,
+                  color: isSelected ? tokens.segmentTextSelected : tokens.segmentText,
+                  background: isSelected ? tokens.segmentSelected : tokens.segmentUnselected,
+                  border: `1px solid ${isSelected ? 'transparent' : tokens.segmentBorder}`,
+                  boxShadow: isSelected ? `0 0 14px ${tokens.cyanGlow}` : 'none',
+                  transition: 'all 0.15s ease',
+                  transform: isSelected ? 'scale(1.02)' : 'scale(1)',
                 }}
               >
                 {value}
@@ -126,7 +185,7 @@ function RatingModalContent({
 
         <button
           type="button"
-          onClick={() => onSave(selected)}
+          onClick={handleSave}
           style={{
             width: '100%',
             padding: '14px 0',
@@ -136,10 +195,13 @@ function RatingModalContent({
             fontSize: 10,
             letterSpacing: '0.45em',
             textTransform: 'uppercase',
-            color: '#0a0a0a',
+            color: tokens.btnText,
             fontWeight: 600,
-            background: 'linear-gradient(95deg, #00f9ff, #ff00aa)',
-            boxShadow: '0 0 24px rgba(0,249,255,0.45)',
+            background: tokens.btnGradient,
+            boxShadow: tokens.btnShadow,
+            transition: 'all 0.15s ease',
+            transform: saving ? 'scale(0.97)' : 'scale(1)',
+            opacity: saving ? 0.85 : 1,
           }}
         >
           LOG RATING

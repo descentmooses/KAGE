@@ -1,3 +1,5 @@
+import { useTheme } from '../../theme/useTheme'
+
 interface SegmentedControlProps {
   value: number
   onChange: (value: number) => void
@@ -13,16 +15,27 @@ export function SegmentedControl({
   max = 10,
   label,
 }: SegmentedControlProps) {
+  const { tokens } = useTheme()
   const options = Array.from({ length: max - min + 1 }, (_, i) => i + min)
 
   return (
     <div>
       {label && (
-        <p className="mb-2 font-mono text-[8px] tracking-[0.35em] text-mist uppercase">
+        <p
+          style={{
+            marginBottom: 8,
+            fontFamily: '"Share Tech Mono", monospace',
+            fontSize: 8,
+            letterSpacing: '0.35em',
+            color: tokens.textMuted,
+            textTransform: 'uppercase',
+            transition: 'color 0.35s ease',
+          }}
+        >
           {label}
         </p>
       )}
-      <div className="grid grid-cols-5 gap-1.5">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
         {options.map((n) => {
           const selected = value === n
           return (
@@ -30,14 +43,17 @@ export function SegmentedControl({
               key={n}
               type="button"
               onClick={() => onChange(n)}
-              className="py-2.5 font-mono text-[11px] transition-all duration-100 active:scale-90"
               style={{
-                color: selected ? '#0a0a0a' : 'rgba(138,138,154,0.55)',
-                background: selected
-                  ? 'linear-gradient(145deg, #00f9ff, #ff00aa)'
-                  : 'rgba(255,255,255,0.03)',
-                border: `1px solid ${selected ? 'transparent' : 'rgba(255,255,255,0.07)'}`,
-                boxShadow: selected ? '0 0 14px #00f9ff44' : 'none',
+                padding: '10px 0',
+                fontFamily: '"Share Tech Mono", monospace',
+                fontSize: 11,
+                cursor: 'pointer',
+                color: selected ? tokens.segmentTextSelected : tokens.segmentText,
+                background: selected ? tokens.segmentSelected : tokens.segmentUnselected,
+                border: `1px solid ${selected ? 'transparent' : tokens.segmentBorder}`,
+                boxShadow: selected ? `0 0 14px ${tokens.cyanGlow}` : 'none',
+                transition: 'all 0.15s ease',
+                transform: selected ? 'scale(1.02)' : 'scale(1)',
               }}
             >
               {n}

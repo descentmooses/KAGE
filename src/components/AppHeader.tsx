@@ -1,4 +1,9 @@
+import { useTheme } from '../theme/useTheme'
+import { ThemeToggle } from './ThemeToggle'
+
 export function AppHeader() {
+  const { tokens } = useTheme()
+
   return (
     <header
       style={{
@@ -7,10 +12,12 @@ export function AppHeader() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: 'rgba(10,10,10,0.97)',
-        borderBottom: '1px solid rgba(255,255,255,0.08)',
-        boxShadow: '0 1px 20px rgba(0,249,255,0.1)',
+        position: 'relative',
+        backgroundColor: tokens.surface,
+        borderBottom: `1px solid ${tokens.border}`,
+        boxShadow: tokens.headerShadow,
         paddingTop: 'env(safe-area-inset-top, 0px)',
+        transition: 'background-color 0.35s ease, border-color 0.35s ease',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -20,23 +27,44 @@ export function AppHeader() {
             fontSize: 14,
             fontWeight: 600,
             letterSpacing: '0.5em',
-            color: '#f0f0f8',
-            textShadow: '0 0 16px rgba(0,249,255,0.6)',
+            color: tokens.text,
+            textShadow: `0 0 16px ${tokens.cyanGlow}`,
+            transition: 'color 0.35s ease',
           }}
         >
           KAGE
         </span>
-        <span style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.2)' }} />
+        <span
+          style={{
+            width: 1,
+            height: 16,
+            background: tokens.border,
+            transition: 'background 0.35s ease',
+          }}
+        />
         <span
           style={{
             fontFamily: '"Noto Sans JP", sans-serif',
             fontSize: 20,
-            color: 'rgba(255,255,255,0.55)',
-            textShadow: '0 0 12px rgba(0,249,255,0.4)',
+            color: tokens.textSubtle,
+            textShadow: `0 0 12px ${tokens.cyanGlow}`,
+            transition: 'color 0.35s ease',
           }}
         >
           影
         </span>
+      </div>
+
+      <div
+        style={{
+          position: 'absolute',
+          right: 16,
+          top: '50%',
+          transform: 'translateY(-50%)',
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+        }}
+      >
+        <ThemeToggle />
       </div>
     </header>
   )
