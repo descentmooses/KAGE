@@ -1,8 +1,10 @@
 import { useTheme } from '../theme/useTheme'
+import { getBuildVersion } from '../lib/cacheBust'
 import { ThemeToggle } from './ThemeToggle'
 
 export function AppHeader() {
   const { tokens } = useTheme()
+  const build = getBuildVersion()
 
   return (
     <header
@@ -54,6 +56,25 @@ export function AppHeader() {
           影
         </span>
       </div>
+
+      {build && (
+        <div
+          style={{
+            position: 'absolute',
+            left: 12,
+            top: '50%',
+            transform: 'translateY(-50%)',
+            fontFamily: '"Share Tech Mono", monospace',
+            fontSize: 7,
+            letterSpacing: '0.1em',
+            color: tokens.textMuted,
+            opacity: 0.7,
+          }}
+          title={`Build ${build}`}
+        >
+          v{build.slice(-6)}
+        </div>
+      )}
 
       <div
         style={{

@@ -1,21 +1,53 @@
 const BUILD_VERSION =
   document.querySelector('meta[name="build-version"]')?.getAttribute('content') ?? ''
 
-/** Detect a newer deploy and reload when GitHub Pages serves stale index.html. */
-export async function checkForStaleCache(): Promise<void> {
-  if (!BUILD_VERSION) return
+const STORAGE_KEY = 'kage-deploy'
 
+function basePath(): string {
+  return import.meta.env.BASE_URL
+}
+
+function rootUrl(version: string): string {
+  const base = basePath().replace(/\/?$/, '/')
+  return `${base}?bust=${version}`
+}
+
+/** Secondary check after bootstrap — reload if HTML/JS bundle is stale. */
+export async function checkForStaleCache(): Promise<void> {
   try {
-    const base = import.meta.env.BASE_URL
-    const url = `${base}version.json?t=${Date.now()}`
+    const url = `${basePath()}version.json?_=${Date.now()}`
     const res = await fetch(url, { cache: 'no-store' })
     if (!res.ok) return
 
     const data = (await res.json()) as { version?: string }
-    if (data.version && data.version !== BUILD_VERSION) {
-      window.location.reload()
+    const remote = data.version
+    if (!remote) return
+
+    const stored = localStorage.getItem(STORAGE_KEY)
+    const params = new URLSearchParams(window.location.search)
+    const bust = params.get('bust')
+
+    if (stored && stored !== remote) {
+      localStorage.setItem(STORAGE_KEY, remote)
+      window.location.replace(rootUrl(remote))
+      return
+    }
+
+    if (!stored) localStorage.setItem(STORAGE_KEY, remote)
+
+    if (BUILD_VERSION && BUILD_VERSION !== remote) {
+      window.location.replace(rootUrl(remote))
+      return
+    }
+
+    if (bust && bust !== remote) {
+      window.location.replace(rootUrl(remote))
     }
   } catch {
-    /* offline or first visit — ignore */
+    /* offline or first visit */
   }
+}
+
+export function getBuildVersion(): string {
+  return BUILD_VERSION
 }
