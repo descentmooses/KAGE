@@ -70,11 +70,10 @@ export function AppShell({ activeTab, onTabChange }: AppShellProps) {
       <CelebrationListener />
       <OnlineIndicator />
 
-      <div
-        style={{ position: 'relative', flex: 1, minHeight: 0, overflow: 'hidden' }}
-        key={activeTab}
-      >
-        <Suspense fallback={<TabFallback />}>{renderScreen()}</Suspense>
+      <div style={{ position: 'relative', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+        <Suspense fallback={<TabFallback />} key={activeTab}>
+          {renderScreen()}
+        </Suspense>
         <CRTOverlay />
       </div>
 

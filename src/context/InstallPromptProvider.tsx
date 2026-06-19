@@ -17,25 +17,51 @@ import {
   shouldShowInstallUI,
   wasInstallPromptShownThisSession,
 } from '../lib/pwa/installUtils'
-import { InstallPromptContext } from './installPromptContext'
+import {
+  getCapturedInstallPrompt,
+  subscribeInstallPrompt,
+} from '../lib/pwa/installPromptCapture'
+import {
+  InstallPromptContext,
+  InstallPromptInternalContext,
+} from './installPromptContext'
 
 const ENGAGEMENT_DELAY_MS = 45_000
-const PILL_DELAY_MS = 6_000
+const PILL_DELAY_MS = 2_000
 const ANDROID_NATIVE_WAIT_MS = 5_000
+
+function shouldAutoOpenSheet(): boolean {
+  return !isStandaloneMode() && !wasInstallPromptShownThisSession()
+}
+
+function applyCapturedPrompt(
+  prompt: BeforeInstallPromptEvent,
+  triedAutoShow: { current: boolean },
+  setDeferred: (p: BeforeInstallPromptEvent) => void,
+  setOpen: (open: boolean) => void,
+  setPillVisible: (visible: boolean) => void,
+  clearNativeWait: () => void,
+) {
+  setDeferred(prompt)
+  if (!shouldAutoOpenSheet() || triedAutoShow.current) return
+  triedAutoShow.current = true
+  clearNativeWait()
+  setPillVisible(false)
+  setOpen(true)
+}
 
 export function InstallPromptProvider({
   children,
-  isReturnVisit,
   onInstalled,
 }: {
   children: ReactNode
-  isReturnVisit: boolean
   onInstalled?: () => void
 }) {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null)
   const [standalone, setStandalone] = useState(isStandaloneMode)
   const [open, setOpen] = useState(false)
   const [pillVisible, setPillVisible] = useState(false)
+  const [isReturnVisit, setReturnVisit] = useState(false)
   const engagementTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pillTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const nativeWaitTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -45,6 +71,13 @@ export function InstallPromptProvider({
   useEffect(() => {
     deferredRef.current = deferred
   }, [deferred])
+
+  const clearNativeWait = useCallback(() => {
+    if (nativeWaitTimer.current) {
+      clearTimeout(nativeWaitTimer.current)
+      nativeWaitTimer.current = null
+    }
+  }, [])
 
   const isIOS = isIOSDevice()
   const isAndroid = isAndroidDevice()
@@ -77,8 +110,8 @@ export function InstallPromptProvider({
   const maybeAutoShow = useCallback(() => {
     if (triedAutoShow.current || standalone || wasInstallPromptShownThisSession()) return
 
-    if (isAndroidDevice() && !deferred) {
-      if (nativeWaitTimer.current) clearTimeout(nativeWaitTimer.current)
+    if (isAndroidDevice() && !deferredRef.current) {
+      clearNativeWait()
       nativeWaitTimer.current = setTimeout(() => {
         if (!deferredRef.current && !standalone && !wasInstallPromptShownThisSession()) {
           openAutoInvite()
@@ -88,20 +121,32 @@ export function InstallPromptProvider({
     }
 
     openAutoInvite()
-  }, [deferred, openAutoInvite, standalone])
+  }, [clearNativeWait, openAutoInvite, standalone])
 
   useEffect(() => {
-    const onBeforeInstall = (e: Event) => {
-      e.preventDefault()
-      const prompt = e as BeforeInstallPromptEvent
-      setDeferred(prompt)
-      if (!isStandaloneMode() && !wasInstallPromptShownThisSession()) {
-        if (nativeWaitTimer.current) clearTimeout(nativeWaitTimer.current)
-        setPillVisible(false)
-        setOpen(true)
-        triedAutoShow.current = true
-      }
+    const captured = getCapturedInstallPrompt()
+    if (captured) {
+      applyCapturedPrompt(
+        captured,
+        triedAutoShow,
+        setDeferred,
+        setOpen,
+        setPillVisible,
+        clearNativeWait,
+      )
     }
+
+    const unsubscribe = subscribeInstallPrompt((prompt) => {
+      applyCapturedPrompt(
+        prompt,
+        triedAutoShow,
+        setDeferred,
+        setOpen,
+        setPillVisible,
+        clearNativeWait,
+      )
+    })
+
     const onInstalled = () => {
       setStandalone(true)
       setDeferred(null)
@@ -111,14 +156,14 @@ export function InstallPromptProvider({
       onInstalled?.()
     }
 
-    window.addEventListener('beforeinstallprompt', onBeforeInstall)
     window.addEventListener('appinstalled', onInstalled)
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', onBeforeInstall)
+      unsubscribe()
       window.removeEventListener('appinstalled', onInstalled)
+      clearNativeWait()
     }
-  }, [onInstalled])
+  }, [clearNativeWait, onInstalled])
 
   useEffect(() => {
     if (!isReturnVisit || standalone || wasInstallPromptShownThisSession()) return
@@ -217,5 +262,11 @@ export function InstallPromptProvider({
     ],
   )
 
-  return <InstallPromptContext.Provider value={value}>{children}</InstallPromptContext.Provider>
+  const internalValue = useMemo(() => ({ setReturnVisit }), [])
+
+  return (
+    <InstallPromptInternalContext.Provider value={internalValue}>
+      <InstallPromptContext.Provider value={value}>{children}</InstallPromptContext.Provider>
+    </InstallPromptInternalContext.Provider>
+  )
 }
