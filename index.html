@@ -51,6 +51,16 @@
       }).catch(function(){});
   }catch(e){}})();
   </script>
+  <!-- Register SW immediately so Chrome can fire beforeinstallprompt (do not wait for load/React). -->
+  <script>
+  (function(){try{
+    var h=location.hostname;
+    var b=(h==='localhost'||h==='127.0.0.1')?'/':'/KAGE/';
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.register(b+'sw.js',{scope:b}).catch(function(){});
+    }
+  }catch(e){}})();
+  </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
     <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png" />

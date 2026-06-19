@@ -2,6 +2,8 @@ import { defineConfig, type Plugin, type ViteDevServer } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import { readFileSync, writeFileSync } from 'node:fs'
+import { join } from 'node:path'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import pkg from './package.json' with { type: 'json' }
 
@@ -87,6 +89,22 @@ function cacheBustAssetsPlugin(): Plugin {
   }
 }
 
+function absoluteManifestPlugin(): Plugin {
+  return {
+    name: 'kage-absolute-manifest',
+    closeBundle() {
+      if (!isGhPagesBuild) return
+      const indexPath = join(process.cwd(), 'dist', 'index.html')
+      const html = readFileSync(indexPath, 'utf8')
+      const next = html.replace(
+        /href="\/KAGE\/manifest\.json"/g,
+        'href="https://descentmooses.github.io/KAGE/manifest.json"',
+      )
+      if (next !== html) writeFileSync(indexPath, next)
+    },
+  }
+}
+
 function cacheBustPlugin(): Plugin {
   return {
     name: 'kage-cache-bust',
@@ -115,7 +133,7 @@ export default defineConfig({
     cacheBustAssetsPlugin(),
     VitePWA({
       registerType: 'autoUpdate',
-      injectRegister: 'inline',
+      injectRegister: null,
       manifestFilename: 'manifest.json',
       includeAssets: [
         'favicon.svg',
@@ -202,6 +220,7 @@ export default defineConfig({
         ],
       },
     }),
+    absoluteManifestPlugin(),
   ],
   build: {
     rollupOptions: {

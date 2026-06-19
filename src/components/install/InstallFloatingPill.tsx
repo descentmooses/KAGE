@@ -60,7 +60,7 @@ export function InstallFloatingPill() {
         <span style={{ marginRight: 8, fontFamily: '"Noto Sans JP", sans-serif' }} aria-hidden>
           影
         </span>
-        {hasNativePrompt ? 'INSTALL APP' : 'HOW TO INSTALL'}
+        {hasNativePrompt ? 'INSTALL KAGE' : 'HOW TO INSTALL'}
       </button>
       <button
         type="button"
