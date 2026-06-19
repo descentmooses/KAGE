@@ -19,6 +19,7 @@ import {
 } from '../lib/pwa/installUtils'
 import {
   getCapturedInstallPrompt,
+  runNativeInstallPrompt,
   subscribeInstallPrompt,
 } from '../lib/pwa/installPromptCapture'
 import {
@@ -27,27 +28,12 @@ import {
 } from './installPromptContext'
 
 const ENGAGEMENT_DELAY_MS = 45_000
-const PILL_DELAY_MS = 2_000
-const ANDROID_NATIVE_WAIT_MS = 5_000
+const PILL_DELAY_MS = 1_500
+/** Wait longer before falling back to manual install steps — BIP often follows SW activation. */
+const ANDROID_MANUAL_FALLBACK_MS = 30_000
 
 function shouldAutoOpenSheet(): boolean {
   return !isStandaloneMode() && !wasInstallPromptShownThisSession()
-}
-
-function applyCapturedPrompt(
-  prompt: BeforeInstallPromptEvent,
-  triedAutoShow: { current: boolean },
-  setDeferred: (p: BeforeInstallPromptEvent) => void,
-  setOpen: (open: boolean) => void,
-  setPillVisible: (visible: boolean) => void,
-  clearNativeWait: () => void,
-) {
-  setDeferred(prompt)
-  if (!shouldAutoOpenSheet() || triedAutoShow.current) return
-  triedAutoShow.current = true
-  clearNativeWait()
-  setPillVisible(false)
-  setOpen(true)
 }
 
 export function InstallPromptProvider({
@@ -64,18 +50,23 @@ export function InstallPromptProvider({
   const [isReturnVisit, setReturnVisit] = useState(false)
   const engagementTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pillTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const nativeWaitTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const manualFallbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const triedAutoShow = useRef(false)
   const deferredRef = useRef<BeforeInstallPromptEvent | null>(null)
+  const onInstalledRef = useRef(onInstalled)
+
+  useEffect(() => {
+    onInstalledRef.current = onInstalled
+  }, [onInstalled])
 
   useEffect(() => {
     deferredRef.current = deferred
   }, [deferred])
 
-  const clearNativeWait = useCallback(() => {
-    if (nativeWaitTimer.current) {
-      clearTimeout(nativeWaitTimer.current)
-      nativeWaitTimer.current = null
+  const clearManualFallback = useCallback(() => {
+    if (manualFallbackTimer.current) {
+      clearTimeout(manualFallbackTimer.current)
+      manualFallbackTimer.current = null
     }
   }, [])
 
@@ -89,7 +80,8 @@ export function InstallPromptProvider({
     markInstallPromptShownThisSession()
     setOpen(false)
     setPillVisible(false)
-  }, [])
+    clearManualFallback()
+  }, [clearManualFallback])
 
   const openInstallInvite = useCallback(() => {
     if (standalone) return
@@ -100,52 +92,67 @@ export function InstallPromptProvider({
     setOpen(false)
   }, [])
 
-  const openAutoInvite = useCallback(() => {
+  const openManualFallback = useCallback(() => {
     if (triedAutoShow.current || standalone || wasInstallPromptShownThisSession()) return
+    if (deferredRef.current) return
     triedAutoShow.current = true
-    setPillVisible(false)
+    setPillVisible(true)
     setOpen(true)
   }, [standalone])
 
-  const maybeAutoShow = useCallback(() => {
-    if (triedAutoShow.current || standalone || wasInstallPromptShownThisSession()) return
+  /** Capture BIP and surface UI — Chrome requires a user gesture to call prompt(). */
+  const applyCapturedPrompt = useCallback(
+    (prompt: BeforeInstallPromptEvent) => {
+      setDeferred(prompt)
+      clearManualFallback()
 
-    if (isAndroidDevice() && !deferredRef.current) {
-      clearNativeWait()
-      nativeWaitTimer.current = setTimeout(() => {
+      if (!shouldAutoOpenSheet() || triedAutoShow.current) {
+        setPillVisible(true)
+        return
+      }
+
+      triedAutoShow.current = true
+      setPillVisible(false)
+      setOpen(true)
+    },
+    [clearManualFallback],
+  )
+
+  const scheduleManualFallback = useCallback(() => {
+    if (triedAutoShow.current || standalone || wasInstallPromptShownThisSession()) return
+    if (deferredRef.current) return
+
+    if (isAndroidDevice()) {
+      clearManualFallback()
+      manualFallbackTimer.current = setTimeout(() => {
         if (!deferredRef.current && !standalone && !wasInstallPromptShownThisSession()) {
-          openAutoInvite()
+          openManualFallback()
         }
-      }, ANDROID_NATIVE_WAIT_MS)
+      }, ANDROID_MANUAL_FALLBACK_MS)
       return
     }
 
-    openAutoInvite()
-  }, [clearNativeWait, openAutoInvite, standalone])
+    openManualFallback()
+  }, [clearManualFallback, openManualFallback, standalone])
+
+  const maybeAutoShow = useCallback(() => {
+    if (triedAutoShow.current || standalone || wasInstallPromptShownThisSession()) return
+    if (deferredRef.current) {
+      applyCapturedPrompt(deferredRef.current)
+      return
+    }
+    scheduleManualFallback()
+  }, [applyCapturedPrompt, scheduleManualFallback, standalone])
 
   useEffect(() => {
-    const captured = getCapturedInstallPrompt()
-    if (captured) {
-      applyCapturedPrompt(
-        captured,
-        triedAutoShow,
-        setDeferred,
-        setOpen,
-        setPillVisible,
-        clearNativeWait,
-      )
+    const runIfCaptured = (prompt: BeforeInstallPromptEvent) => {
+      queueMicrotask(() => applyCapturedPrompt(prompt))
     }
 
-    const unsubscribe = subscribeInstallPrompt((prompt) => {
-      applyCapturedPrompt(
-        prompt,
-        triedAutoShow,
-        setDeferred,
-        setOpen,
-        setPillVisible,
-        clearNativeWait,
-      )
-    })
+    const captured = getCapturedInstallPrompt()
+    if (captured) runIfCaptured(captured)
+
+    const unsubscribe = subscribeInstallPrompt(runIfCaptured)
 
     const onInstalled = () => {
       setStandalone(true)
@@ -153,17 +160,25 @@ export function InstallPromptProvider({
       setOpen(false)
       setPillVisible(false)
       markInstallPromptShownThisSession()
-      onInstalled?.()
+      clearManualFallback()
+      onInstalledRef.current?.()
+    }
+
+    const onControllerChange = () => {
+      const late = getCapturedInstallPrompt()
+      if (late && !deferredRef.current) runIfCaptured(late)
     }
 
     window.addEventListener('appinstalled', onInstalled)
+    navigator.serviceWorker?.addEventListener('controllerchange', onControllerChange)
 
     return () => {
       unsubscribe()
       window.removeEventListener('appinstalled', onInstalled)
-      clearNativeWait()
+      navigator.serviceWorker?.removeEventListener('controllerchange', onControllerChange)
+      clearManualFallback()
     }
-  }, [clearNativeWait, onInstalled])
+  }, [applyCapturedPrompt, clearManualFallback])
 
   useEffect(() => {
     if (!isReturnVisit || standalone || wasInstallPromptShownThisSession()) return
@@ -210,13 +225,13 @@ export function InstallPromptProvider({
 
   const promptInstall = useCallback(async (): Promise<'accepted' | 'dismissed' | 'unavailable'> => {
     if (!deferred) return 'unavailable'
-    await deferred.prompt()
-    const { outcome } = await deferred.userChoice
+    const result = await runNativeInstallPrompt(deferred)
+    if (result.outcome === 'failed') return 'unavailable'
     setDeferred(null)
-    markInstallPromptShownThisSession()
     setOpen(false)
     setPillVisible(false)
-    return outcome
+    if (result.outcome === 'accepted') onInstalledRef.current?.()
+    return result.outcome
   }, [deferred])
 
   const tryNativeInstall = useCallback(async () => {
