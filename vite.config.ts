@@ -89,16 +89,28 @@ function cacheBustAssetsPlugin(): Plugin {
   }
 }
 
+const ABSOLUTE_MANIFEST_HREF = `${GH_PAGES_ORIGIN}/KAGE/manifest.json`
+
 function absoluteManifestPlugin(): Plugin {
   return {
     name: 'kage-absolute-manifest',
+    transformIndexHtml: {
+      order: 'post',
+      handler(html: string) {
+        if (!isGhPagesBuild) return html
+        return html.replace(
+          /href="\/KAGE\/manifest\.json"/g,
+          `href="${ABSOLUTE_MANIFEST_HREF}"`,
+        )
+      },
+    },
     closeBundle() {
       if (!isGhPagesBuild) return
       const indexPath = join(process.cwd(), 'dist', 'index.html')
       const html = readFileSync(indexPath, 'utf8')
       const next = html.replace(
         /href="\/KAGE\/manifest\.json"/g,
-        'href="https://descentmooses.github.io/KAGE/manifest.json"',
+        `href="${ABSOLUTE_MANIFEST_HREF}"`,
       )
       if (next !== html) writeFileSync(indexPath, next)
     },

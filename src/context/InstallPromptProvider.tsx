@@ -100,32 +100,23 @@ export function InstallPromptProvider({
     setOpen(true)
   }, [standalone])
 
-  const triggerNativeInstall = useCallback(async (prompt: BeforeInstallPromptEvent) => {
-    setDeferred(prompt)
-    clearManualFallback()
-    setPillVisible(false)
-    setOpen(false)
+  /** Capture BIP and surface UI — Chrome requires a user gesture to call prompt(). */
+  const applyCapturedPrompt = useCallback(
+    (prompt: BeforeInstallPromptEvent) => {
+      setDeferred(prompt)
+      clearManualFallback()
 
-    if (!shouldAutoOpenSheet()) return
+      if (!shouldAutoOpenSheet() || triedAutoShow.current) {
+        setPillVisible(true)
+        return
+      }
 
-    triedAutoShow.current = true
-    const result = await runNativeInstallPrompt(prompt)
-
-    if (result.outcome === 'accepted') {
-      setDeferred(null)
-      onInstalledRef.current?.()
-      return
-    }
-
-    if (result.outcome === 'dismissed') {
-      setDeferred(null)
-      setPillVisible(true)
-      return
-    }
-
-    // prompt() failed — show sheet with INSTALL KAGE button as fallback
-    setOpen(true)
-  }, [clearManualFallback])
+      triedAutoShow.current = true
+      setPillVisible(false)
+      setOpen(true)
+    },
+    [clearManualFallback],
+  )
 
   const scheduleManualFallback = useCallback(() => {
     if (triedAutoShow.current || standalone || wasInstallPromptShownThisSession()) return
@@ -147,17 +138,15 @@ export function InstallPromptProvider({
   const maybeAutoShow = useCallback(() => {
     if (triedAutoShow.current || standalone || wasInstallPromptShownThisSession()) return
     if (deferredRef.current) {
-      void triggerNativeInstall(deferredRef.current)
+      applyCapturedPrompt(deferredRef.current)
       return
     }
     scheduleManualFallback()
-  }, [scheduleManualFallback, standalone, triggerNativeInstall])
+  }, [applyCapturedPrompt, scheduleManualFallback, standalone])
 
   useEffect(() => {
     const runIfCaptured = (prompt: BeforeInstallPromptEvent) => {
-      queueMicrotask(() => {
-        void triggerNativeInstall(prompt)
-      })
+      queueMicrotask(() => applyCapturedPrompt(prompt))
     }
 
     const captured = getCapturedInstallPrompt()
@@ -189,7 +178,7 @@ export function InstallPromptProvider({
       navigator.serviceWorker?.removeEventListener('controllerchange', onControllerChange)
       clearManualFallback()
     }
-  }, [clearManualFallback, triggerNativeInstall])
+  }, [applyCapturedPrompt, clearManualFallback])
 
   useEffect(() => {
     if (!isReturnVisit || standalone || wasInstallPromptShownThisSession()) return
@@ -237,11 +226,11 @@ export function InstallPromptProvider({
   const promptInstall = useCallback(async (): Promise<'accepted' | 'dismissed' | 'unavailable'> => {
     if (!deferred) return 'unavailable'
     const result = await runNativeInstallPrompt(deferred)
+    if (result.outcome === 'failed') return 'unavailable'
     setDeferred(null)
     setOpen(false)
     setPillVisible(false)
     if (result.outcome === 'accepted') onInstalledRef.current?.()
-    if (result.outcome === 'failed') return 'unavailable'
     return result.outcome
   }, [deferred])
 
