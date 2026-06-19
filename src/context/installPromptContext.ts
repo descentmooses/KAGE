@@ -18,10 +18,25 @@ export interface InstallPromptContextValue {
   tryNativeInstall: () => Promise<'accepted' | 'dismissed' | 'unavailable'>
 }
 
+export interface InstallPromptInternalValue {
+  setReturnVisit: (value: boolean) => void
+}
+
 export const InstallPromptContext = createContext<InstallPromptContextValue | null>(null)
+export const InstallPromptInternalContext = createContext<InstallPromptInternalValue | null>(
+  null,
+)
 
 export function useInstallPromptContext() {
   const ctx = useContext(InstallPromptContext)
   if (!ctx) throw new Error('useInstallPromptContext must be used within InstallPromptProvider')
+  return ctx
+}
+
+export function useInstallPromptInternal() {
+  const ctx = useContext(InstallPromptInternalContext)
+  if (!ctx) {
+    throw new Error('useInstallPromptInternal must be used within InstallPromptProvider')
+  }
   return ctx
 }

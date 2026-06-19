@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ErrorBoundary } from './components/ErrorBoundary'
-import { InstallShell } from './components/InstallShell'
+import { InstallPromptRoot } from './components/InstallPromptRoot'
+import { InstallReturnVisitSync } from './components/install/InstallReturnVisitSync'
 import { AppShell } from './components/layout/AppShell'
 import { TrackerProvider } from './context/TrackerProvider'
 import { ElaraProvider } from './context/ElaraProvider'
@@ -13,13 +14,14 @@ function App() {
   return (
     <ErrorBoundary>
       <ToastProvider>
-        <TrackerProvider>
-          <InstallShell>
+        <InstallPromptRoot>
+          <TrackerProvider>
+            <InstallReturnVisitSync />
             <ElaraProvider>
               <AppShell activeTab={activeTab} onTabChange={setActiveTab} />
             </ElaraProvider>
-          </InstallShell>
-        </TrackerProvider>
+          </TrackerProvider>
+        </InstallPromptRoot>
       </ToastProvider>
     </ErrorBoundary>
   )

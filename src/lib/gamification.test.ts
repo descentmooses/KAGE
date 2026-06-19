@@ -11,6 +11,7 @@ import {
   xpProgressInLevel,
 } from './gamification'
 import type { DailyLog } from '../types'
+import { todayKey, daysAgo } from './dates'
 
 describe('gamification', () => {
   it('computes XP required per level', () => {
@@ -50,12 +51,8 @@ describe('gamification', () => {
   })
 
   it('increments streak on consecutive days', () => {
-    const yesterday = new Date()
-    yesterday.setDate(yesterday.getDate() - 1)
-    const yesterdayKey = yesterday.toISOString().slice(0, 10)
-
-    const state = { ...DEFAULT_GAMIFICATION, lastLogDate: yesterdayKey, currentStreak: 3 }
-    const next = updateStreak(state, '2026-06-18')
+    const state = { ...DEFAULT_GAMIFICATION, lastLogDate: daysAgo(1), currentStreak: 3 }
+    const next = updateStreak(state, todayKey())
     expect(next.currentStreak).toBe(4)
     expect(next.longestStreak).toBe(4)
   })
