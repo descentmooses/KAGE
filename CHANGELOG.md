@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.7.0] — 2026-06-22
+
+### GitHub Shadow Vault (free private sync)
+
+- Optional **GitHub sync** — your data in a private repo you control (`kage-shadow-vault`)
+- Personal access token (classic) with `repo` scope; token stored only in browser IndexedDB
+- Auto-sync on saves (debounced) + manual Sync Now / Pull from GitHub
+- First-log bottom sheet invites GitHub connect after your first shadow entry
+- Expanded Settings panel with GitHub Sync section and header sync status dot
+- Timestamp-based merge for cross-device logs, goals, and gamification
+
+### Polish
+
+- Quick log **SEALED** confirmation flash on tap/swipe
+- Elara whispers: gentle **body-low** movement suggestions
+- MBS radar chart refinements
+- Settings drawer layout (profile, sync, data)
+
 ## [0.6.3] — 2026-06-18
 
 ### Android WebAPK install fix

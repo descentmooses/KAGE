@@ -3,6 +3,7 @@ import { computeCore } from '../../types'
 import { applyXpDelta, updateStreak, xpForDailyLog } from '../gamification'
 import { isStreakMilestone } from '../affirmations'
 import { emitFirstShadowLog, emitShadowLogged } from '../pwa/installUtils'
+import { emitDataChanged, emitFirstLogGitHubInvite } from '../syncEvents'
 import { getDailyLog, getAllDailyLogs, putDailyLog, putGamification } from '../db'
 
 export interface PersistDailyLogInput {
@@ -66,8 +67,12 @@ export async function persistDailyLog({
     await putGamification(applyXpDelta(g, xpGain).state)
   }
 
-  if (wasFirstEver) emitFirstShadowLog()
+  if (wasFirstEver) {
+    emitFirstShadowLog()
+    emitFirstLogGitHubInvite()
+  }
   if (!options?.silent) emitShadowLogged()
+  emitDataChanged()
 
   return log
 }

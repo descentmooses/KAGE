@@ -17,6 +17,7 @@ function SwipeableQuickLogButton({
   isPressed,
   isSwiping,
   swipeDx,
+  saved,
   onTap,
   onSwipeLeft,
   onSwipeRight,
@@ -26,6 +27,7 @@ function SwipeableQuickLogButton({
   isPressed: boolean
   isSwiping: boolean
   swipeDx: number
+  saved: boolean
   onTap: () => void
   onSwipeLeft: () => void
   onSwipeRight: () => void
@@ -59,6 +61,8 @@ function SwipeableQuickLogButton({
             : 'scale(1)',
         boxShadow: active ? `0 0 22px ${tokens.accentGlow}` : tokens.cardShadow,
         touchAction: 'pan-y',
+        position: 'relative',
+        overflow: 'hidden',
       }}
       aria-label={`${area.label} ${value} of 10. Tap to bump, swipe right for good score, swipe left to adjust.`}
     >
@@ -88,6 +92,26 @@ function SwipeableQuickLogButton({
       >
         {String(value).padStart(2, '0')}
       </span>
+      {saved && (
+        <span
+          aria-hidden
+          className="animate-fade-in"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: `${tokens.crimson}22`,
+            fontFamily: '"Orbitron", sans-serif',
+            fontSize: 10,
+            letterSpacing: '0.2em',
+            color: tokens.crimson,
+          }}
+        >
+          SEALED
+        </span>
+      )}
     </button>
   )
 }
@@ -98,11 +122,18 @@ export function QuickLogPanel({ onAdjust }: QuickLogPanelProps) {
   const [pressedId, setPressedId] = useState<AreaId | null>(null)
   const [swipeState, setSwipeState] = useState<{ id: AreaId; dx: number } | null>(null)
   const [activeTag, setActiveTag] = useState<AreaId | null>(null)
+  const [savedFlash, setSavedFlash] = useState<AreaId | null>(null)
+
+  const flashSaved = (id: AreaId) => {
+    setSavedFlash(id)
+    setTimeout(() => setSavedFlash(null), 650)
+  }
 
   const handleBump = (id: AreaId) => {
     setPressedId(id)
     tapHaptic(10)
     void quickBump(id)
+    flashSaved(id)
     setTimeout(() => setPressedId(null), 220)
   }
 
@@ -112,6 +143,7 @@ export function QuickLogPanel({ onAdjust }: QuickLogPanelProps) {
     setPressedId(id)
     tapHaptic([8, 24, 12])
     void logRating(id, next, 'quick')
+    flashSaved(id)
     setTimeout(() => {
       setPressedId(null)
       setSwipeState(null)
@@ -129,6 +161,7 @@ export function QuickLogPanel({ onAdjust }: QuickLogPanelProps) {
     setPressedId(id)
     tapHaptic(14)
     void logRating(id, ratings[id], 'quick')
+    flashSaved(id)
     setTimeout(() => {
       setPressedId(null)
       setActiveTag(null)
@@ -182,6 +215,7 @@ export function QuickLogPanel({ onAdjust }: QuickLogPanelProps) {
               isPressed={pressedId === id}
               isSwiping={isSwiping}
               swipeDx={isSwiping ? swipeState.dx : 0}
+              saved={savedFlash === id}
               onTap={() => handleBump(id)}
               onSwipeRight={() => handleGoodScore(id)}
               onSwipeLeft={() => handleAdjust(area)}

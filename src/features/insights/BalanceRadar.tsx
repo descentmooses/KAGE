@@ -87,8 +87,8 @@ export function BalanceRadar() {
               dataKey="value"
               stroke={tokens.crimson}
               fill={tokens.crimson}
-              fillOpacity={0.22}
-              strokeWidth={2}
+              fillOpacity={0.28}
+              strokeWidth={2.5}
               isAnimationActive
               animationDuration={500}
               className="animate-pillar-shift"

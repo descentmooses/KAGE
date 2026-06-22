@@ -14,6 +14,7 @@ Shadow mastery tracker — mind (心), body (体), spirit (魂). Built with Reac
 - Elara whispers affirmations (toggleable)
 - Installable PWA with offline support
 - JSON export/import backup (privacy-first, no cloud required)
+- **GitHub Shadow Vault** — optional free sync to your own private GitHub repo (Settings → Connect GitHub)
 
 See [CHANGELOG.md](./CHANGELOG.md) for release notes.
 
@@ -33,6 +34,17 @@ npm run preview
 ```
 
 Production build uses base path `/KAGE/` for GitHub Pages.
+
+## GitHub Sync (optional)
+
+Cross-device backup uses **your** GitHub account — no KAGE server, no paid database.
+
+1. Log your first shadow entry (or open **Settings → Connect GitHub**).
+2. Create a [Personal access token (classic)](https://github.com/settings/tokens) named `KAGE Shadow Sync` with the **repo** scope only.
+3. Paste the token in KAGE. A private repo `kage-shadow-vault` is created with `data/state.json`.
+4. Data syncs automatically after saves, or use **Sync now** / **Pull from GitHub** in Settings.
+
+Your token stays in this browser’s IndexedDB. Disconnect anytime — local data remains.
 
 ## GitHub Pages
 

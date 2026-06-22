@@ -1,6 +1,7 @@
 import type { Goal } from '../../../types'
 import { deleteGoal, putGoal } from '../../../lib/db'
 import { progressFromMilestones } from '../../../lib/goals'
+import { emitDataChanged } from '../../../lib/syncEvents'
 import type { CelebrationHandler, RefreshHandler } from './types'
 import { createUid } from './types'
 
@@ -36,6 +37,7 @@ export function createGoalActions(deps: GoalActionDeps) {
       deps.onCelebrate(`Seed bloomed — “${goal.title}” complete`, 'success')
     }
     await deps.refresh()
+    emitDataChanged()
   }
 
   const updateGoal = async (
@@ -58,6 +60,7 @@ export function createGoalActions(deps: GoalActionDeps) {
           : goal.completedAt
     await putGoal({ ...goal, ...patch, milestones, progress, completedAt })
     await deps.refresh()
+    emitDataChanged()
   }
 
   const updateGoalProgress = async (id: string, progress: number) => {
@@ -85,11 +88,13 @@ export function createGoalActions(deps: GoalActionDeps) {
       deps.onCelebrate(`Milestone arc sealed — “${goal.title}”`, 'success')
     }
     await deps.refresh()
+    emitDataChanged()
   }
 
   const removeGoal = async (id: string) => {
     await deleteGoal(id)
     await deps.refresh()
+    emitDataChanged()
   }
 
   return { addGoal, updateGoal, updateGoalProgress, toggleMilestone, removeGoal }

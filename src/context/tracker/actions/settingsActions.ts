@@ -1,5 +1,6 @@
 import type { AppSettings } from '../../../types'
 import { getSettings, putSettings } from '../../../lib/db'
+import { emitDataChanged } from '../../../lib/syncEvents'
 import type { RefreshHandler } from './types'
 
 export interface SettingsActionDeps {
@@ -13,6 +14,7 @@ export function createSettingsActions(deps: SettingsActionDeps) {
     const next = { ...current, ...patch }
     await putSettings(next)
     await deps.refresh()
+    emitDataChanged()
   }
 
   const saveWhisper = async (text: string) => {
