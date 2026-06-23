@@ -18,6 +18,8 @@ import type {
 } from '../types'
 import {
   getAllDailyLogs,
+  getAllMorningLogs,
+  getAllReflectionLogs,
   getDailyLog,
   getGamification,
   getGoals,
@@ -25,6 +27,7 @@ import {
   getReflectionLogByDate,
   getSettings,
   putGamification,
+  putSettings,
 } from '../lib/db'
 import { DEFAULT_RATINGS, computeCore } from '../types'
 import { migrateFromLocalStorage } from '../lib/migrate'
@@ -32,6 +35,7 @@ import { todayKey } from '../lib/dates'
 import { resetQuestsIfNewDay } from '../lib/gamification'
 import { buildTrendForPeriod, generateInsights } from '../lib/insights'
 import { normalizeGoal } from '../lib/goals'
+import { buildElaraPersona, personaChanged } from '../lib/elaraPersona'
 import { LoadingScreen } from '../components/LoadingScreen'
 import { evaluateQuests } from '../lib/quests'
 import { createApplyGamificationXp } from './tracker/actions/gamificationActions'
@@ -76,19 +80,37 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       g = resetG
     }
 
-    const [log, logs, goalList, s, morning, reflection] = await Promise.all([
+    const [log, logs, goalList, s, morning, reflection, morningLogs, reflectionLogs] =
+      await Promise.all([
       getDailyLog(date),
       getAllDailyLogs(),
       getGoals(),
       getSettings(),
       getMorningLogByDate(date),
       getReflectionLogByDate(date),
+      getAllMorningLogs(),
+      getAllReflectionLogs(),
     ])
+
+    const persona = buildElaraPersona({
+      allLogs: logs,
+      morningLogs,
+      reflectionLogs,
+      goals: goalList.map(normalizeGoal),
+      streak: g.currentStreak,
+      favoriteWhispers: s.favoriteWhispers,
+    })
+    const nextSettings =
+      personaChanged(s.elaraPersona, persona) ? { ...s, elaraPersona: persona } : s
+    if (nextSettings !== s) {
+      await putSettings(nextSettings)
+    }
+
     setTodayLog(log)
     setAllLogs(logs)
     setGamification(g)
     setGoals(goalList.map(normalizeGoal))
-    setSettings(s)
+    setSettings(nextSettings)
     setMorningToday(morning)
     setReflectionToday(reflection)
     setLoadError(null)

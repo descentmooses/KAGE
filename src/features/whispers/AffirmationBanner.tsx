@@ -37,10 +37,12 @@ export function AffirmationBanner() {
         morningToday,
         reflectionToday,
         todayLog,
+        persona: settings.elaraPersona,
         nonce,
       }),
     [
       settings.elaraWhispers,
+      settings.elaraPersona,
       ratings,
       core,
       gamification.currentStreak,

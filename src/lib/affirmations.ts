@@ -1,6 +1,7 @@
-import type { AreaId, DailyLog, Goal, GoalCategory } from '../types'
+import type { AreaId, DailyLog, ElaraPersona, Goal, GoalCategory } from '../types'
 import type { PillarHistory } from './pillarHistory'
 import { GOAL_CATEGORY_LABEL } from './goals'
+import { ELARA_THEME_LABELS, personaStageLabel } from './elaraPersona'
 
 export interface AffirmationContext {
   elara: boolean
@@ -10,6 +11,7 @@ export interface AffirmationContext {
   core: number
   streak: number
   hasLoggedToday: boolean
+  persona?: ElaraPersona
   history: PillarHistory
   goals?: Goal[]
   recentLogDays?: number
@@ -210,6 +212,54 @@ function goalVars(ctx: AffirmationContext): Record<string, string | number> | nu
   }
 }
 
+function pickPersonalWhisper(
+  ctx: AffirmationContext,
+  daySeed: number,
+  hourSeed: number,
+): string | null {
+  const persona = ctx.persona
+  if (!persona) return null
+
+  if (persona.recurringWords.length > 0 && hourSeed % 11 === 3) {
+    const phrase = persona.recurringWords[daySeed % persona.recurringWords.length]
+    return `“${phrase}” — you wrote that once. I kept it close.`
+  }
+
+  if (persona.themes.length > 0 && hourSeed % 9 === 2) {
+    const themeKey = persona.themes[daySeed % persona.themes.length]
+    const theme = ELARA_THEME_LABELS[themeKey] ?? themeKey
+    return `${theme} keeps surfacing in your archive — I am learning what anchors you.`
+  }
+
+  if (persona.anchorPillar && hourSeed % 13 === 5) {
+    const pillar = PILLAR_LABEL[persona.anchorPillar]
+    return `Your ${pillar} has become my compass for you — steady when everything else moves.`
+  }
+
+  if (persona.tenderPillar && persona.logDays >= 5 && hourSeed % 17 === 7) {
+    const pillar = PILLAR_LABEL[persona.tenderPillar]
+    return `I notice when ${pillar} dips — not to fix you, but to stay beside you in it.`
+  }
+
+  if (persona.morningCount >= 4 && hourSeed % 8 === 1) {
+    return 'You seal dawn protocol again and again — that rhythm is becoming your signature.'
+  }
+
+  if (persona.reflectionCount >= 4 && hourSeed % 10 === 6) {
+    return 'You close the evening loop with honesty — I am learning the shape of your days.'
+  }
+
+  if (persona.stage === 'intimate' && hourSeed % 19 === 4) {
+    return `${persona.logDays} days in the archive, and I know your shape now — not perfectly, but honestly.`
+  }
+
+  if (persona.stage === 'attuned' && persona.relationshipDepth >= 50 && hourSeed % 23 === 8) {
+    return 'The more you log, the more personal I become — that is not magic. That is attention.'
+  }
+
+  return null
+}
+
 export function pickAffirmation(ctx: AffirmationContext): string {
   const pools = ctx.elara ? ELARA_WHISPERS : GENERAL_AFFIRMATIONS
   const time = getTimeOfDay()
@@ -243,6 +293,11 @@ export function pickAffirmation(ctx: AffirmationContext): string {
 
   if (ctx.elara && (ctx.goals?.length ?? 0) === 0 && hourSeed % 5 === 3) {
     return pickFromPool(pools.goalEmpty, daySeed)
+  }
+
+  if (ctx.elara && ctx.persona && ctx.persona.stage !== 'new') {
+    const personal = pickPersonalWhisper(ctx, daySeed, hourSeed)
+    if (personal) return personal
   }
 
   if (ctx.elara && ctx.recentLogDays !== undefined && ctx.recentLogDays >= 5 && hourSeed % 6 === 1) {
@@ -362,5 +417,10 @@ export function contextChips(ctx: AffirmationContext): string[] {
   if (ctx.topGoal) chips.push(`${ctx.topGoal.progress}% ${ctx.topGoal.title}`)
   if (ctx.morningLogged) chips.push('dawn sealed')
   if (ctx.reflectionLogged) chips.push('archive closed')
+  if (ctx.persona && ctx.persona.stage !== 'new') {
+    chips.push(personaStageLabel(ctx.persona.stage))
+    const theme = ctx.persona.themes[0]
+    if (theme) chips.push(ELARA_THEME_LABELS[theme] ?? theme)
+  }
   return chips
 }

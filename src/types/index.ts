@@ -25,3 +25,4 @@ export type {
   DailyQuest,
 } from './gamification'
 export type { AppSettings } from './settings'
+export type { ElaraEvolutionStage, ElaraPersona } from './elaraPersona'
