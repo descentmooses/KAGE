@@ -78,6 +78,8 @@ export function SettingsPanel({ open, onClose }: SettingsPanelProps) {
           Settings
         </p>
 
+        <GitHubSyncSection />
+
         <section style={{ marginBottom: 18 }}>
           <p
             style={{
@@ -104,8 +106,6 @@ export function SettingsPanel({ open, onClose }: SettingsPanelProps) {
             <ThemeToggle />
           </div>
         </section>
-
-        <GitHubSyncSection />
 
         <section style={{ marginBottom: 18 }}>
           <p

@@ -1,13 +1,9 @@
 import { useTheme } from '../../theme/useTheme'
-import { useGitHubSyncOptional } from '../../context/githubSyncContext'
+import { useGitHubSync } from '../../context/githubSyncContext'
 import { formatLastSynced } from '../../lib/github/syncService'
 
 export function GitHubSyncSection() {
   const { tokens } = useTheme()
-  const sync = useGitHubSyncOptional()
-
-  if (!sync) return null
-
   const {
     connected,
     username,
@@ -19,7 +15,7 @@ export function GitHubSyncSection() {
     disconnect,
     syncNow,
     pullNow,
-  } = sync
+  } = useGitHubSync()
 
   const dotColor =
     status === 'syncing'
