@@ -80,7 +80,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     title: 'You are ready',
     target: null,
     elara:
-      'Explore the demo as long as you like. When you want your real archive, open Settings → Start my archive. I will be here.',
+      'Your real archive begins now — pillars at zero until you log. I will learn your rhythm from here. Welcome home.',
   },
 ]
 

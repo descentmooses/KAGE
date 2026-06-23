@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.2] — 2026-06-18
+
+### Demo graduation
+
+- Demo mode ends automatically when the Elara tutorial finishes
+- Archive resets to zero pillars (clean slate) unless GitHub vault is already connected
+- Removed post-tutorial demo banner — users start their real archive immediately
+
 ## [0.8.1] — 2026-06-18
 
 ### Fixed

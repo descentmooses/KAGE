@@ -1,7 +1,7 @@
-export const APP_VERSION = '0.8.1'
+export const APP_VERSION = '0.8.2'
 
 export const WHATS_NEW = [
-  'Demo mode on first launch — explore sample data safely',
-  'Elara walks you through a guided tutorial',
-  'Start my archive in Settings when you are ready for real logs',
+  'Demo ends when the tutorial finishes — your real archive begins',
+  'Pillars reset to zero after the tour unless GitHub vault is connected',
+  'Tutorial completion no longer leaves you in demo mode',
 ] as const

@@ -223,7 +223,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     [settings, refresh],
   )
 
-  const { exportData, importData, resetDemoData, beginRealArchive } = useMemo(
+  const { exportData, importData, resetDemoData, beginRealArchive, completeTutorial } = useMemo(
     () =>
       createDataActions({
         refresh,
@@ -337,6 +337,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     importData,
     resetDemoData,
     beginRealArchive,
+    completeTutorial,
     refresh,
   }
 
