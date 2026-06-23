@@ -5,7 +5,6 @@ import { ShadowParticles } from '../../components/ShadowParticles'
 import { useShadowLogs } from '../../hooks/useShadowLogs'
 import { AffirmationBanner } from '../whispers/AffirmationBanner'
 import { WhatsNewBanner } from './WhatsNewBanner'
-import { DemoModeBanner } from './DemoModeBanner'
 import { RankBadge } from './RankBadge'
 import { QuickLogPanel } from '../logging/QuickLogPanel'
 import { GoalPanel } from '../goals/GoalPanel'
@@ -66,7 +65,6 @@ export function HomeScreen() {
             width: '100%',
           }}
         >
-          <DemoModeBanner />
           <WhatsNewBanner />
           <AffirmationBanner />
           <div

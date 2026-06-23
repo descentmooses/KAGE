@@ -1,5 +1,5 @@
 import { exportAllData, importAllData } from '../../../lib/db'
-import { seedDemoData, startRealArchive } from '../../../lib/demoSeed'
+import { graduateFromDemo, seedDemoData, startRealArchive } from '../../../lib/demoSeed'
 import { todayKey } from '../../../lib/dates'
 import type { CelebrationHandler, RefreshHandler } from './types'
 
@@ -42,5 +42,15 @@ export function createDataActions(deps: DataActionDeps) {
     deps.onCelebrate('Your archive is ready — begin logging for real.', 'success')
   }
 
-  return { exportData, importData, resetDemoData, beginRealArchive }
+  const completeTutorial = async (tutorialStep: number) => {
+    const { resetArchive } = await graduateFromDemo(tutorialStep)
+    await deps.refresh()
+    if (resetArchive) {
+      deps.onCelebrate('Tutorial complete — your archive starts at zero.', 'success')
+    } else {
+      deps.onCelebrate('Tutorial complete — GitHub vault connected.', 'success')
+    }
+  }
+
+  return { exportData, importData, resetDemoData, beginRealArchive, completeTutorial }
 }

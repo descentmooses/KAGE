@@ -10,6 +10,7 @@ import { computeCore } from '../types'
 import { DEFAULT_GAMIFICATION } from './gamification'
 import { daysAgo, todayKey } from './dates'
 import { getDb } from './db'
+import { getGitHubSyncConfig } from './github/githubSyncStorage'
 
 function isoAt(date: string, hour: number): string {
   return `${date}T${String(hour).padStart(2, '0')}:30:00.000Z`
@@ -173,6 +174,12 @@ export async function seedDemoData(): Promise<void> {
   await tx.done
 }
 
+/** True when a PAT and vault repo are stored locally. */
+export async function isGitHubVaultConnected(): Promise<boolean> {
+  const config = await getGitHubSyncConfig()
+  return !!(config?.token?.trim() && config?.repoName?.trim())
+}
+
 /** Empty archive for a real user journey (leaves tutorial complete). */
 export async function startRealArchive(): Promise<void> {
   const db = await getDb()
@@ -200,6 +207,35 @@ export async function startRealArchive(): Promise<void> {
     'settings',
   )
   await tx.done
+}
+
+/**
+ * Leave demo mode when the tutorial ends.
+ * Wipes sample data (core → 0) unless GitHub vault is already connected.
+ */
+export async function graduateFromDemo(tutorialStep: number): Promise<{ resetArchive: boolean }> {
+  const connected = await isGitHubVaultConnected()
+  if (!connected) {
+    await startRealArchive()
+    return { resetArchive: true }
+  }
+
+  const db = await getDb()
+  const current = (await db.get('meta', 'settings')) as AppSettings | undefined
+  await db.put(
+    'meta',
+    {
+      ...current,
+      affirmationsEnabled: current?.affirmationsEnabled ?? true,
+      elaraWhispers: current?.elaraWhispers ?? true,
+      demoMode: false,
+      tutorialComplete: true,
+      hasOnboarded: true,
+      tutorialStep,
+    },
+    'settings',
+  )
+  return { resetArchive: false }
 }
 
 export async function shouldSeedDemoOnLaunch(): Promise<boolean> {

@@ -71,6 +71,7 @@ export interface TrackerContextValue {
   importData: (file: File) => Promise<void>
   resetDemoData: () => Promise<void>
   beginRealArchive: () => Promise<void>
+  completeTutorial: (tutorialStep: number) => Promise<void>
   refresh: () => Promise<void>
 }
 

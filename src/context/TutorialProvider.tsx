@@ -23,7 +23,7 @@ export function TutorialProvider({
   activeTab,
   onTabChange,
 }: TutorialProviderProps) {
-  const { ready, settings, updateSettings } = useTracker()
+  const { ready, settings, updateSettings, completeTutorial } = useTracker()
   const [stepIndex, setStepIndex] = useState<number | null>(null)
   const [finishing, setFinishing] = useState(false)
   const prevShouldRun = useRef(false)
@@ -68,16 +68,12 @@ export function TutorialProvider({
     setStepIndex(null)
 
     try {
-      await updateSettings({
-        tutorialComplete: true,
-        hasOnboarded: true,
-        tutorialStep: TUTORIAL_STEPS.length,
-      })
+      await completeTutorial(TUTORIAL_STEPS.length)
       onTabChange('home')
     } catch {
       setFinishing(false)
     }
-  }, [finishing, onTabChange, updateSettings])
+  }, [completeTutorial, finishing, onTabChange])
 
   const nextStep = useCallback(() => {
     if (stepIndex === null || finishing) return

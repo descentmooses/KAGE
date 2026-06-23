@@ -7,6 +7,7 @@ describe('demo tutorial', () => {
     expect(TUTORIAL_STEPS[0].elara).toMatch(/Elara/i)
     expect(TUTORIAL_STEPS[0].elara).toMatch(/demo/i)
     expect(TUTORIAL_STEPS.at(-1)?.id).toBe('complete')
+    expect(TUTORIAL_STEPS.at(-1)?.elara).toMatch(/archive/i)
   })
 
   it('maps highlight targets to DOM ids', () => {
