@@ -3,7 +3,6 @@ import { useTheme } from '../../theme/useTheme'
 import { useShadowLogs } from '../../hooks/useShadowLogs'
 import { pillarAccentColor } from '../../lib/pillars'
 import { NeonCard } from '../../components/ui/NeonCard'
-import { orbitronCaps } from '../../theme/componentStyles'
 import { AREA_CONFIGS, type AreaId } from '../../types'
 
 interface ShadowLogFieldsProps {
@@ -126,16 +125,10 @@ function ShadowLogFields({ mind, body, spirit, initialNote = '' }: ShadowLogFiel
 }
 
 export function ShadowLogForm() {
-  const { tokens } = useTheme()
   const { ratings, pendingVoiceNote } = useShadowLogs()
 
   return (
-    <NeonCard style={{ marginBottom: 16 }}>
-      <p style={orbitronCaps(tokens)}>Full shadow log</p>
-      <p style={{ margin: '0 0 14px', fontSize: 11, color: tokens.textSubtle }}>
-        Parked only — sliders for an honest daily seal
-      </p>
-
+    <NeonCard style={{ marginBottom: 0 }}>
       <ShadowLogFields
         key={`${ratings.mind}-${ratings.body}-${ratings.spirit}-${pendingVoiceNote ?? ''}`}
         mind={ratings.mind}

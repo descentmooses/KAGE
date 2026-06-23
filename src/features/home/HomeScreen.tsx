@@ -8,7 +8,7 @@ import { OnboardingHint } from './OnboardingHint'
 import { WhatsNewBanner } from './WhatsNewBanner'
 import { VoiceConfirmBanner } from '../logging/VoiceConfirmBanner'
 import { RankBadge } from './RankBadge'
-import { QuickLogPanel, CompactPillars } from '../logging/QuickLogPanel'
+import { QuickLogPanel } from '../logging/QuickLogPanel'
 import { GoalPanel } from '../goals/GoalPanel'
 import { RatingModal } from '../logging/RatingModal'
 import { HomeHeroSection } from './HomeHeroSection'
@@ -62,11 +62,10 @@ export function HomeScreen() {
           <RankBadge />
 
           <QuickLogPanel onAdjust={openAdjust} />
-          <CompactPillars onAdjust={openAdjust} />
 
           <LazyTrendSection />
           <GoalPanel />
-          <DeepShadowSection onAdjust={openAdjust} />
+          <DeepShadowSection />
         </section>
       </main>
 

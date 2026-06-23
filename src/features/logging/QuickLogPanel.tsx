@@ -121,7 +121,6 @@ export function QuickLogPanel({ onAdjust }: QuickLogPanelProps) {
   const { ratings, quickBump, logRating } = useShadowLogs()
   const [pressedId, setPressedId] = useState<AreaId | null>(null)
   const [swipeState, setSwipeState] = useState<{ id: AreaId; dx: number } | null>(null)
-  const [activeTag, setActiveTag] = useState<AreaId | null>(null)
   const [savedFlash, setSavedFlash] = useState<AreaId | null>(null)
 
   const flashSaved = (id: AreaId) => {
@@ -154,18 +153,6 @@ export function QuickLogPanel({ onAdjust }: QuickLogPanelProps) {
     setSwipeState({ id: area.id as AreaId, dx: -28 })
     setTimeout(() => setSwipeState(null), 200)
     onAdjust(area)
-  }
-
-  const handleTag = (id: AreaId) => {
-    setActiveTag(id)
-    setPressedId(id)
-    tapHaptic(14)
-    void logRating(id, ratings[id], 'quick')
-    flashSaved(id)
-    setTimeout(() => {
-      setPressedId(null)
-      setActiveTag(null)
-    }, 300)
   }
 
   return (
@@ -226,103 +213,15 @@ export function QuickLogPanel({ onAdjust }: QuickLogPanelProps) {
 
       <p
         style={{
-          margin: '12px 0 8px',
-          fontSize: 9,
-          letterSpacing: '0.2em',
-          textTransform: 'uppercase',
-          color: tokens.textSubtle,
-          textAlign: 'center',
-        }}
-      >
-        Quick tags
-      </p>
-      <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-        {AREA_CONFIGS.map((tag) => (
-          <button
-            key={tag.id}
-            type="button"
-            onClick={() => handleTag(tag.id)}
-            className="kage-touch-target"
-            style={{
-              flex: 1,
-              minHeight: 52,
-              borderRadius: 10,
-              border: `1px solid ${activeTag === tag.id ? tokens.crimson : tokens.border}`,
-              background: activeTag === tag.id ? tokens.bannerBg : tokens.cardBg,
-              color: activeTag === tag.id ? tokens.crimson : tokens.textMuted,
-              fontSize: 11,
-              cursor: 'pointer',
-              boxShadow: activeTag === tag.id ? `0 0 14px ${tokens.accentGlow}` : 'none',
-            }}
-          >
-            {tag.kanji} {tag.label}
-          </button>
-        ))}
-      </div>
-
-      <p
-        style={{
           margin: '12px 0 0',
           fontSize: 11,
           color: tokens.textSubtle,
           textAlign: 'center',
+          lineHeight: 1.5,
         }}
       >
-        Tap +1 · header mic when parked · voice confirms before save
+        Tap +1 · swipe left to fine-tune · full sliders when parked below
       </p>
-    </div>
-  )
-}
-
-interface CompactPillarsProps {
-  onAdjust: (area: AreaConfig) => void
-}
-
-export function CompactPillars({ onAdjust }: CompactPillarsProps) {
-  const { tokens } = useTheme()
-  const { ratings } = useShadowLogs()
-
-  return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: 8,
-        marginBottom: 16,
-      }}
-    >
-      {AREA_CONFIGS.map((area) => (
-        <button
-          key={area.id}
-          type="button"
-          onClick={() => onAdjust(area)}
-          className="kage-touch-target"
-          style={{
-            minHeight: 60,
-            borderRadius: 10,
-            border: `1px solid ${tokens.border}`,
-            background: tokens.cardBg,
-            padding: '12px 8px',
-            cursor: 'pointer',
-            boxShadow: tokens.cardShadow,
-          }}
-          aria-label={`Adjust ${area.label}, ${ratings[area.id]} of 10`}
-        >
-          <span style={{ fontSize: 18, display: 'block' }}>{area.kanji}</span>
-          <span
-            style={{
-              fontFamily: '"Share Tech Mono", monospace',
-              fontSize: 16,
-              fontWeight: 600,
-              color: pillarAccentColor(tokens, area.color),
-              marginTop: 4,
-              display: 'block',
-            }}
-          >
-            {String(ratings[area.id]).padStart(2, '0')}
-          </span>
-        </button>
-      ))}
     </div>
   )
 }
