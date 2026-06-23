@@ -6,8 +6,8 @@ export function DeepShadowSection() {
   return (
     <>
       <CollapsibleSection
-        title="Parked full log"
-        subtitle="Sliders, note, and save — when safely parked"
+        title="Full log"
+        subtitle="Sliders, note, and save"
         defaultOpen={false}
       >
         <ShadowLogForm />

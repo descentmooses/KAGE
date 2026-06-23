@@ -1,7 +1,7 @@
 import { useTracker } from '../context/trackerContext'
 
-/** Parked-only voice capture state (pending note awaiting confirmation). */
-export function useParkedState() {
+/** Pending voice note awaiting confirmation in the shadow log. */
+export function usePendingVoiceNote() {
   const { settings, pendingVoiceNote, setPendingVoiceNote } = useTracker()
 
   return {

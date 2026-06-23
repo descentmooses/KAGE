@@ -73,7 +73,7 @@ const ELARA_WHISPERS = {
     'The long shift is eating you — rest is part of the mission, not a betrayal of it.',
   ],
   bodyLow: [
-    'Body score is low — when you park, stretch your shoulders, walk once around the car. Two minutes counts.',
+    'Body score is low — stretch your shoulders, take a short walk. Two minutes counts.',
     'Your body is asking for care, not punishment. Hydrate before the next dash.',
     'Long miles compress the spine. A slow breath and unclenching your jaw is shadow work too.',
   ],

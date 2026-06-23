@@ -9,8 +9,8 @@ import { useTracker } from '../context/trackerContext'
 import { useVoiceInput } from '../hooks/useVoiceInput'
 import { useToast } from '../hooks/useToast'
 
-const VOICE_PARKED_TITLE =
-  'Voice input — use only when safely parked. Never while driving or on Autopilot.'
+const VOICE_INPUT_LABEL = 'Voice input'
+const VOICE_STOP_LABEL = 'Stop listening'
 
 export function AppHeader() {
   const { tokens } = useTheme()
@@ -21,7 +21,7 @@ export function AppHeader() {
 
   const { listening, supported, toggle } = useVoiceInput((text) => {
     setPendingVoiceNote(text)
-    showToast('Voice captured — added to shadow note when parked.', 'info')
+    showToast('Voice captured — confirm in the banner below.', 'info')
   })
 
   const headerBtn: CSSProperties = {
@@ -91,28 +91,17 @@ export function AppHeader() {
           <button
             type="button"
             onClick={toggle}
-            title={listening ? 'Stop listening' : VOICE_PARKED_TITLE}
-            aria-label={VOICE_PARKED_TITLE}
+            title={listening ? VOICE_STOP_LABEL : VOICE_INPUT_LABEL}
+            aria-label={listening ? VOICE_STOP_LABEL : VOICE_INPUT_LABEL}
             style={{
               ...headerBtn,
-              flexDirection: 'column',
-              gap: 2,
               background: listening ? tokens.bannerBg : 'transparent',
               border: `1px solid ${listening ? tokens.crimson : tokens.border}`,
               color: listening ? tokens.crimson : tokens.textMuted,
             }}
           >
-            <span style={{ fontSize: 14, lineHeight: 1 }} aria-hidden>
+            <span style={{ fontSize: 18, lineHeight: 1 }} aria-hidden>
               🎙
-            </span>
-            <span
-              style={{
-                fontFamily: '"Share Tech Mono", monospace',
-                fontSize: 6,
-                letterSpacing: '0.08em',
-              }}
-            >
-              PARKED
             </span>
           </button>
         )}

@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useTheme } from '../../theme/useTheme'
-import { ParkedSafetyBanner } from '../../components/ui/ParkedSafetyBanner'
 import { useShadowLogs } from '../../hooks/useShadowLogs'
 import { useSwipeGesture } from '../../hooks/useSwipeGesture'
 import { pillarAccentColor, tapHaptic } from '../../lib/pillars'
@@ -157,8 +156,6 @@ export function QuickLogPanel({ onAdjust }: QuickLogPanelProps) {
 
   return (
     <div style={{ marginBottom: 20 }}>
-      <ParkedSafetyBanner />
-
       <div
         style={{
           display: 'flex',
@@ -220,7 +217,7 @@ export function QuickLogPanel({ onAdjust }: QuickLogPanelProps) {
           lineHeight: 1.5,
         }}
       >
-        Tap +1 · swipe left to fine-tune · full sliders when parked below
+        Tap +1 · swipe left to fine-tune · full log with sliders below
       </p>
     </div>
   )

@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { useTheme } from '../../theme/useTheme'
-import { useParkedState } from '../../hooks/useParkedState'
+import { usePendingVoiceNote } from '../../hooks/usePendingVoiceNote'
 
 export function VoiceConfirmBanner() {
   const { tokens } = useTheme()
-  const { pendingVoiceNote, setPendingVoiceNote } = useParkedState()
+  const { pendingVoiceNote, setPendingVoiceNote } = usePendingVoiceNote()
   const [confirmedNote, setConfirmedNote] = useState<string | null>(null)
 
   const acknowledged =
@@ -34,7 +34,7 @@ export function VoiceConfirmBanner() {
           color: tokens.crimson,
         }}
       >
-        Voice captured · parked only
+        Voice captured
       </p>
       <p
         style={{
