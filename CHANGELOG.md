@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.8.1] — 2026-06-18
+
+### Fixed
+
+- Tutorial completion no longer crashes into "Shadow disrupted" — fixed a race that restarted the tour while finishing
+
 ## [0.8.0] — 2026-06-18
 
 ### Demo mode & Elara tutorial

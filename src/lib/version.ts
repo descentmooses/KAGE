@@ -1,4 +1,4 @@
-export const APP_VERSION = '0.8.0'
+export const APP_VERSION = '0.8.1'
 
 export const WHATS_NEW = [
   'Demo mode on first launch — explore sample data safely',
