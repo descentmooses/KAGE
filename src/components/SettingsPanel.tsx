@@ -184,7 +184,7 @@ export function SettingsPanel({ open, onClose }: SettingsPanelProps) {
         </section>
 
         <p style={{ margin: 0, fontSize: 10, color: tokens.textMuted, lineHeight: 1.6 }}>
-          Log only when parked. KAGE never uploads data unless you connect GitHub sync.
+          KAGE never uploads data unless you connect GitHub sync.
         </p>
       </div>
     </div>

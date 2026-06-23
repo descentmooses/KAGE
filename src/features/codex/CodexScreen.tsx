@@ -203,8 +203,8 @@ export function CodexScreen() {
               color: tokens.textMuted,
             }}
           >
-            Voice input appears in the header when enabled. Use only when safely parked — never
-            while driving or on Autopilot.
+            Voice input appears in the header when enabled. Speak a note, then confirm it in the
+            banner on Home before saving.
           </p>
           <label
             style={{
@@ -222,7 +222,7 @@ export function CodexScreen() {
               onChange={(e) => void updateSettings({ voiceEnabled: e.target.checked })}
               style={{ width: 22, height: 22, accentColor: tokens.crimson }}
             />
-            Enable voice input (parked only)
+            Enable voice input
           </label>
         </div>
         <div>

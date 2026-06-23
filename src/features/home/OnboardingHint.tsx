@@ -30,8 +30,7 @@ export function OnboardingHint() {
         First shadow
       </p>
       <p style={{ margin: '0 0 10px', fontSize: 13, lineHeight: 1.55, color: tokens.text }}>
-        Your first shadow log plants the seed. Tap a pillar to quick-log, or save a full entry when
-        parked.
+        Your first shadow log plants the seed. Tap a pillar to quick-log, or expand full log for sliders and a note.
       </p>
       <button
         type="button"

@@ -49,7 +49,7 @@ export function cardSurface(tokens: ThemeTokens, overrides?: CSSProperties): CSS
   }
 }
 
-/** Parked / accent notice banner surface. */
+/** Accent notice banner surface. */
 export function bannerSurface(tokens: ThemeTokens, overrides?: CSSProperties): CSSProperties {
   return {
     marginBottom: 14,
