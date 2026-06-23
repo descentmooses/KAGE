@@ -1,7 +1,6 @@
 import type { AffirmationContext } from './affirmations'
 import { topActiveGoal } from './goals'
 import { buildPillarHistory } from './pillarHistory'
-import { userMentionsDriving } from './drivingContext'
 import type { DailyLog, Goal, MorningLogEntry, ReflectionEntry } from '../types'
 
 export function buildAffirmationContext(input: {
@@ -33,11 +32,6 @@ export function buildAffirmationContext(input: {
     core: input.core,
     streak: input.streak,
     hasLoggedToday: !!input.todayLog,
-    mentionsDriving: userMentionsDriving(
-      input.allLogs,
-      input.morningToday,
-      input.reflectionToday,
-    ),
     history: buildPillarHistory(input.allLogs),
     goals: input.goals,
     recentLogDays,

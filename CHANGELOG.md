@@ -6,7 +6,7 @@
 
 - Mind / Body / Spirit default to **0** until you log (no phantom 7s)
 - Elara shows **welcome** whispers before your first log today — not low-energy messaging
-- Driving-themed copy only appears when **you** mention driving in logs or rituals
+- One universal Elara voice — positive, context-aware, never driving-specific
 - Rituals, goals, and insights use universal language by default
 
 ## [0.7.0] — 2026-06-22
