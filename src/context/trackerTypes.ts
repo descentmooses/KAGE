@@ -70,6 +70,7 @@ export interface TrackerContextValue {
   exportData: () => Promise<void>
   importData: (file: File) => Promise<void>
   resetDemoData: () => Promise<void>
+  beginRealArchive: () => Promise<void>
   refresh: () => Promise<void>
 }
 

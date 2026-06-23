@@ -1,4 +1,5 @@
-import { clearAllData, exportAllData, importAllData } from '../../../lib/db'
+import { exportAllData, importAllData } from '../../../lib/db'
+import { seedDemoData, startRealArchive } from '../../../lib/demoSeed'
 import { todayKey } from '../../../lib/dates'
 import type { CelebrationHandler, RefreshHandler } from './types'
 
@@ -30,10 +31,16 @@ export function createDataActions(deps: DataActionDeps) {
   }
 
   const resetDemoData = async () => {
-    await clearAllData()
+    await seedDemoData()
     await deps.refresh()
-    deps.onCelebrate('Demo data reset — your shadow slate is clean.', 'info')
+    deps.onCelebrate('Demo reset — Elara will guide you through again.', 'info')
   }
 
-  return { exportData, importData, resetDemoData }
+  const beginRealArchive = async () => {
+    await startRealArchive()
+    await deps.refresh()
+    deps.onCelebrate('Your archive is ready — begin logging for real.', 'success')
+  }
+
+  return { exportData, importData, resetDemoData, beginRealArchive }
 }

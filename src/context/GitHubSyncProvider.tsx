@@ -114,12 +114,13 @@ export function GitHubSyncProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const onFirstLog = () => {
       if (connected) return
+      if (tracker?.settings?.demoMode) return
       if (tracker?.settings?.githubConnectPromptDismissed) return
       setFirstLogSheetOpen(true)
     }
     window.addEventListener(FIRST_LOG_GITHUB_EVENT, onFirstLog)
     return () => window.removeEventListener(FIRST_LOG_GITHUB_EVENT, onFirstLog)
-  }, [connected, tracker?.settings?.githubConnectPromptDismissed])
+  }, [connected, tracker?.settings?.demoMode, tracker?.settings?.githubConnectPromptDismissed])
 
   const connect = useCallback(
     async (token: string) => {

@@ -5,9 +5,11 @@ import { ConnectionDot } from './ConnectionDot'
 import { SettingsPanel } from './SettingsPanel'
 import { ElaraWhisperTrigger } from '../features/whispers/ElaraWhisperTrigger'
 import { InstallHeaderButton } from './install/InstallHeaderButton'
+import { useTracker } from '../context/trackerContext'
 
 export function AppHeader() {
   const { tokens } = useTheme()
+  const { settings } = useTracker()
   const [settingsOpen, setSettingsOpen] = useState(false)
   const build = getBuildVersion()
 
@@ -73,6 +75,24 @@ export function AppHeader() {
             </div>
           )}
         </div>
+
+        {settings.demoMode && (
+          <span
+            style={{
+              fontFamily: '"Share Tech Mono", monospace',
+              fontSize: 8,
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: tokens.crimson,
+              padding: '4px 8px',
+              borderRadius: 6,
+              border: `1px solid ${tokens.borderAccent}`,
+              background: tokens.bannerBg,
+            }}
+          >
+            Demo
+          </span>
+        )}
 
         <ElaraWhisperTrigger />
 
