@@ -1,9 +1,9 @@
-export const APP_VERSION = '0.6.3'
+export const APP_VERSION = '0.7.0'
 
 export const WHATS_NEW = [
-  'Elara Whispers — intimate, context-aware guidance from a living modal',
-  'Freedom goals — milestones, target dates, and a growing seed metaphor',
-  'Mind–Body–Spirit balance radar and richer 7-day trends',
-  'Parked-first quick log with voice confirmation and pillar tags',
-  'Morning & evening rituals — deeper, quieter ceremony',
+  'GitHub Shadow Vault — free private sync to your own repo',
+  'First-log invite to connect GitHub across phone, desktop, and Tesla',
+  'Quick log SEALED confirmation flash on every tap',
+  'Elara body-low whispers — gentle movement when Body score dips',
+  'Expanded Settings with sync status, pull, and disconnect',
 ] as const

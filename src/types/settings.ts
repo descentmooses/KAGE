@@ -6,4 +6,5 @@ export interface AppSettings {
   favoriteWhispers?: string[]
   hasOnboarded?: boolean
   whatsNewSeen?: string
+  githubConnectPromptDismissed?: boolean
 }

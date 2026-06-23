@@ -2,6 +2,7 @@ import type { AreaId, MorningLogEntry, ReflectionEntry } from '../../../types'
 import { addMorningLog, addReflectionLog, getGamification } from '../../../lib/db'
 import { resetQuestsIfNewDay, xpForMorning, xpForReflection } from '../../../lib/gamification'
 import { todayKey } from '../../../lib/dates'
+import { emitDataChanged } from '../../../lib/syncEvents'
 import type { ApplyGamificationXp, RefreshHandler } from './types'
 import { createUid } from './types'
 
@@ -30,6 +31,7 @@ export function createRitualActions(deps: RitualActionDeps) {
     const g = resetQuestsIfNewDay(await getGamification(), date)
     await deps.applyGamificationXp(g, xpForMorning(), 'Dawn protocol sealed — +40 XP')
     await deps.refresh()
+    emitDataChanged()
   }
 
   const saveReflection = async (r: Record<AreaId, number>, journal: string) => {

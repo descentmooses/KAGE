@@ -8,3 +8,7 @@ export function useTracker() {
   if (!ctx) throw new Error('useTracker must be used within TrackerProvider')
   return ctx
 }
+
+export function useTrackerOptional() {
+  return useContext(TrackerContext)
+}

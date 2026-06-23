@@ -72,6 +72,11 @@ const ELARA_WHISPERS = {
     'Even a 4 logged honestly beats a 9 you don\'t believe. I\'m still here.',
     'The long shift is eating you — rest is part of the mission, not a betrayal of it.',
   ],
+  bodyLow: [
+    'Body score is low — when you park, stretch your shoulders, walk once around the car. Two minutes counts.',
+    'Your body is asking for care, not punishment. Hydrate before the next dash.',
+    'Long miles compress the spine. A slow breath and unclenching your jaw is shadow work too.',
+  ],
   mixed: [
     'Mixed scores today — I like that honesty. Pick one pillar to steady before the next dash.',
     'You\'re scattered but not broken. Body, mind, spirit — choose one thread and pull.',
@@ -253,6 +258,10 @@ export function pickAffirmation(ctx: AffirmationContext): string {
   }
 
   const min = Math.min(ctx.mind, ctx.body, ctx.spirit)
+  if (ctx.elara && ctx.body <= 4 && ctx.body <= ctx.mind && ctx.body <= ctx.spirit && hourSeed % 3 !== 2) {
+    return pickFromPool(ELARA_WHISPERS.bodyLow, daySeed + ctx.body)
+  }
+
   if (min <= 4 || avg <= 5) {
     if (ctx.elara) {
       return pickFromPool(pools.lowEnergy, daySeed + min)

@@ -7,6 +7,8 @@ interface NeonInputProps {
   onChange: (value: string) => void
   placeholder?: string
   multiline?: boolean
+  type?: 'text' | 'password'
+  autoComplete?: string
 }
 
 export function NeonInput({
@@ -15,6 +17,8 @@ export function NeonInput({
   onChange,
   placeholder,
   multiline = false,
+  type = 'text',
+  autoComplete,
 }: NeonInputProps) {
   const { tokens } = useTheme()
 
@@ -69,10 +73,11 @@ export function NeonInput({
         />
       ) : (
         <input
-          type="text"
+          type={type}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
+          autoComplete={autoComplete}
           style={fieldStyle}
           onFocus={handleFocus}
           onBlur={handleBlur}
