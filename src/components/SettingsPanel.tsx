@@ -12,19 +12,32 @@ interface SettingsPanelProps {
 
 export function SettingsPanel({ open, onClose }: SettingsPanelProps) {
   const { tokens } = useTheme()
-  const { exportData, resetDemoData } = useTracker()
+  const { exportData, resetDemoData, beginRealArchive, settings } = useTracker()
   const { isStandalone, showInstallUI, openInstallInvite } = useInstallPromptContext()
   const [confirmReset, setConfirmReset] = useState(false)
+  const [confirmReal, setConfirmReal] = useState(false)
 
   if (!open) return null
 
   const handleReset = async () => {
     if (!confirmReset) {
       setConfirmReset(true)
+      setConfirmReal(false)
       return
     }
     await resetDemoData()
     setConfirmReset(false)
+    onClose()
+  }
+
+  const handleBeginReal = async () => {
+    if (!confirmReal) {
+      setConfirmReal(true)
+      setConfirmReset(false)
+      return
+    }
+    await beginRealArchive()
+    setConfirmReal(false)
     onClose()
   }
 
@@ -171,6 +184,7 @@ export function SettingsPanel({ open, onClose }: SettingsPanelProps) {
             style={{
               width: '100%',
               minHeight: 48,
+              marginBottom: 8,
               borderRadius: 8,
               border: `1px solid ${confirmReset ? tokens.crimson : tokens.border}`,
               background: confirmReset ? tokens.bannerBg : 'transparent',
@@ -179,8 +193,28 @@ export function SettingsPanel({ open, onClose }: SettingsPanelProps) {
               cursor: 'pointer',
             }}
           >
-            {confirmReset ? 'Tap again to reset demo data' : 'Reset to demo'}
+            {confirmReset ? 'Tap again to reset demo' : 'Reset to demo'}
           </button>
+
+          {settings.demoMode && (
+            <button
+              type="button"
+              onClick={() => void handleBeginReal()}
+              className="kage-touch-target"
+              style={{
+                width: '100%',
+                minHeight: 48,
+                borderRadius: 8,
+                border: `1px solid ${confirmReal ? tokens.crimson : tokens.borderAccent}`,
+                background: confirmReal ? tokens.bannerBg : 'transparent',
+                color: confirmReal ? tokens.crimson : tokens.text,
+                fontSize: 12,
+                cursor: 'pointer',
+              }}
+            >
+              {confirmReal ? 'Tap again — wipe demo data' : 'Start my archive'}
+            </button>
+          )}
         </section>
 
         <p style={{ margin: 0, fontSize: 10, color: tokens.textMuted, lineHeight: 1.6 }}>

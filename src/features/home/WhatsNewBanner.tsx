@@ -7,6 +7,7 @@ export function WhatsNewBanner() {
   const { settings, updateSettings } = useTracker()
 
   if (settings.whatsNewSeen === APP_VERSION) return null
+  if (settings.demoMode && !settings.tutorialComplete) return null
 
   return (
     <div

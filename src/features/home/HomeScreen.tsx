@@ -4,8 +4,8 @@ import { useTheme } from '../../theme/useTheme'
 import { ShadowParticles } from '../../components/ShadowParticles'
 import { useShadowLogs } from '../../hooks/useShadowLogs'
 import { AffirmationBanner } from '../whispers/AffirmationBanner'
-import { OnboardingHint } from './OnboardingHint'
 import { WhatsNewBanner } from './WhatsNewBanner'
+import { DemoModeBanner } from './DemoModeBanner'
 import { RankBadge } from './RankBadge'
 import { QuickLogPanel } from '../logging/QuickLogPanel'
 import { GoalPanel } from '../goals/GoalPanel'
@@ -13,12 +13,25 @@ import { RatingModal } from '../logging/RatingModal'
 import { HomeHeroSection } from './HomeHeroSection'
 import { LazyTrendSection } from './LazyTrendSection'
 import { DeepShadowSection } from './DeepShadowSection'
+import { useTutorialHighlight } from '../tutorial/useTutorialHighlight'
 import type { AreaConfig } from '../../types'
+
+function tutorialRing(tokens: { crimson: string; accentGlow: string }, on: boolean) {
+  if (!on) return undefined
+  return {
+    boxShadow: `0 0 0 2px ${tokens.crimson}, 0 0 28px ${tokens.accentGlow}`,
+    borderRadius: 14,
+    transition: 'box-shadow 0.25s ease',
+  } as const
+}
 
 export function HomeScreen() {
   const { tokens } = useTheme()
   const { core, ratings, logRating } = useShadowLogs()
   const [activeArea, setActiveArea] = useState<AreaConfig | null>(null)
+  const highlightCore = useTutorialHighlight('home-core')
+  const highlightQuickLog = useTutorialHighlight('home-quick-log')
+  const highlightGoals = useTutorialHighlight('home-goals')
 
   const highScore = core >= 85
 
@@ -53,16 +66,39 @@ export function HomeScreen() {
             width: '100%',
           }}
         >
-          <OnboardingHint />
+          <DemoModeBanner />
           <WhatsNewBanner />
           <AffirmationBanner />
-          <CoreDisplay value={core} pulse={highScore} />
-          <RankBadge />
+          <div
+            id="tutorial-home-core"
+            style={{
+              marginBottom: 16,
+              ...tutorialRing(tokens, highlightCore),
+            }}
+          >
+            <CoreDisplay value={core} pulse={highScore} />
+            <RankBadge />
+          </div>
 
-          <QuickLogPanel onAdjust={openAdjust} />
+          <div
+            id="tutorial-home-quick-log"
+            style={{
+              marginBottom: 16,
+              ...tutorialRing(tokens, highlightQuickLog),
+            }}
+          >
+            <QuickLogPanel onAdjust={openAdjust} />
+          </div>
 
           <LazyTrendSection />
-          <GoalPanel />
+          <div
+            id="tutorial-home-goals"
+            style={{
+              ...tutorialRing(tokens, highlightGoals),
+            }}
+          >
+            <GoalPanel />
+          </div>
           <DeepShadowSection />
         </section>
       </main>

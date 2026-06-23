@@ -6,6 +6,9 @@ export interface AppSettings {
   whisperHistory?: string[]
   favoriteWhispers?: string[]
   elaraPersona?: ElaraPersona
+  demoMode?: boolean
+  tutorialComplete?: boolean
+  tutorialStep?: number
   hasOnboarded?: boolean
   whatsNewSeen?: string
   githubConnectPromptDismissed?: boolean

@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.8.0] — 2026-06-18
+
+### Demo mode & Elara tutorial
+
+- New users start in **demo mode** with sample logs, goals, rituals, and streak data
+- **Elara-guided tutorial** walks through Home, quick log, goals, Activate, Reflect, and Codex
+- Header **Demo** badge; Settings → **Start my archive** for a clean real slate
+- **Reset to demo** re-seeds sample data and restarts the tutorial
+
 ## [0.7.2] — 2026-06-18
 
 ### Removed
