@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.2] — 2026-06-18
+
+### Removed
+
+- Header microphone / voice input — use your keyboard's built-in dictation for notes instead
+- Voice confirm banner on Home and Codex voice toggle
+
 ## [0.7.1] — 2026-06-18
 
 ### Universal defaults & Elara voice

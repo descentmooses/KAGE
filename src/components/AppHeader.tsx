@@ -5,24 +5,11 @@ import { ConnectionDot } from './ConnectionDot'
 import { SettingsPanel } from './SettingsPanel'
 import { ElaraWhisperTrigger } from '../features/whispers/ElaraWhisperTrigger'
 import { InstallHeaderButton } from './install/InstallHeaderButton'
-import { useTracker } from '../context/trackerContext'
-import { useVoiceInput } from '../hooks/useVoiceInput'
-import { useToast } from '../hooks/useToast'
-
-const VOICE_INPUT_LABEL = 'Voice input'
-const VOICE_STOP_LABEL = 'Stop listening'
 
 export function AppHeader() {
   const { tokens } = useTheme()
-  const { settings, setPendingVoiceNote } = useTracker()
-  const { showToast } = useToast()
   const [settingsOpen, setSettingsOpen] = useState(false)
   const build = getBuildVersion()
-
-  const { listening, supported, toggle } = useVoiceInput((text) => {
-    setPendingVoiceNote(text)
-    showToast('Voice captured — confirm in the banner below.', 'info')
-  })
 
   const headerBtn: CSSProperties = {
     minWidth: 44,
@@ -86,25 +73,6 @@ export function AppHeader() {
             </div>
           )}
         </div>
-
-        {settings.voiceEnabled && supported && (
-          <button
-            type="button"
-            onClick={toggle}
-            title={listening ? VOICE_STOP_LABEL : VOICE_INPUT_LABEL}
-            aria-label={listening ? VOICE_STOP_LABEL : VOICE_INPUT_LABEL}
-            style={{
-              ...headerBtn,
-              background: listening ? tokens.bannerBg : 'transparent',
-              border: `1px solid ${listening ? tokens.crimson : tokens.border}`,
-              color: listening ? tokens.crimson : tokens.textMuted,
-            }}
-          >
-            <span style={{ fontSize: 18, lineHeight: 1 }} aria-hidden>
-              🎙
-            </span>
-          </button>
-        )}
 
         <ElaraWhisperTrigger />
 

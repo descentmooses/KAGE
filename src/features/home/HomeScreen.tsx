@@ -6,7 +6,6 @@ import { useShadowLogs } from '../../hooks/useShadowLogs'
 import { AffirmationBanner } from '../whispers/AffirmationBanner'
 import { OnboardingHint } from './OnboardingHint'
 import { WhatsNewBanner } from './WhatsNewBanner'
-import { VoiceConfirmBanner } from '../logging/VoiceConfirmBanner'
 import { RankBadge } from './RankBadge'
 import { QuickLogPanel } from '../logging/QuickLogPanel'
 import { GoalPanel } from '../goals/GoalPanel'
@@ -56,7 +55,6 @@ export function HomeScreen() {
         >
           <OnboardingHint />
           <WhatsNewBanner />
-          <VoiceConfirmBanner />
           <AffirmationBanner />
           <CoreDisplay value={core} pulse={highScore} />
           <RankBadge />

@@ -22,7 +22,7 @@ export interface PersistDailyLogInput {
 
 /**
  * Writes today's daily log, updates streak/XP, and fires PWA install hooks.
- * Shared by quick-log, full-log, reflect, and voice flows.
+ * Shared by quick-log, full-log, and reflect flows.
  */
 export async function persistDailyLog({
   patch,

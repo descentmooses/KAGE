@@ -139,7 +139,6 @@ export async function getSettings(): Promise<AppSettings> {
     ((await db.get('meta', 'settings')) as AppSettings | undefined) ?? {
       affirmationsEnabled: true,
       elaraWhispers: true,
-      voiceEnabled: true,
       whisperHistory: [],
       favoriteWhispers: [],
       hasOnboarded: false,
@@ -211,7 +210,6 @@ export async function clearAllData(): Promise<void> {
     {
       affirmationsEnabled: true,
       elaraWhispers: true,
-      voiceEnabled: true,
       whisperHistory: [],
       favoriteWhispers: [],
       hasOnboarded: false,
