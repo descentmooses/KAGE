@@ -2,6 +2,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react'
@@ -24,18 +25,28 @@ export function TutorialProvider({
 }: TutorialProviderProps) {
   const { ready, settings, updateSettings } = useTracker()
   const [stepIndex, setStepIndex] = useState<number | null>(null)
+  const [finishing, setFinishing] = useState(false)
+  const prevShouldRun = useRef(false)
 
-  const shouldRun = ready && settings.demoMode && !settings.tutorialComplete
+  const shouldRun = ready && !!settings.demoMode && !settings.tutorialComplete
 
   useEffect(() => {
-    if (!shouldRun) return
-    if (stepIndex !== null) return
-    const resume = settings.tutorialStep ?? 0
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- resume tutorial after async settings load
-    setStepIndex(Math.min(resume, TUTORIAL_STEPS.length - 1))
-  }, [shouldRun, stepIndex, settings.tutorialStep])
+    const opening = shouldRun && !prevShouldRun.current
+    prevShouldRun.current = shouldRun
 
-  const step = stepIndex !== null ? TUTORIAL_STEPS[stepIndex] : null
+    if (opening) {
+      setFinishing(false)
+    }
+    if (!shouldRun || finishing) return
+    if (stepIndex !== null) return
+
+    const resume = settings.tutorialStep ?? 0
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- resume after IndexedDB settings load
+    setStepIndex(Math.min(resume, TUTORIAL_STEPS.length - 1))
+  }, [shouldRun, finishing, stepIndex, settings.tutorialStep])
+
+  const step =
+    shouldRun && !finishing && stepIndex !== null ? TUTORIAL_STEPS[stepIndex] : null
 
   useEffect(() => {
     if (!step) return
@@ -52,17 +63,24 @@ export function TutorialProvider({
   }, [step?.id, step?.target])
 
   const finishTutorial = useCallback(async () => {
+    if (finishing) return
+    setFinishing(true)
     setStepIndex(null)
-    await updateSettings({
-      tutorialComplete: true,
-      hasOnboarded: true,
-      tutorialStep: TUTORIAL_STEPS.length,
-    })
-    onTabChange('home')
-  }, [onTabChange, updateSettings])
+
+    try {
+      await updateSettings({
+        tutorialComplete: true,
+        hasOnboarded: true,
+        tutorialStep: TUTORIAL_STEPS.length,
+      })
+      onTabChange('home')
+    } catch {
+      setFinishing(false)
+    }
+  }, [finishing, onTabChange, updateSettings])
 
   const nextStep = useCallback(() => {
-    if (stepIndex === null) return
+    if (stepIndex === null || finishing) return
     const next = stepIndex + 1
     if (next >= TUTORIAL_STEPS.length) {
       void finishTutorial()
@@ -70,28 +88,30 @@ export function TutorialProvider({
     }
     setStepIndex(next)
     void updateSettings({ tutorialStep: next })
-  }, [finishTutorial, stepIndex, updateSettings])
+  }, [finishTutorial, finishing, stepIndex, updateSettings])
 
   const skipTutorial = useCallback(() => {
     void finishTutorial()
   }, [finishTutorial])
 
+  const tutorialActive = step !== null && stepIndex !== null
+
   const value = useMemo(
     () => ({
-      active: stepIndex !== null,
+      active: tutorialActive,
       stepIndex: stepIndex ?? 0,
       totalSteps: TUTORIAL_STEPS.length,
-      highlightTarget: step?.target ?? null,
+      highlightTarget: tutorialActive ? (step?.target ?? null) : null,
       nextStep,
       skipTutorial,
     }),
-    [nextStep, skipTutorial, step?.target, stepIndex],
+    [nextStep, skipTutorial, step?.target, stepIndex, tutorialActive],
   )
 
   return (
     <TutorialContext.Provider value={value}>
       {children}
-      {step && stepIndex !== null && (
+      {tutorialActive && step && (
         <ElaraTutorialOverlay
           step={step}
           stepIndex={stepIndex}
