@@ -14,8 +14,6 @@ export function useShadowLogs() {
     logRating,
     quickBump,
     saveTodayShadow,
-    pendingVoiceNote,
-    setPendingVoiceNote,
   } = useTracker()
 
   return {
@@ -30,7 +28,5 @@ export function useShadowLogs() {
     logRating,
     quickBump,
     saveTodayShadow,
-    pendingVoiceNote,
-    setPendingVoiceNote,
   }
 }

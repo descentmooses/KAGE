@@ -60,7 +60,6 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
   const [reflectionToday, setReflectionToday] = useState<ReflectionEntry | null>(null)
   const [period, setPeriod] = useState<Period>('weekly')
   const [celebration, setCelebration] = useState<CelebrationEvent | null>(null)
-  const [pendingVoiceNote, setPendingVoiceNote] = useState<string | null>(null)
 
   const clearCelebration = useCallback(() => setCelebration(null), [])
 
@@ -316,8 +315,6 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     quests,
     celebration,
     clearCelebration,
-    pendingVoiceNote,
-    setPendingVoiceNote,
     logRating,
     quickBump,
     saveTodayShadow,

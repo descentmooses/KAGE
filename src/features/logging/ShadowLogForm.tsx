@@ -9,16 +9,15 @@ interface ShadowLogFieldsProps {
   mind: number
   body: number
   spirit: number
-  initialNote?: string
 }
 
-function ShadowLogFields({ mind, body, spirit, initialNote = '' }: ShadowLogFieldsProps) {
+function ShadowLogFields({ mind, body, spirit }: ShadowLogFieldsProps) {
   const { tokens } = useTheme()
   const { saveTodayShadow } = useShadowLogs()
   const [m, setM] = useState(mind)
   const [b, setB] = useState(body)
   const [s, setS] = useState(spirit)
-  const [note, setNote] = useState(initialNote)
+  const [note, setNote] = useState('')
   const [saving, setSaving] = useState(false)
 
   const values = { mind: m, body: b, spirit: s }
@@ -87,7 +86,7 @@ function ShadowLogFields({ mind, body, spirit, initialNote = '' }: ShadowLogFiel
           value={note}
           onChange={(e) => setNote(e.target.value)}
           rows={2}
-          placeholder="Voice or typed note…"
+          placeholder="Optional note…"
           style={{
             width: '100%',
             padding: '10px 12px',
@@ -128,16 +127,15 @@ function ShadowLogFields({ mind, body, spirit, initialNote = '' }: ShadowLogFiel
 }
 
 export function ShadowLogForm() {
-  const { ratings, pendingVoiceNote } = useShadowLogs()
+  const { ratings } = useShadowLogs()
 
   return (
     <NeonCard style={{ marginBottom: 0 }}>
       <ShadowLogFields
-        key={`${ratings.mind}-${ratings.body}-${ratings.spirit}-${pendingVoiceNote ?? ''}`}
+        key={`${ratings.mind}-${ratings.body}-${ratings.spirit}`}
         mind={ratings.mind}
         body={ratings.body}
         spirit={ratings.spirit}
-        initialNote={pendingVoiceNote ?? ''}
       />
     </NeonCard>
   )

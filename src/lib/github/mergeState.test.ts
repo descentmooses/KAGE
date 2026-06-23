@@ -15,7 +15,6 @@ function basePayload(overrides: Partial<KageSyncPayload> = {}): KageSyncPayload 
     settings: {
       affirmationsEnabled: true,
       elaraWhispers: true,
-      voiceEnabled: true,
     },
     ...overrides,
   }

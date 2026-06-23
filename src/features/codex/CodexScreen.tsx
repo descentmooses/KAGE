@@ -195,35 +195,6 @@ export function CodexScreen() {
             />
             Elara whispers
           </label>
-          <p
-            style={{
-              margin: '0 0 12px',
-              fontSize: 11,
-              lineHeight: 1.55,
-              color: tokens.textMuted,
-            }}
-          >
-            Voice input appears in the header when enabled. Speak a note, then confirm it in the
-            banner on Home before saving.
-          </p>
-          <label
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-              fontSize: 14,
-              minHeight: 48,
-              cursor: 'pointer',
-            }}
-          >
-            <input
-              type="checkbox"
-              checked={settings.voiceEnabled}
-              onChange={(e) => void updateSettings({ voiceEnabled: e.target.checked })}
-              style={{ width: 22, height: 22, accentColor: tokens.crimson }}
-            />
-            Enable voice input
-          </label>
         </div>
         <div>
           <p

@@ -38,8 +38,6 @@ export interface TrackerContextValue {
   quests: ReturnType<typeof evaluateQuests>
   celebration: CelebrationEvent | null
   clearCelebration: () => void
-  pendingVoiceNote: string | null
-  setPendingVoiceNote: (text: string | null) => void
   logRating: (area: AreaId, value: number, source?: LogSource) => Promise<void>
   quickBump: (area: AreaId, delta?: number) => Promise<void>
   saveTodayShadow: (
