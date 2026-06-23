@@ -1,7 +1,13 @@
 import type { AffirmationContext } from './affirmations'
 import { topActiveGoal } from './goals'
 import { buildPillarHistory } from './pillarHistory'
-import type { DailyLog, Goal, MorningLogEntry, ReflectionEntry } from '../types'
+import type {
+  DailyLog,
+  ElaraPersona,
+  Goal,
+  MorningLogEntry,
+  ReflectionEntry,
+} from '../types'
 
 export function buildAffirmationContext(input: {
   elara: boolean
@@ -14,6 +20,8 @@ export function buildAffirmationContext(input: {
   goals: Goal[]
   morningToday: MorningLogEntry | null
   reflectionToday: ReflectionEntry | null
+  todayLog: DailyLog | null
+  persona?: ElaraPersona | null
   nonce?: number
 }): AffirmationContext {
   const top = topActiveGoal(input.goals)
@@ -30,6 +38,8 @@ export function buildAffirmationContext(input: {
     spirit: input.spirit,
     core: input.core,
     streak: input.streak,
+    hasLoggedToday: !!input.todayLog,
+    persona: input.persona ?? undefined,
     history: buildPillarHistory(input.allLogs),
     goals: input.goals,
     recentLogDays,

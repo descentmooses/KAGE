@@ -9,7 +9,7 @@ import { useConfirmMessage } from '../../hooks/useMorningLog'
 import type { MorningLogEntry } from '../../types'
 
 const RITUAL_STEPS = [
-  { n: '01', label: 'Breathe', hint: 'One slow exhale before the wheel turns.' },
+  { n: '01', label: 'Breathe', hint: 'One slow exhale before the day begins.' },
   { n: '02', label: 'Energy', hint: 'Honest score — no performance.' },
   { n: '03', label: 'Intention', hint: 'One move toward freedom today.' },
   { n: '04', label: 'Discipline', hint: 'One small act you will not negotiate.' },
@@ -128,7 +128,7 @@ export function ActivateScreen() {
     <TabScreen
       kanji="活"
       title="Morning Activation"
-      subtitle="覚醒 — a quiet ceremony before the first mile"
+      subtitle="覚醒 — a quiet ceremony to begin the day"
     >
       <ActivateForm key={morningToday?.id ?? 'new'} initial={morningToday} />
     </TabScreen>

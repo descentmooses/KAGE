@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useTheme } from '../../theme/useTheme'
 import { pickAffirmation, pickCompanionWhisper, contextChips } from '../../lib/affirmations'
 import { buildAffirmationContext } from '../../lib/affirmationContext'
+import { personaStageLabel } from '../../lib/elaraPersona'
 import { useTracker } from '../../context/trackerContext'
 
 interface ElaraWhispersModalProps {
@@ -18,6 +19,7 @@ export function ElaraWhispersModal({ open, onClose }: ElaraWhispersModalProps) {
     gamification,
     allLogs,
     goals,
+    todayLog,
     morningToday,
     reflectionToday,
     saveWhisper,
@@ -38,6 +40,8 @@ export function ElaraWhispersModal({ open, onClose }: ElaraWhispersModalProps) {
         goals,
         morningToday,
         reflectionToday,
+        todayLog,
+        persona: settings.elaraPersona,
         nonce,
       }),
     [
@@ -46,8 +50,10 @@ export function ElaraWhispersModal({ open, onClose }: ElaraWhispersModalProps) {
       gamification.currentStreak,
       allLogs,
       goals,
+      todayLog,
       morningToday,
       reflectionToday,
+      settings.elaraPersona,
       nonce,
     ],
   )
@@ -141,8 +147,24 @@ export function ElaraWhispersModal({ open, onClose }: ElaraWhispersModalProps) {
             fontStyle: 'italic',
           }}
         >
-          Context-aware · client-side · only for you
+          Context-aware · evolves with your logs · only for you
         </p>
+
+        {settings.elaraPersona && settings.elaraPersona.stage !== 'new' && (
+          <p
+            style={{
+              margin: '0 0 16px',
+              fontSize: 10,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: tokens.crimson,
+              textAlign: 'center',
+            }}
+          >
+            {personaStageLabel(settings.elaraPersona.stage)} · depth{' '}
+            {settings.elaraPersona.relationshipDepth}%
+          </p>
+        )}
 
         <div
           style={{

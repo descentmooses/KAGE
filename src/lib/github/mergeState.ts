@@ -1,6 +1,7 @@
 import type { DailyLog, Goal } from '../../types'
 import type { KageSyncPayload } from './types'
 import { normalizeGoal } from '../goals'
+import { mergeElaraPersona } from '../elaraPersona'
 
 function pickNewerLog(a: DailyLog, b: DailyLog): DailyLog {
   return a.loggedAt >= b.loggedAt ? a : b
@@ -108,6 +109,7 @@ export function mergeSyncPayloads(
         local.settings.favoriteWhispers,
         remote.settings.favoriteWhispers,
       ),
+      elaraPersona: mergeElaraPersona(local.settings.elaraPersona, remote.settings.elaraPersona),
     },
   }
 }

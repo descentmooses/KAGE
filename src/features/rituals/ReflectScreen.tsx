@@ -10,9 +10,9 @@ import type { AreaConfig, AreaId, ReflectionEntry } from '../../types'
 import { AREA_CONFIGS } from '../../types'
 
 const EVENING_PHASES = [
-  'Exhale the shift — you survived the miles.',
+  'Exhale the day — you made it through.',
   'Score the triad without flinching.',
-  'Archive one truth the dash tried to erase.',
+  'Archive one truth the day tried to erase.',
 ]
 
 function ReflectForm({ initial }: { initial: ReflectionEntry | null }) {
@@ -20,13 +20,14 @@ function ReflectForm({ initial }: { initial: ReflectionEntry | null }) {
   const { saveReflection } = useTracker()
   const [phase, setPhase] = useState(0)
   const [saved, setSaved] = useState(false)
-  const [mind, setMind] = useState(initial?.mind ?? 7)
-  const [body, setBody] = useState(initial?.body ?? 7)
-  const [spirit, setSpirit] = useState(initial?.spirit ?? 7)
+  const [mind, setMind] = useState(initial?.mind ?? 0)
+  const [body, setBody] = useState(initial?.body ?? 0)
+  const [spirit, setSpirit] = useState(initial?.spirit ?? 0)
   const [journal, setJournal] = useState(initial?.journal ?? '')
   const [activeArea, setActiveArea] = useState<AreaConfig | null>(null)
 
   const ratings = { mind, body, spirit }
+  const hasRating = Math.max(mind, body, spirit) >= 1
 
   const handleSaveRating = (value: number) => {
     if (!activeArea) return
@@ -37,6 +38,7 @@ function ReflectForm({ initial }: { initial: ReflectionEntry | null }) {
   }
 
   const handleLog = () => {
+    if (!hasRating) return
     void saveReflection({ mind, body, spirit }, journal)
     setSaved(true)
     setTimeout(() => setSaved(false), 3000)
@@ -129,7 +131,11 @@ function ReflectForm({ initial }: { initial: ReflectionEntry | null }) {
         {phase === 1 && (
           <NeonButton onClick={() => setPhase(2)}>CONTINUE TO ARCHIVE</NeonButton>
         )}
-        {phase === 2 && <NeonButton onClick={handleLog}>SEAL SHADOW ARCHIVE</NeonButton>}
+        {phase === 2 && (
+          <NeonButton onClick={handleLog} disabled={!hasRating}>
+            SEAL SHADOW ARCHIVE
+          </NeonButton>
+        )}
       </div>
 
       <RatingModal

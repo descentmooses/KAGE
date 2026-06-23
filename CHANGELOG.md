@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.7.1] — 2026-06-18
+
+### Universal defaults & Elara voice
+
+- Mind / Body / Spirit default to **0** until you log (no phantom 7s)
+- Elara shows **welcome** whispers before your first log today — not low-energy messaging
+- One universal Elara voice — positive, context-aware, never driving-specific
+- **Evolving persona** — Elara learns themes, anchor pillars, and your own words from logs and rituals
+- Rituals, goals, and insights use universal language by default
+
 ## [0.7.0] — 2026-06-22
 
 ### GitHub Shadow Vault (free private sync)

@@ -19,7 +19,7 @@ interface RatingModalContentProps {
 
 function RatingModalContent({ area, initialValue, onSave }: RatingModalContentProps) {
   const { tokens } = useTheme()
-  const [selected, setSelected] = useState(initialValue ?? 5)
+  const [selected, setSelected] = useState(initialValue && initialValue > 0 ? initialValue : 5)
   const [saving, setSaving] = useState(false)
   const fillPercent = (selected / 10) * 100
   const accentColor = pillarAccentColor(tokens, area.color)
