@@ -39,9 +39,9 @@ export const AREA_CONFIGS: AreaConfig[] = [
   },
 ]
 
-export const DEFAULT_RATINGS = { mind: 7, body: 7, spirit: 7 } as const
+export const DEFAULT_RATINGS = { mind: 0, body: 0, spirit: 0 } as const
 
-/** Composite shadow score (0–100) from three pillar ratings (1–10). */
+/** Composite shadow score (0–100) from three pillar ratings (0–10 each; 0 = not logged). */
 export function computeCore(mind: number, body: number, spirit: number): number {
   return Math.round(((mind + body + spirit) / 3) * 10)
 }

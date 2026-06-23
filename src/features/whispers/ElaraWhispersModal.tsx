@@ -18,6 +18,7 @@ export function ElaraWhispersModal({ open, onClose }: ElaraWhispersModalProps) {
     gamification,
     allLogs,
     goals,
+    todayLog,
     morningToday,
     reflectionToday,
     saveWhisper,
@@ -38,6 +39,7 @@ export function ElaraWhispersModal({ open, onClose }: ElaraWhispersModalProps) {
         goals,
         morningToday,
         reflectionToday,
+        todayLog,
         nonce,
       }),
     [
@@ -46,6 +48,7 @@ export function ElaraWhispersModal({ open, onClose }: ElaraWhispersModalProps) {
       gamification.currentStreak,
       allLogs,
       goals,
+      todayLog,
       morningToday,
       reflectionToday,
       nonce,

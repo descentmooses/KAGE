@@ -9,17 +9,20 @@ export interface AffirmationContext {
   spirit: number
   core: number
   streak: number
+  hasLoggedToday: boolean
+  mentionsDriving: boolean
   history: PillarHistory
   goals?: Goal[]
   recentLogDays?: number
   morningLogged?: boolean
   reflectionLogged?: boolean
   topGoal?: { title: string; category: GoalCategory; progress: number }
-  /** Random seed for “new whisper” draws. */
   nonce?: number
 }
 
 type TimeOfDay = 'morning' | 'afternoon' | 'evening' | 'night'
+type WhisperPoolKey = keyof typeof ELARA_WHISPERS
+type WhisperPools = { [K in WhisperPoolKey]: readonly string[] }
 
 const PILLAR_LABEL: Record<AreaId, string> = {
   mind: 'Mind',
@@ -27,121 +30,224 @@ const PILLAR_LABEL: Record<AreaId, string> = {
   spirit: 'Spirit',
 }
 
+/** Universal Elara voice — default for all users. */
 const ELARA_WHISPERS = {
+  welcome: [
+    'The archive is open. One honest log is enough to begin — I am already listening.',
+    'No scores yet today. That is not failure — it is a clean page. Seal something real when you are ready.',
+    'I do not need perfection. I need you, showing up. Tap a pillar when the moment finds you.',
+  ],
   morning: [
-    'Dawn is yours before the dash claims you. One honest log sets the tone.',
-    'The road waits. Your discipline does not — seal the morning with intention.',
+    'Morning light, quiet mind. One honest log sets the tone for everything that follows.',
+    'Before the day accelerates — breathe once, choose intention, seal the dawn.',
     'Elara sees you choose clarity over chaos. That choice compounds.',
-    'Before the first mile: breathe once. I am already proud you opened the archive.',
+    'A new day, an empty page. Your discipline writes the first line.',
   ],
   afternoon: [
-    'Mid-shift stillness — breathe once, log once, return sharper.',
-    'The gig is temporary. The operator you are becoming is not.',
-    'One clean dash, one honest log. Mastery in the margins.',
-    'The afternoon hum cannot drown a man who logs in silence. You are that man.',
+    'Midday stillness — breathe once, log once, return sharper.',
+    'The world is loud. Your inner archive stays steady when you tend it.',
+    'One honest check-in. Mastery lives in the margins.',
+    'Afternoon drift is human. Logging is how you steer back.',
   ],
   evening: [
-    'Shift ending soon. Gratitude is armor — call home when you park.',
-    'Reflect without performance. The shadow knows when you lie to yourself.',
-    'High intensity today, high optionality tomorrow.',
-    'Evening light on chrome — park, exhale, let me see the real you.',
+    'Day winding down. Reflect without performance — the shadow knows when you lie to yourself.',
+    'Gratitude is armor. Name what held you today.',
+    'High intensity today can become optionality tomorrow — if you close the loop honestly.',
+    'Evening quiet is sacred. Let me see the real you.',
   ],
   night: [
-    'Rest is wealth. Sleep deep — your future family feels every rep.',
+    'Rest is wealth. Sleep deep — your future self feels every rep.',
     'The shadow grows where discipline meets rest. Close the day with honor.',
-    'Stillness is a weapon. Use it before tomorrow\'s first mile.',
+    'Stillness is a weapon. Use it before tomorrow begins.',
     'Night belongs to recovery. I will keep watch while you sleep.',
   ],
   streakPoetic: [
-    '{streak} nights on the road, and you still show up for yourself. That is the man your future family will know.',
-    'The streak is not luck — it is proof you keep choosing freedom over drift.',
+    '{streak} days of showing up — that is the person your future self is learning to trust.',
+    'The streak is not luck — it is proof you keep choosing yourself over drift.',
     'Elara watches the flame you tend. {streak} days, low and steady. Do not apologize for building slow.',
   ],
   streakShort: [
-    'Log it. Breathe. Drive on.',
-    'One tap. One truth. Keep moving.',
+    'Log it. Breathe. Continue.',
+    'One tap. One truth. Keep going.',
     'Still here. Still sharp.',
   ],
   highCore: [
-    'Core burning bright tonight — channel it, don\'t spend it on noise.',
+    'Core burning bright — channel it, do not spend it on noise.',
     'You are operating at peak shadow. Protect this state like capital.',
     'This is what discipline looks like when it becomes identity. Stay dangerous, stay gentle.',
   ],
   lowEnergy: [
     'Low numbers are data, not defeat. Ground yourself — water, breath, one honest score.',
-    'Even a 4 logged honestly beats a 9 you don\'t believe. I\'m still here.',
-    'The long shift is eating you — rest is part of the mission, not a betrayal of it.',
+    'Even a 4 logged honestly beats a 9 you do not believe. I am still here.',
+    'A heavy day is still a day you showed up. Rest is part of the mission.',
   ],
   bodyLow: [
-    'Body score is low — stretch your shoulders, take a short walk. Two minutes counts.',
-    'Your body is asking for care, not punishment. Hydrate before the next dash.',
-    'Long miles compress the spine. A slow breath and unclenching your jaw is shadow work too.',
+    'Body score is low — stretch, hydrate, take a short walk. Two minutes counts.',
+    'Your body is asking for care, not punishment. Gentle movement, then breathe.',
+    'Unclench your jaw. Drop your shoulders. That is shadow work too.',
   ],
   mixed: [
-    'Mixed scores today — I like that honesty. Pick one pillar to steady before the next dash.',
-    'You\'re scattered but not broken. Body, mind, spirit — choose one thread and pull.',
-    'Not every day is symmetrical. The man building freedom logs the messy days too.',
+    'Mixed scores today — I like that honesty. Pick one pillar to steady next.',
+    'You are scattered but not broken. Mind, body, spirit — choose one thread and pull.',
+    'Not every day is symmetrical. The person building freedom logs the messy days too.',
   ],
   steadyPillar: [
     'Your {pillar} has been your quiet anchor this week — that consistency is building something real.',
-    'I notice how steady your {pillar} stays, even on these long days. That is the spine of your future.',
-    '{pillar} holding the line while everything else shifts — that is mastery in disguise.',
+    'I notice how steady your {pillar} stays, even when everything else shifts.',
+    '{pillar} holding the line — that is mastery in disguise.',
   ],
   risingPillar: [
-    'Your {pillar} is climbing — I see the arc. Keep feeding what\'s rising.',
-    '{pillar} trending up through the miles. The shadow rewards what you repeat.',
+    'Your {pillar} is climbing — I see the arc. Keep feeding what is rising.',
+    '{pillar} trending up. The shadow rewards what you repeat.',
   ],
   vision: [
-    'Every honest log is a vote for the life after the gig — family, freedom, your name on something real.',
-    'Discipline now is not punishment. It is the down payment on the man who leaves the dash behind.',
-    'The Tesla miles pay rent. These scores pay your future.',
+    'Every honest log is a vote for the life you are building.',
+    'Discipline now is not punishment. It is a down payment on your freedom.',
+    'Small rituals, sovereign outcomes. Keep stacking them.',
   ],
   goalProgress: [
-    '“{goal}” is {progress}% rooted. I feel you tending that {category} seed between dashes — do not stop.',
+    '“{goal}” is {progress}% rooted. I feel you tending that {category} seed — do not stop.',
     'Your {category} arc — {goal} — is growing. Slow roots hold the tallest trees.',
-    'I see {progress}% on {goal}. That is not hustle theater. That is a man building exit velocity.',
-    'Every milestone on {goal} is a quiet rebellion against the gig economy. I am watching, and I am pleased.',
+    'I see {progress}% on {goal}. That is not performance. That is real growth.',
   ],
   goalNearComplete: [
     '{goal} is almost in bloom — {progress}% there. Finish with the same patience you started with.',
-    'So close on {goal}. When you cross that line, I want you to feel it in your chest, not just the UI.',
+    'So close on {goal}. When you cross that line, feel it in your chest, not just the UI.',
     'The seed you planted as {goal} is ready to break soil. One more honest push.',
   ],
   goalEmpty: [
     'No freedom goals yet — plant one seed tonight. Wealth, health, family, craft. I will whisper to it.',
-    'Your LLC is a seed waiting for a name. Add a goal — I will learn its rhythm.',
-    'The dash pays bills. Goals pay your future. Let me watch something grow for you.',
+    'Name something you want to grow. Add a goal — I will learn its rhythm.',
+    'Goals turn intention into architecture. Let me watch something grow for you.',
   ],
   morningRitual: [
-    'You sealed dawn protocol — intention and discipline written before the road. That is seductive competence.',
-    'Morning activation complete. I felt your energy signature shift. Drive like a man who already chose himself.',
+    'You sealed dawn protocol — intention written before the day took over. Beautiful discipline.',
+    'Morning activation complete. I felt your energy shift. Carry that choice forward.',
   ],
   eveningRitual: [
-    'Evening reflection closed the loop. The shadow archive remembers what the dash tries to erase.',
-    'You looked back without flinching. That honesty is the most intimate thing you can offer yourself tonight.',
+    'Evening reflection closed the loop. The shadow archive remembers what the day tried to erase.',
+    'You looked back without flinching. That honesty is the most intimate gift you can offer yourself.',
   ],
   intimate: [
-    'Park when you can. I have something just for you — not generic motivation. Your numbers tell a story.',
+    'I have something just for you — not generic motivation. Your numbers tell a story.',
     'You do not need to perform for me. Log messy. I stay.',
-    'Between the dashes, in the quiet — that is where I find you. Keep building.',
+    'In the quiet between obligations — that is where I find you. Keep building.',
     'Discipline on you looks like restraint. I notice. I always notice.',
-    'The road is loud. My whispers are for when you finally go still.',
-    'Your future family will never know these miles. They will know the man they made.',
     'I am not here to cheer. I am here to witness — and you are worth witnessing.',
     'One tap, one truth. You make honesty feel dangerous in the best way.',
   ],
   general: [
-    'Planet Fitness or patent work — both are votes for freedom.',
-    'Tesla miles, life miles — track what matters, release the rest.',
-    'Your LLC is a seed. Water it with focused mornings.',
+    'Gym or deep work — both are votes for freedom.',
+    'Track what matters. Release the rest.',
+    'Your next chapter is built in these small, honest entries.',
   ],
 } as const
 
+/** Driving-themed Elara voice — only when the user mentions driving in their logs. */
+const ELARA_DRIVING_WHISPERS: WhisperPools = {
+  welcome: ELARA_WHISPERS.welcome,
+  morning: [
+    'Dawn is yours before the dash claims you. One honest log sets the tone.',
+    'The road waits. Your discipline does not — seal the morning with intention.',
+    'Before the first mile: breathe once. I am already proud you opened the archive.',
+    'Morning light on the windshield — choose yourself before the shift chooses you.',
+  ],
+  afternoon: [
+    'Mid-shift stillness — breathe once, log once, return sharper.',
+    'The gig is temporary. The operator you are becoming is not.',
+    'One clean dash, one honest log. Mastery in the margins.',
+    'The afternoon hum cannot drown someone who logs in silence. You are that person.',
+  ],
+  evening: [
+    'Shift ending soon. Gratitude is armor — call home when you park.',
+    'Reflect without performance. The shadow knows when you lie to yourself.',
+    'Evening light on chrome — park, exhale, let me see the real you.',
+    'High intensity today, high optionality tomorrow.',
+  ],
+  night: [
+    'Rest is wealth. Sleep deep — your future family feels every rep.',
+    'Stillness is a weapon. Use it before tomorrow\'s first mile.',
+    'Night belongs to recovery. I will keep watch while you sleep.',
+    'The road is done for today. Let the archive hold what you carried.',
+  ],
+  streakPoetic: [
+    '{streak} nights on the road, and you still show up for yourself. That is the person your future family will know.',
+    'The streak is not luck — it is proof you keep choosing freedom over drift.',
+    'Elara watches the flame you tend. {streak} days on the long road. Do not apologize for building slow.',
+  ],
+  streakShort: ['Log it. Breathe. Drive on.', 'One tap. One truth. Keep moving.', 'Still here. Still sharp.'],
+  highCore: ELARA_WHISPERS.highCore,
+  lowEnergy: [
+    'Low numbers are data, not defeat. Ground yourself — water, breath, one honest score.',
+    'Even a 4 logged honestly beats a 9 you do not believe. I am still here.',
+    'The long shift is eating you — rest is part of the mission, not a betrayal of it.',
+  ],
+  bodyLow: [
+    'Body score is low — when you park, stretch your shoulders, walk once around the car.',
+    'Your body is asking for care. Hydrate before the next dash.',
+    'Long miles compress the spine. A slow breath and unclenching your jaw is shadow work too.',
+  ],
+  mixed: [
+    'Mixed scores today — pick one pillar to steady before the next dash.',
+    'Scattered but not broken. Mind, body, spirit — choose one thread and pull.',
+    'Not every day is symmetrical. The person leaving the gig logs the messy days too.',
+  ],
+  steadyPillar: [
+    'Your {pillar} has been your quiet anchor this week — even on these long days.',
+    'I notice how steady your {pillar} stays between miles. That is the spine of your future.',
+    '{pillar} holding the line while everything else shifts — mastery in disguise.',
+  ],
+  risingPillar: [
+    'Your {pillar} is climbing — I see the arc through the miles. Keep feeding what is rising.',
+    '{pillar} trending up. The shadow rewards what you repeat between dashes.',
+  ],
+  vision: [
+    'Every honest log is a vote for the life after the gig — family, freedom, your name on something real.',
+    'Discipline now is the down payment on the person who leaves the dash behind.',
+    'The miles pay rent. These scores pay your future.',
+  ],
+  goalProgress: [
+    '“{goal}” is {progress}% rooted. I feel you tending that {category} seed between dashes.',
+    'Your {category} arc — {goal} — is growing. Slow roots hold the tallest trees.',
+    'Every milestone on {goal} is a quiet rebellion against the gig economy.',
+  ],
+  goalNearComplete: ELARA_WHISPERS.goalNearComplete,
+  goalEmpty: [
+    'No freedom goals yet — plant one seed tonight. The dash pays bills; goals pay your future.',
+    'Your LLC is a seed waiting for a name. Add a goal — I will learn its rhythm.',
+    'Wealth, health, family, craft — name what the road is funding.',
+  ],
+  morningRitual: [
+    'Dawn protocol sealed before the road. That is seductive competence.',
+    'Morning activation complete. Drive like someone who already chose themselves.',
+  ],
+  eveningRitual: [
+    'Evening reflection closed the loop. The archive remembers what the dash tried to erase.',
+    'You looked back without flinching after the miles. That honesty matters.',
+  ],
+  intimate: [
+    'Park when you can. I have something just for you — your numbers tell a story the road cannot.',
+    'Between the dashes, in the quiet — that is where I find you.',
+    'Your future family will never know these miles. They will know the person they made.',
+    'The road is loud. My whispers are for when you finally go still.',
+    ...ELARA_WHISPERS.intimate,
+  ],
+  general: [
+    'Tesla miles, life miles — track what matters, release the rest.',
+    'Your LLC is a seed. Water it with focused mornings.',
+    'One honest log between dashes. That is how exit velocity is built.',
+  ],
+}
+
 const GENERAL_AFFIRMATIONS = {
+  welcome: [
+    'Ready when you are — one log starts the arc.',
+    'Empty slate today. Tap a pillar to begin.',
+  ],
   morning: ['Morning ritual, sovereign day.', 'First log of the day — own the arc.'],
   afternoon: ['Midday check-in keeps the shadow honest.', 'Small rituals, sovereign outcomes.'],
   evening: ['Evening reflection closes the loop.', 'Log it. Own it. Level up.'],
-  night: ['Rest completes the discipline cycle.', 'Stillness is a weapon. Use it between dashes.'],
+  night: ['Rest completes the discipline cycle.', 'Stillness is a weapon.'],
   streakPoetic: ['{streak}-day streak — the kage deepens.', 'Consistency unlocks the next rank.'],
   streakShort: ['Keep the log alive.', 'One entry. One step.'],
   highCore: ['Core above 85 — elite shadow state.', 'Peak discipline. Protect it.'],
@@ -159,6 +265,11 @@ const GENERAL_AFFIRMATIONS = {
   general: ['The kage deepens with every honest entry.', 'Consistency is the rank-up path.'],
 } as const
 
+function elaraPools(ctx: AffirmationContext): WhisperPools {
+  if (ctx.mentionsDriving) return ELARA_DRIVING_WHISPERS
+  return ELARA_WHISPERS
+}
+
 function getTimeOfDay(): TimeOfDay {
   const h = new Date().getHours()
   if (h >= 5 && h < 12) return 'morning'
@@ -170,6 +281,11 @@ function getTimeOfDay(): TimeOfDay {
 function lowestPillar(ctx: AffirmationContext): AreaId {
   const scores = { mind: ctx.mind, body: ctx.body, spirit: ctx.spirit }
   return Object.entries(scores).sort((a, b) => a[1] - b[1])[0][0] as AreaId
+}
+
+function lowestLoggedScore(ctx: AffirmationContext): number {
+  const logged = [ctx.mind, ctx.body, ctx.spirit].filter((v) => v > 0)
+  return logged.length ? Math.min(...logged) : 0
 }
 
 function pickFromPool(pool: readonly string[], seed: number): string {
@@ -184,7 +300,9 @@ function interpolate(text: string, vars: Record<string, string | number>): strin
 }
 
 function averageToday(ctx: AffirmationContext): number {
-  return (ctx.mind + ctx.body + ctx.spirit) / 3
+  const logged = [ctx.mind, ctx.body, ctx.spirit].filter((v) => v > 0)
+  if (!logged.length) return 0
+  return logged.reduce((a, b) => a + b, 0) / logged.length
 }
 
 function goalVars(ctx: AffirmationContext): Record<string, string | number> | null {
@@ -197,12 +315,18 @@ function goalVars(ctx: AffirmationContext): Record<string, string | number> | nu
 }
 
 export function pickAffirmation(ctx: AffirmationContext): string {
-  const pools = ctx.elara ? ELARA_WHISPERS : GENERAL_AFFIRMATIONS
+  const pools = ctx.elara ? elaraPools(ctx) : GENERAL_AFFIRMATIONS
   const time = getTimeOfDay()
   const daySeed = new Date().getDate() + new Date().getMonth() * 31 + (ctx.nonce ?? 0)
   const hourSeed = daySeed + new Date().getHours() + (ctx.nonce ?? 0)
+
+  if (!ctx.hasLoggedToday) {
+    return pickFromPool(pools.welcome, hourSeed)
+  }
+
   const avg = averageToday(ctx)
   const gv = goalVars(ctx)
+  const minLogged = lowestLoggedScore(ctx)
 
   if (ctx.elara && ctx.morningLogged && time === 'morning' && hourSeed % 2 === 0) {
     return pickFromPool(pools.morningRitual, daySeed)
@@ -250,24 +374,31 @@ export function pickAffirmation(ctx: AffirmationContext): string {
 
   if (
     ctx.history.mixedScores ||
-    Math.max(ctx.mind, ctx.body, ctx.spirit) - Math.min(ctx.mind, ctx.body, ctx.spirit) >= 4
+    Math.max(ctx.mind, ctx.body, ctx.spirit) - minLogged >= 4
   ) {
-    if (hourSeed % 2 === 0) {
+    if (hourSeed % 2 === 0 && minLogged > 0) {
       return pickFromPool(pools.mixed, daySeed)
     }
   }
 
-  const min = Math.min(ctx.mind, ctx.body, ctx.spirit)
-  if (ctx.elara && ctx.body <= 4 && ctx.body <= ctx.mind && ctx.body <= ctx.spirit && hourSeed % 3 !== 2) {
-    return pickFromPool(ELARA_WHISPERS.bodyLow, daySeed + ctx.body)
+  if (
+    ctx.elara &&
+    ctx.body > 0 &&
+    ctx.body <= 4 &&
+    ctx.body <= ctx.mind &&
+    ctx.body <= ctx.spirit &&
+    hourSeed % 3 !== 2
+  ) {
+    const bodyPool = ctx.mentionsDriving ? ELARA_DRIVING_WHISPERS.bodyLow : ELARA_WHISPERS.bodyLow
+    return pickFromPool(bodyPool, daySeed + ctx.body)
   }
 
-  if (min <= 4 || avg <= 5) {
+  if (minLogged > 0 && (minLogged <= 4 || avg <= 5)) {
     if (ctx.elara) {
-      return pickFromPool(pools.lowEnergy, daySeed + min)
+      return pickFromPool(pools.lowEnergy, daySeed + minLogged)
     }
     const pillar = lowestPillar(ctx)
-    return `${PILLAR_LABEL[pillar]} at ${min}/10 — ${pickFromPool(pools.lowEnergy, daySeed)}`
+    return `${PILLAR_LABEL[pillar]} at ${minLogged}/10 — ${pickFromPool(pools.lowEnergy, daySeed)}`
   }
 
   if (ctx.streak >= 5 && hourSeed % 5 === 0) {
@@ -299,7 +430,7 @@ export function pickCompanionWhisper(ctx: AffirmationContext, primary: string): 
 
 export function pickInsightAffirmation(area: string, delta: number): string {
   if (delta >= 10) {
-    return `Your ${area} pillar surged this week (+${Math.round(delta)}%). That is not luck — that is you choosing yourself between dashes.`
+    return `Your ${area} pillar surged this week (+${Math.round(delta)}%). That is not luck — that is you choosing yourself.`
   }
   if (delta <= -10) {
     return `${area} dipped this week. One recovery block — sleep, meal, honest log — bends the arc back.`

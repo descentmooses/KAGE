@@ -21,17 +21,20 @@ function ShadowLogFields({ mind, body, spirit, initialNote = '' }: ShadowLogFiel
   const [note, setNote] = useState(initialNote)
   const [saving, setSaving] = useState(false)
 
+  const values = { mind: m, body: b, spirit: s }
+  const hasRating = Math.max(m, b, s) >= 1
+
   const handleSave = async () => {
+    if (!hasRating) return
     setSaving(true)
     try {
-      await saveTodayShadow({ mind: m, body: b, spirit: s }, note.trim() || undefined, 'quick')
+      await saveTodayShadow(values, note.trim() || undefined, 'quick')
       setNote('')
     } finally {
       setSaving(false)
     }
   }
 
-  const values = { mind: m, body: b, spirit: s }
   const setters = { mind: setM, body: setB, spirit: setS }
 
   return (
@@ -65,7 +68,7 @@ function ShadowLogFields({ mind, body, spirit, initialNote = '' }: ShadowLogFiel
             </div>
             <input
               type="range"
-              min={1}
+              min={0}
               max={10}
               value={value}
               onChange={(e) => setValue(Number(e.target.value))}
@@ -101,7 +104,7 @@ function ShadowLogFields({ mind, body, spirit, initialNote = '' }: ShadowLogFiel
       <button
         type="button"
         onClick={() => void handleSave()}
-        disabled={saving}
+        disabled={saving || !hasRating}
         className="kage-touch-target"
         style={{
           width: '100%',

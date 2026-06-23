@@ -87,7 +87,7 @@ export function generateInsights(logs: DailyLog[]): Insight[] {
     insights.push({
       id: 'steady',
       message:
-        'Steady week in the shadow log. Every honest entry is a brick in the life you are building after the dash.',
+        'Steady week in the shadow log. Every honest entry is a brick in the life you are building.',
     })
   }
 

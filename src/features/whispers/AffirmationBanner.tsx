@@ -15,6 +15,7 @@ export function AffirmationBanner() {
     gamification,
     allLogs,
     goals,
+    todayLog,
     morningToday,
     reflectionToday,
     saveWhisper,
@@ -35,6 +36,7 @@ export function AffirmationBanner() {
         goals,
         morningToday,
         reflectionToday,
+        todayLog,
         nonce,
       }),
     [
@@ -44,6 +46,7 @@ export function AffirmationBanner() {
       gamification.currentStreak,
       allLogs,
       goals,
+      todayLog,
       morningToday,
       reflectionToday,
       nonce,

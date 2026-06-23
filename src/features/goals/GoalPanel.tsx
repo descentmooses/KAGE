@@ -73,7 +73,7 @@ export function GoalPanel() {
         <div style={{ flex: 1 }}>
           <p style={orbitronCaps(tokens)}>Freedom goals</p>
           <p style={{ margin: 0, fontSize: 12, lineHeight: 1.5, color: tokens.textSubtle }}>
-            Wealth · health · family · craft — seeds for life after the dash
+            Wealth · health · family · craft — seeds for the life you are building
           </p>
         </div>
         <button
