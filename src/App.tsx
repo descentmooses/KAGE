@@ -6,6 +6,7 @@ import { AppShell } from './components/layout/AppShell'
 import { TrackerProvider } from './context/TrackerProvider'
 import { GitHubSyncProvider } from './context/GitHubSyncProvider'
 import { ElaraProvider } from './context/ElaraProvider'
+import { SettingsPanelProvider } from './context/SettingsPanelProvider'
 import { TutorialProvider } from './context/TutorialProvider'
 import { ToastProvider } from './context/ToastProvider'
 import type { TabId } from './types'
@@ -21,9 +22,11 @@ function App() {
             <GitHubSyncProvider>
               <InstallReturnVisitSync />
               <ElaraProvider>
-                <TutorialProvider activeTab={activeTab} onTabChange={setActiveTab}>
-                  <AppShell activeTab={activeTab} onTabChange={setActiveTab} />
-                </TutorialProvider>
+                <SettingsPanelProvider>
+                  <TutorialProvider activeTab={activeTab} onTabChange={setActiveTab}>
+                    <AppShell activeTab={activeTab} onTabChange={setActiveTab} />
+                  </TutorialProvider>
+                </SettingsPanelProvider>
               </ElaraProvider>
             </GitHubSyncProvider>
           </TrackerProvider>

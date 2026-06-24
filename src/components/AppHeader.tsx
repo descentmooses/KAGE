@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from 'react'
+import { type CSSProperties } from 'react'
 import { useTheme } from '../theme/useTheme'
 import { getBuildVersion } from '../lib/cacheBust'
 import { ConnectionDot } from './ConnectionDot'
@@ -6,11 +6,12 @@ import { SettingsPanel } from './SettingsPanel'
 import { ElaraWhisperTrigger } from '../features/whispers/ElaraWhisperTrigger'
 import { InstallHeaderButton } from './install/InstallHeaderButton'
 import { useTracker } from '../context/trackerContext'
+import { useSettingsPanel } from '../context/settingsPanelContext'
 
 export function AppHeader() {
   const { tokens } = useTheme()
   const { settings } = useTracker()
-  const [settingsOpen, setSettingsOpen] = useState(false)
+  const { open: settingsOpen, openSettings, closeSettings } = useSettingsPanel()
   const build = getBuildVersion()
 
   const headerBtn: CSSProperties = {
@@ -100,7 +101,7 @@ export function AppHeader() {
 
         <button
           type="button"
-          onClick={() => setSettingsOpen(true)}
+          onClick={openSettings}
           aria-label="Open settings"
           title="Settings"
           style={headerBtn}
@@ -109,7 +110,7 @@ export function AppHeader() {
         </button>
       </header>
 
-      <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      <SettingsPanel open={settingsOpen} onClose={closeSettings} />
     </>
   )
 }

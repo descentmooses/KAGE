@@ -1,11 +1,16 @@
 import { exportAllData, importAllData } from '../../../lib/db'
-import { graduateFromDemo, seedDemoData, startRealArchive } from '../../../lib/demoSeed'
+import {
+  graduateFromDemo,
+  markTutorialComplete,
+  seedDemoData,
+} from '../../../lib/demoSeed'
 import { todayKey } from '../../../lib/dates'
 import type { CelebrationHandler, RefreshHandler } from './types'
 
 export interface DataActionDeps {
   refresh: RefreshHandler
   onCelebrate: CelebrationHandler
+  tutorialStep: number
 }
 
 export function createDataActions(deps: DataActionDeps) {
@@ -37,19 +42,19 @@ export function createDataActions(deps: DataActionDeps) {
   }
 
   const beginRealArchive = async () => {
-    await startRealArchive()
+    const { resetArchive } = await graduateFromDemo(deps.tutorialStep)
     await deps.refresh()
-    deps.onCelebrate('Your archive is ready — begin logging for real.', 'success')
+    if (resetArchive) {
+      deps.onCelebrate('Your archive is ready — begin logging for real.', 'success')
+    } else {
+      deps.onCelebrate('Demo cleared — your GitHub vault archive continues.', 'success')
+    }
   }
 
   const completeTutorial = async (tutorialStep: number) => {
-    const { resetArchive } = await graduateFromDemo(tutorialStep)
+    await markTutorialComplete(tutorialStep)
     await deps.refresh()
-    if (resetArchive) {
-      deps.onCelebrate('Tutorial complete — your archive starts at zero.', 'success')
-    } else {
-      deps.onCelebrate('Tutorial complete — GitHub vault connected.', 'success')
-    }
+    deps.onCelebrate('Tutorial complete — open Settings to start your archive.', 'success')
   }
 
   return { exportData, importData, resetDemoData, beginRealArchive, completeTutorial }
