@@ -51,3 +51,9 @@ export async function checkForStaleCache(): Promise<void> {
 export function getBuildVersion(): string {
   return BUILD_VERSION
 }
+
+/** Hard reload at app root (Home tab). Use after tutorial graduation. */
+export function reloadAppHome(): void {
+  const base = basePath().replace(/\/?$/, '/')
+  window.location.replace(base)
+}

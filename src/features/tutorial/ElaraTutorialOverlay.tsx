@@ -135,7 +135,7 @@ export function ElaraTutorialOverlay({
               boxShadow: tokens.btnShadow,
             }}
           >
-            {isLast ? 'FINISH TOUR' : 'CONTINUE'}
+            {isLast ? 'BEGIN YOUR ARCHIVE' : 'CONTINUE'}
           </button>
         </div>
       </div>

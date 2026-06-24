@@ -12,17 +12,17 @@ interface SettingsPanelProps {
 
 export function SettingsPanel({ open, onClose }: SettingsPanelProps) {
   const { tokens } = useTheme()
-  const { exportData, resetDemoData, beginRealArchive, settings } = useTracker()
+  const { exportData, resetDemoData, resetArchive, settings } = useTracker()
   const { isStandalone, showInstallUI, openInstallInvite } = useInstallPromptContext()
   const [confirmReset, setConfirmReset] = useState(false)
-  const [confirmReal, setConfirmReal] = useState(false)
+  const [confirmResetArchive, setConfirmResetArchive] = useState(false)
 
   if (!open) return null
 
   const handleReset = async () => {
     if (!confirmReset) {
       setConfirmReset(true)
-      setConfirmReal(false)
+      setConfirmResetArchive(false)
       return
     }
     await resetDemoData()
@@ -30,14 +30,14 @@ export function SettingsPanel({ open, onClose }: SettingsPanelProps) {
     onClose()
   }
 
-  const handleBeginReal = async () => {
-    if (!confirmReal) {
-      setConfirmReal(true)
+  const handleResetArchive = async () => {
+    if (!confirmResetArchive) {
+      setConfirmResetArchive(true)
       setConfirmReset(false)
       return
     }
-    await beginRealArchive()
-    setConfirmReal(false)
+    await resetArchive()
+    setConfirmResetArchive(false)
     onClose()
   }
 
@@ -196,23 +196,23 @@ export function SettingsPanel({ open, onClose }: SettingsPanelProps) {
             {confirmReset ? 'Tap again to reset demo' : 'Reset to demo'}
           </button>
 
-          {settings.demoMode && (
+          {!settings.demoMode && (
             <button
               type="button"
-              onClick={() => void handleBeginReal()}
+              onClick={() => void handleResetArchive()}
               className="kage-touch-target"
               style={{
                 width: '100%',
                 minHeight: 48,
                 borderRadius: 8,
-                border: `1px solid ${confirmReal ? tokens.crimson : tokens.borderAccent}`,
-                background: confirmReal ? tokens.bannerBg : 'transparent',
-                color: confirmReal ? tokens.crimson : tokens.text,
+                border: `1px solid ${confirmResetArchive ? tokens.crimson : tokens.borderAccent}`,
+                background: confirmResetArchive ? tokens.bannerBg : 'transparent',
+                color: confirmResetArchive ? tokens.crimson : tokens.text,
                 fontSize: 12,
                 cursor: 'pointer',
               }}
             >
-              {confirmReal ? 'Tap again — wipe demo data' : 'Start my archive'}
+              {confirmResetArchive ? 'Tap again — wipe all data' : 'Reset archive'}
             </button>
           )}
         </section>

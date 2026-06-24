@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from 'react'
 import { useTracker } from './trackerContext'
-import { useSettingsPanel } from './settingsPanelContext'
+import { reloadAppHome } from '../lib/cacheBust'
 import type { TabId } from '../types'
 import { TUTORIAL_STEPS } from '../features/tutorial/tutorialSteps'
 import { ElaraTutorialOverlay } from '../features/tutorial/ElaraTutorialOverlay'
@@ -25,7 +25,6 @@ export function TutorialProvider({
   onTabChange,
 }: TutorialProviderProps) {
   const { ready, settings, updateSettings, completeTutorial } = useTracker()
-  const { openSettings } = useSettingsPanel()
   const [stepIndex, setStepIndex] = useState<number | null>(null)
   const [finishing, setFinishing] = useState(false)
   const prevShouldRun = useRef(false)
@@ -71,12 +70,11 @@ export function TutorialProvider({
 
     try {
       await completeTutorial(TUTORIAL_STEPS.length)
-      onTabChange('home')
-      openSettings()
+      reloadAppHome()
     } catch {
       setFinishing(false)
     }
-  }, [completeTutorial, finishing, onTabChange, openSettings])
+  }, [completeTutorial, finishing])
 
   const nextStep = useCallback(() => {
     if (stepIndex === null || finishing) return

@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.4] — 2026-06-18
+
+### Tutorial graduation
+
+- Finishing the Elara tutorial graduates you out of demo mode and reloads Home with core at zero
+- Settings **Start my archive** replaced with **Reset archive** for wiping data later
+
 ## [0.8.3] — 2026-06-18
 
 ### Tutorial completion

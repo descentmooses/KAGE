@@ -38,7 +38,6 @@ import { buildTrendForPeriod, generateInsights } from '../lib/insights'
 import { normalizeGoal } from '../lib/goals'
 import { buildElaraPersona, personaChanged } from '../lib/elaraPersona'
 import { LoadingScreen } from '../components/LoadingScreen'
-import { TUTORIAL_STEPS } from '../features/tutorial/tutorialSteps'
 import { evaluateQuests } from '../lib/quests'
 import { createApplyGamificationXp } from './tracker/actions/gamificationActions'
 import { createLoggingActions } from './tracker/actions/loggingActions'
@@ -224,14 +223,13 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     [settings, refresh],
   )
 
-  const { exportData, importData, resetDemoData, beginRealArchive, completeTutorial } = useMemo(
+  const { exportData, importData, resetDemoData, resetArchive, completeTutorial } = useMemo(
     () =>
       createDataActions({
         refresh,
         onCelebrate: pushCelebration,
-        tutorialStep: settings?.tutorialStep ?? TUTORIAL_STEPS.length,
       }),
-    [refresh, pushCelebration, settings?.tutorialStep],
+    [refresh, pushCelebration],
   )
 
   const { claimQuest } = useMemo(
@@ -338,7 +336,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     exportData,
     importData,
     resetDemoData,
-    beginRealArchive,
+    resetArchive,
     completeTutorial,
     refresh,
   }

@@ -1,16 +1,11 @@
 import { exportAllData, importAllData } from '../../../lib/db'
-import {
-  graduateFromDemo,
-  markTutorialComplete,
-  seedDemoData,
-} from '../../../lib/demoSeed'
+import { graduateFromDemo, seedDemoData, startRealArchive } from '../../../lib/demoSeed'
 import { todayKey } from '../../../lib/dates'
 import type { CelebrationHandler, RefreshHandler } from './types'
 
 export interface DataActionDeps {
   refresh: RefreshHandler
   onCelebrate: CelebrationHandler
-  tutorialStep: number
 }
 
 export function createDataActions(deps: DataActionDeps) {
@@ -41,21 +36,15 @@ export function createDataActions(deps: DataActionDeps) {
     deps.onCelebrate('Demo reset — Elara will guide you through again.', 'info')
   }
 
-  const beginRealArchive = async () => {
-    const { resetArchive } = await graduateFromDemo(deps.tutorialStep)
+  const resetArchive = async () => {
+    await startRealArchive()
     await deps.refresh()
-    if (resetArchive) {
-      deps.onCelebrate('Your archive is ready — begin logging for real.', 'success')
-    } else {
-      deps.onCelebrate('Demo cleared — your GitHub vault archive continues.', 'success')
-    }
+    deps.onCelebrate('Archive reset — your pillars start at zero.', 'success')
   }
 
   const completeTutorial = async (tutorialStep: number) => {
-    await markTutorialComplete(tutorialStep)
-    await deps.refresh()
-    deps.onCelebrate('Tutorial complete — open Settings to start your archive.', 'success')
+    await graduateFromDemo(tutorialStep)
   }
 
-  return { exportData, importData, resetDemoData, beginRealArchive, completeTutorial }
+  return { exportData, importData, resetDemoData, resetArchive, completeTutorial }
 }
