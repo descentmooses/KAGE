@@ -80,7 +80,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     title: 'You are ready',
     target: null,
     elara:
-      'Your real archive begins now — pillars at zero until you log. I will learn your rhythm from here. Welcome home.',
+      'You have seen the shadow archive. Open Settings and tap Start my archive when you are ready — your real pillars begin at zero. I will learn your rhythm from there.',
   },
 ]
 

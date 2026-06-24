@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.3] — 2026-06-18
+
+### Tutorial completion
+
+- Finishing the Elara tutorial returns you to Home with Settings open so you can tap **Start my archive**
+- Demo data stays until you start your archive (GitHub-aware wipe unchanged from Settings)
+
 ## [0.8.2] — 2026-06-18
 
 ### Demo graduation
