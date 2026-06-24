@@ -1,7 +1,7 @@
-export const APP_VERSION = '0.8.3'
+export const APP_VERSION = '0.8.4'
 
 export const WHATS_NEW = [
-  'Tutorial finish opens Settings so you can tap Start my archive',
-  'Demo data stays until you begin your real archive from Settings',
-  'GitHub-connected vaults still keep your data when you graduate',
+  'Tutorial finish reloads Home with a clean archive — core at zero',
+  'Settings → Reset archive wipes your data when you want a fresh start',
+  'No more Start my archive step after the tour',
 ] as const

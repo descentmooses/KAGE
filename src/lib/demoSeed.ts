@@ -209,28 +209,6 @@ export async function startRealArchive(): Promise<void> {
   await tx.done
 }
 
-/** Mark the Elara tutorial finished while keeping demo data until the user starts their archive. */
-export async function markTutorialComplete(tutorialStep: number): Promise<void> {
-  const db = await getDb()
-  const current = (await db.get('meta', 'settings')) as AppSettings | undefined
-  await db.put(
-    'meta',
-    {
-      ...current,
-      affirmationsEnabled: current?.affirmationsEnabled ?? true,
-      elaraWhispers: current?.elaraWhispers ?? true,
-      demoMode: current?.demoMode ?? true,
-      tutorialComplete: true,
-      tutorialStep,
-    },
-    'settings',
-  )
-}
-
-/**
- * Leave demo mode when the user starts their real archive.
- * Wipes sample data (core → 0) unless GitHub vault is already connected.
- */
 export async function graduateFromDemo(tutorialStep: number): Promise<{ resetArchive: boolean }> {
   const connected = await isGitHubVaultConnected()
   if (!connected) {
