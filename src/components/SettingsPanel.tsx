@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useTheme } from '../theme/useTheme'
 import { useTracker } from '../context/trackerContext'
+import { reloadAppHome } from '../lib/cacheBust'
+import { TUTORIAL_STEPS } from '../features/tutorial/tutorialSteps'
 import { ThemeToggle } from './ThemeToggle'
 import { useInstallPromptContext } from '../context/installPromptContext'
 import { GitHubSyncSection } from '../features/sync/GitHubSyncSection'
@@ -12,10 +14,18 @@ interface SettingsPanelProps {
 
 export function SettingsPanel({ open, onClose }: SettingsPanelProps) {
   const { tokens } = useTheme()
-  const { exportData, resetDemoData, resetArchive, settings } = useTracker()
+  const { exportData, resetDemoData, resetArchive, completeTutorial, settings } = useTracker()
   const { isStandalone, showInstallUI, openInstallInvite } = useInstallPromptContext()
   const [confirmReset, setConfirmReset] = useState(false)
   const [confirmResetArchive, setConfirmResetArchive] = useState(false)
+
+  const handleExitDemo = async () => {
+    await completeTutorial(settings.tutorialStep ?? TUTORIAL_STEPS.length)
+    onClose()
+    reloadAppHome()
+  }
+
+  const stuckInDemo = !!settings.demoMode && !!settings.tutorialComplete
 
   if (!open) return null
 
@@ -176,6 +186,27 @@ export function SettingsPanel({ open, onClose }: SettingsPanelProps) {
           >
             Export JSON backup
           </button>
+
+          {stuckInDemo && (
+            <button
+              type="button"
+              onClick={() => void handleExitDemo()}
+              className="kage-touch-target"
+              style={{
+                width: '100%',
+                minHeight: 48,
+                marginBottom: 8,
+                borderRadius: 8,
+                border: `1px solid ${tokens.borderAccent}`,
+                background: tokens.bannerBg,
+                color: tokens.crimson,
+                fontSize: 12,
+                cursor: 'pointer',
+              }}
+            >
+              Exit demo mode
+            </button>
+          )}
 
           <button
             type="button"

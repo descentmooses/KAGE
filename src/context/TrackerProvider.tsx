@@ -31,7 +31,7 @@ import {
 } from '../lib/db'
 import { DEFAULT_RATINGS, computeCore } from '../types'
 import { migrateFromLocalStorage } from '../lib/migrate'
-import { shouldSeedDemoOnLaunch, seedDemoData } from '../lib/demoSeed'
+import { repairStuckDemoGraduation, seedDemoData, shouldSeedDemoOnLaunch } from '../lib/demoSeed'
 import { todayKey } from '../lib/dates'
 import { resetQuestsIfNewDay } from '../lib/gamification'
 import { buildTrendForPeriod, generateInsights } from '../lib/insights'
@@ -121,7 +121,9 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     setLoadError(null)
     try {
       await migrateFromLocalStorage()
-      if (await shouldSeedDemoOnLaunch()) {
+      if (await repairStuckDemoGraduation()) {
+        await refresh()
+      } else if (await shouldSeedDemoOnLaunch()) {
         await seedDemoData()
       }
       await refresh()
