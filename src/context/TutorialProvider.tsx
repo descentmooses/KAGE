@@ -70,6 +70,7 @@ export function TutorialProvider({
 
     try {
       await completeTutorial(TUTORIAL_STEPS.length)
+      setFinishing(false)
       reloadAppHome()
     } catch {
       setFinishing(false)

@@ -86,4 +86,27 @@ describe('mergeSyncPayloads', () => {
     const merged = mergeSyncPayloads(local, remote)
     expect(merged.dailyLogs).toHaveLength(2)
   })
+
+  it('does not restore demo mode after local tutorial graduation', () => {
+    const local = basePayload({
+      settings: {
+        affirmationsEnabled: true,
+        elaraWhispers: true,
+        demoMode: false,
+        tutorialComplete: true,
+      },
+    })
+    const remote = basePayload({
+      settings: {
+        affirmationsEnabled: true,
+        elaraWhispers: true,
+        demoMode: true,
+        tutorialComplete: false,
+      },
+    })
+
+    const merged = mergeSyncPayloads(local, remote)
+    expect(merged.settings.demoMode).toBe(false)
+    expect(merged.settings.tutorialComplete).toBe(true)
+  })
 })

@@ -1,4 +1,4 @@
-import type { DailyLog, Goal } from '../../types'
+import type { AppSettings, DailyLog, Goal } from '../../types'
 import type { KageSyncPayload } from './types'
 import { normalizeGoal } from '../goals'
 import { mergeElaraPersona } from '../elaraPersona'
@@ -58,6 +58,26 @@ function mergeStringArrays(a: string[] = [], b: string[] = []): string[] {
   return out.slice(-24)
 }
 
+function mergeSettings(local: AppSettings, remote: AppSettings): AppSettings {
+  const merged: AppSettings = {
+    ...local,
+    ...remote,
+    whisperHistory: mergeStringArrays(local.whisperHistory, remote.whisperHistory),
+    favoriteWhispers: mergeStringArrays(local.favoriteWhispers, remote.favoriteWhispers),
+    elaraPersona: mergeElaraPersona(local.elaraPersona, remote.elaraPersona),
+  }
+
+  // Tutorial graduation is local — never let a remote demo snapshot re-enable demo mode.
+  if (local.tutorialComplete && local.demoMode === false) {
+    merged.tutorialComplete = true
+    merged.demoMode = false
+  } else if (local.tutorialComplete) {
+    merged.tutorialComplete = true
+  }
+
+  return merged
+}
+
 /** Timestamp-aware merge — keeps the newest record per entity. */
 export function mergeSyncPayloads(
   local: KageSyncPayload,
@@ -98,18 +118,6 @@ export function mergeSyncPayloads(
     ),
     goals: mergeGoals(local.goals, remote.goals),
     gamification,
-    settings: {
-      ...local.settings,
-      ...remote.settings,
-      whisperHistory: mergeStringArrays(
-        local.settings.whisperHistory,
-        remote.settings.whisperHistory,
-      ),
-      favoriteWhispers: mergeStringArrays(
-        local.settings.favoriteWhispers,
-        remote.settings.favoriteWhispers,
-      ),
-      elaraPersona: mergeElaraPersona(local.settings.elaraPersona, remote.settings.elaraPersona),
-    },
+    settings: mergeSettings(local.settings, remote.settings),
   }
 }

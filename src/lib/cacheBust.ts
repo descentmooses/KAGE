@@ -55,5 +55,6 @@ export function getBuildVersion(): string {
 /** Hard reload at app root (Home tab). Use after tutorial graduation. */
 export function reloadAppHome(): void {
   const base = basePath().replace(/\/?$/, '/')
-  window.location.replace(base)
+  const url = `${base}?graduated=${Date.now()}`
+  window.location.assign(url)
 }

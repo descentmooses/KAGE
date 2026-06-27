@@ -44,6 +44,7 @@ export function createDataActions(deps: DataActionDeps) {
 
   const completeTutorial = async (tutorialStep: number) => {
     await graduateFromDemo(tutorialStep)
+    await deps.refresh()
   }
 
   return { exportData, importData, resetDemoData, resetArchive, completeTutorial }

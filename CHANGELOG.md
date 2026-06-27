@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.5] — 2026-06-18
+
+### Fixed
+
+- Tutorial completion now reliably exits demo mode — forced page reload, state refresh, and bootstrap repair for stuck archives
+- GitHub sync no longer restores demo mode after you have graduated locally
+- Settings **Exit demo mode** appears if the tour finished but the demo badge remains
+
 ## [0.8.4] — 2026-06-18
 
 ### Tutorial graduation
