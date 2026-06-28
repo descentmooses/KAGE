@@ -1,5 +1,6 @@
 import type { AppSettings } from '../../../types'
 import { getSettings, putSettings } from '../../../lib/db'
+import { mergeSettingsPatch } from '../../../lib/settingsMerge'
 import { emitDataChanged } from '../../../lib/syncEvents'
 import type { RefreshHandler } from './types'
 
@@ -11,7 +12,7 @@ export interface SettingsActionDeps {
 export function createSettingsActions(deps: SettingsActionDeps) {
   const updateSettings = async (patch: Partial<AppSettings>) => {
     const current = (await getSettings()) ?? deps.settings!
-    const next = { ...current, ...patch }
+    const next = mergeSettingsPatch(current, patch)
     await putSettings(next)
     await deps.refresh()
     emitDataChanged()

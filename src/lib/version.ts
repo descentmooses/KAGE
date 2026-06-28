@@ -1,7 +1,7 @@
-export const APP_VERSION = '0.8.5'
+export const APP_VERSION = '0.8.6'
 
 export const WHATS_NEW = [
-  'Tutorial completion reliably exits demo mode and reloads Home',
-  'Fixed stuck demo state after finishing the Elara tour',
-  'Settings → Exit demo mode if the tour finished but demo badge remains',
+  'Skip tour now reliably exits demo mode and starts your real archive',
+  'Fixed race where tutorial step saves could undo graduation',
+  'Tutorial overlay stays up with feedback while skipping',
 ] as const
