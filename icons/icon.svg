@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <rect width="512" height="512" fill="#050505"/>
+  <rect x="32" y="32" width="448" height="448" stroke="#c41e3a" stroke-width="2" opacity="0.35"/>
+  <line x1="32" y1="256" x2="480" y2="256" stroke="#e85d4c" stroke-width="1" opacity="0.4"/>
+  <line x1="256" y1="32" x2="256" y2="480" stroke="#c41e3a" stroke-width="1" opacity="0.25"/>
+  <text x="256" y="310" text-anchor="middle" font-family="serif" font-size="220" fill="#c41e3a" opacity="0.95">影</text>
+  <circle cx="256" cy="256" r="200" stroke="#e85d4c" stroke-width="1" opacity="0.18" fill="none"/>
+</svg>

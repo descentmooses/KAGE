@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="build-version" content="1782608527187" />
+    <meta name="app-version" content="0.8.6" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+  <!-- KAGE cache bootstrap: reload only when deploy version changes (preserves PWA offline cache) -->
+  <script>
+  (function(){try{
+    var K='kage-deploy';
+    function base(){
+      var h=location.hostname;
+      return (h==='localhost'||h==='127.0.0.1')?'/':'/KAGE/';
+    }
+    function clearPwaCaches(){
+      if('serviceWorker'in navigator){
+        navigator.serviceWorker.getRegistrations().then(function(r){
+          r.forEach(function(x){x.unregister()});
+        });
+      }
+      if('caches'in window){
+        caches.keys().then(function(keys){
+          keys.forEach(function(n){caches.delete(n)});
+        });
+      }
+    }
+    var b=base();
+    fetch(b+'version.json?_='+Date.now(),{cache:'no-store',headers:{'Pragma':'no-cache','Cache-Control':'no-cache'}})
+      .then(function(r){if(!r.ok)throw 0;return r.json();})
+      .then(function(d){
+        var v=d&&d.version;if(!v)return;
+        var stored=localStorage.getItem(K);
+        var params=new URLSearchParams(location.search);
+        var bust=params.get('bust');
+        var root=b.replace(/\/?$/,'/');
+        if(stored&&stored!==v){
+          localStorage.setItem(K,v);
+          clearPwaCaches();
+          location.replace(root+'?bust='+v);
+          return;
+        }
+        if(!stored)localStorage.setItem(K,v);
+        if(bust&&bust!==v){
+          clearPwaCaches();
+          location.replace(root+'?bust='+v);
+          return;
+        }
+        var meta=document.querySelector('meta[name="build-version"]');
+        if(meta&&meta.content&&meta.content!==v){
+          clearPwaCaches();
+          location.replace(root+'?bust='+v);
+        }
+      }).catch(function(){});
+  }catch(e){}})();
+  </script>
+  <!-- Register SW immediately so Chrome can fire beforeinstallprompt (do not wait for load/React). -->
+  <script>
+  (function(){try{
+    var h=location.hostname;
+    var b=(h==='localhost'||h==='127.0.0.1')?'/':'/KAGE/';
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.register(b+'sw.js',{scope:b}).catch(function(){});
+    }
+  }catch(e){}})();
+  </script>
+    <link rel="icon" type="image/svg+xml" href="/KAGE/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/KAGE/icons/icon-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/KAGE/icons/icon-512.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#050505" />
+    <meta name="description" content="KAGE — shadow mastery tracker for Mind 心, Body 体, and Spirit 魂" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="KAGE" />
+    <link rel="apple-touch-icon" href="/KAGE/icons/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/KAGE/icons/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="512x512" href="/KAGE/icons/icon-512.png" />
+    <!-- manifest link injected by vite-plugin-pwa at build time -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500&family=Orbitron:wght@400;500;700&family=Share+Tech+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <title>KAGE — Shadow Mastery</title>
+    <script type="module" crossorigin src="/KAGE/assets/index-gSCXqA34.js?v=1782608527187"></script>
+    <link rel="stylesheet" crossorigin href="/KAGE/assets/index-BQn8jo64.css?v=1782608527187">
+  <link rel="manifest" href="https://descentmooses.github.io/KAGE/manifest.json"></head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
