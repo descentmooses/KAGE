@@ -27,6 +27,7 @@ export function TutorialProvider({
   const { ready, settings, updateSettings, completeTutorial } = useTracker()
   const [stepIndex, setStepIndex] = useState<number | null>(null)
   const [finishing, setFinishing] = useState(false)
+  const finishingRef = useRef(false)
   const prevShouldRun = useRef(false)
 
   const shouldRun = ready && !!settings.demoMode && !settings.tutorialComplete
@@ -46,8 +47,7 @@ export function TutorialProvider({
     setStepIndex(Math.min(resume, TUTORIAL_STEPS.length - 1))
   }, [shouldRun, finishing, stepIndex, settings.tutorialStep])
 
-  const step =
-    shouldRun && !finishing && stepIndex !== null ? TUTORIAL_STEPS[stepIndex] : null
+  const step = shouldRun && stepIndex !== null ? TUTORIAL_STEPS[stepIndex] : null
 
   useEffect(() => {
     if (!step) return
@@ -64,21 +64,22 @@ export function TutorialProvider({
   }, [step?.id, step?.target])
 
   const finishTutorial = useCallback(async () => {
-    if (finishing) return
+    if (finishingRef.current) return
+    finishingRef.current = true
     setFinishing(true)
-    setStepIndex(null)
 
     try {
       await completeTutorial(TUTORIAL_STEPS.length)
-      setFinishing(false)
+      setStepIndex(null)
       reloadAppHome()
     } catch {
+      finishingRef.current = false
       setFinishing(false)
     }
-  }, [completeTutorial, finishing])
+  }, [completeTutorial])
 
   const nextStep = useCallback(() => {
-    if (stepIndex === null || finishing) return
+    if (stepIndex === null || finishingRef.current) return
     const next = stepIndex + 1
     if (next >= TUTORIAL_STEPS.length) {
       void finishTutorial()
@@ -86,11 +87,13 @@ export function TutorialProvider({
     }
     setStepIndex(next)
     void updateSettings({ tutorialStep: next })
-  }, [finishTutorial, finishing, stepIndex, updateSettings])
+  }, [finishTutorial, stepIndex, updateSettings])
 
   const skipTutorial = useCallback(() => {
     void finishTutorial()
   }, [finishTutorial])
+
+  const overlayBusy = finishing
 
   const tutorialActive = step !== null && stepIndex !== null
 
@@ -114,6 +117,7 @@ export function TutorialProvider({
           step={step}
           stepIndex={stepIndex}
           totalSteps={TUTORIAL_STEPS.length}
+          busy={overlayBusy}
           onNext={nextStep}
           onSkip={skipTutorial}
         />

@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.6] — 2026-06-18
+
+### Fixed
+
+- **Skip tour** now reliably graduates out of demo mode and reloads Home
+- Stale tutorial-step saves no longer undo graduation after skip or finish
+- Tutorial overlay shows "Skipping…" feedback instead of disappearing before graduation completes
+
 ## [0.8.5] — 2026-06-18
 
 ### Fixed

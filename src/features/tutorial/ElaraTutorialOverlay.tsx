@@ -5,6 +5,7 @@ interface ElaraTutorialOverlayProps {
   step: TutorialStep
   stepIndex: number
   totalSteps: number
+  busy?: boolean
   onNext: () => void
   onSkip: () => void
 }
@@ -13,6 +14,7 @@ export function ElaraTutorialOverlay({
   step,
   stepIndex,
   totalSteps,
+  busy = false,
   onNext,
   onSkip,
 }: ElaraTutorialOverlayProps) {
@@ -103,6 +105,8 @@ export function ElaraTutorialOverlay({
           <button
             type="button"
             onClick={onSkip}
+            disabled={busy}
+            aria-busy={busy}
             className="kage-touch-target"
             style={{
               flex: 1,
@@ -112,14 +116,16 @@ export function ElaraTutorialOverlay({
               background: 'transparent',
               color: tokens.textMuted,
               fontSize: 11,
-              cursor: 'pointer',
+              cursor: busy ? 'wait' : 'pointer',
+              opacity: busy ? 0.6 : 1,
             }}
           >
-            Skip tour
+            {busy ? 'Skipping…' : 'Skip tour'}
           </button>
           <button
             type="button"
             onClick={onNext}
+            disabled={busy}
             className="kage-touch-target"
             style={{
               flex: 2,
@@ -131,11 +137,12 @@ export function ElaraTutorialOverlay({
               fontFamily: '"Orbitron", sans-serif',
               fontSize: 10,
               letterSpacing: '0.2em',
-              cursor: 'pointer',
+              cursor: busy ? 'wait' : 'pointer',
+              opacity: busy ? 0.6 : 1,
               boxShadow: tokens.btnShadow,
             }}
           >
-            {isLast ? 'BEGIN YOUR ARCHIVE' : 'CONTINUE'}
+            {busy ? 'Starting…' : isLast ? 'BEGIN YOUR ARCHIVE' : 'CONTINUE'}
           </button>
         </div>
       </div>
