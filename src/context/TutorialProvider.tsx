@@ -7,7 +7,6 @@ import {
   type ReactNode,
 } from 'react'
 import { useTracker } from './trackerContext'
-import { reloadAppHome } from '../lib/cacheBust'
 import type { TabId } from '../types'
 import { TUTORIAL_STEPS } from '../features/tutorial/tutorialSteps'
 import { ElaraTutorialOverlay } from '../features/tutorial/ElaraTutorialOverlay'
@@ -76,13 +75,15 @@ export function TutorialProvider({
 
     try {
       await completeTutorial(TUTORIAL_STEPS.length)
-      reloadAppHome()
+      onTabChange('home')
+      finishingRef.current = false
+      setFinishing(false)
     } catch {
       finishingRef.current = false
       setFinishing(false)
       setPromptDismissed(false)
     }
-  }, [completeTutorial])
+  }, [completeTutorial, onTabChange])
 
   const nextStep = useCallback(() => {
     if (stepIndex === null || finishingRef.current) return

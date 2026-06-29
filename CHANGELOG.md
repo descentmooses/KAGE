@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.8] — 2026-06-18
+
+### Fixed
+
+- **Skip tour** no longer reloads the page — demo mode exits in place with core at zero
+- Graduation completes fully before the UI updates (reload was interrupting the flow)
+
 ## [0.8.7] — 2026-06-18
 
 ### Fixed
