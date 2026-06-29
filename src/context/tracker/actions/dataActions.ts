@@ -45,6 +45,7 @@ export function createDataActions(deps: DataActionDeps) {
   const completeTutorial = async (tutorialStep: number) => {
     await graduateFromDemo(tutorialStep)
     await deps.refresh()
+    deps.onCelebrate('Your real archive begins at zero.', 'success')
   }
 
   return { exportData, importData, resetDemoData, resetArchive, completeTutorial }

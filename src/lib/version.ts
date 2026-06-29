@@ -1,7 +1,7 @@
-export const APP_VERSION = '0.8.6'
+export const APP_VERSION = '0.8.8'
 
 export const WHATS_NEW = [
-  'Skip tour now reliably exits demo mode and starts your real archive',
-  'Fixed race where tutorial step saves could undo graduation',
-  'Tutorial overlay stays up with feedback while skipping',
+  'Skip tour exits demo mode in place — no page reload',
+  'Core resets to zero and the Demo badge clears after skip',
+  'Fixed reload interrupting graduation before demo mode could end',
 ] as const

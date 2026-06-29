@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useTheme } from '../theme/useTheme'
 import { useTracker } from '../context/trackerContext'
-import { reloadAppHome } from '../lib/cacheBust'
 import { TUTORIAL_STEPS } from '../features/tutorial/tutorialSteps'
 import { ThemeToggle } from './ThemeToggle'
 import { useInstallPromptContext } from '../context/installPromptContext'
@@ -22,7 +21,6 @@ export function SettingsPanel({ open, onClose }: SettingsPanelProps) {
   const handleExitDemo = async () => {
     await completeTutorial(settings.tutorialStep ?? TUTORIAL_STEPS.length)
     onClose()
-    reloadAppHome()
   }
 
   const stuckInDemo = !!settings.demoMode && !!settings.tutorialComplete

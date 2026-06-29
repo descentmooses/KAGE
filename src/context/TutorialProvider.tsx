@@ -7,7 +7,6 @@ import {
   type ReactNode,
 } from 'react'
 import { useTracker } from './trackerContext'
-import { reloadAppHome } from '../lib/cacheBust'
 import type { TabId } from '../types'
 import { TUTORIAL_STEPS } from '../features/tutorial/tutorialSteps'
 import { ElaraTutorialOverlay } from '../features/tutorial/ElaraTutorialOverlay'
@@ -27,10 +26,12 @@ export function TutorialProvider({
   const { ready, settings, updateSettings, completeTutorial } = useTracker()
   const [stepIndex, setStepIndex] = useState<number | null>(null)
   const [finishing, setFinishing] = useState(false)
+  const [promptDismissed, setPromptDismissed] = useState(false)
   const finishingRef = useRef(false)
   const prevShouldRun = useRef(false)
 
-  const shouldRun = ready && !!settings.demoMode && !settings.tutorialComplete
+  const shouldRun =
+    ready && !!settings.demoMode && !settings.tutorialComplete && !promptDismissed
 
   useEffect(() => {
     const opening = shouldRun && !prevShouldRun.current
@@ -38,6 +39,8 @@ export function TutorialProvider({
 
     if (opening) {
       setFinishing(false)
+      finishingRef.current = false
+      setPromptDismissed(false)
     }
     if (!shouldRun || finishing) return
     if (stepIndex !== null) return
@@ -67,16 +70,20 @@ export function TutorialProvider({
     if (finishingRef.current) return
     finishingRef.current = true
     setFinishing(true)
+    setPromptDismissed(true)
+    setStepIndex(null)
 
     try {
       await completeTutorial(TUTORIAL_STEPS.length)
-      setStepIndex(null)
-      reloadAppHome()
+      onTabChange('home')
+      finishingRef.current = false
+      setFinishing(false)
     } catch {
       finishingRef.current = false
       setFinishing(false)
+      setPromptDismissed(false)
     }
-  }, [completeTutorial])
+  }, [completeTutorial, onTabChange])
 
   const nextStep = useCallback(() => {
     if (stepIndex === null || finishingRef.current) return

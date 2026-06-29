@@ -1,6 +1,6 @@
 import type { AppSettings } from '../../../types'
 import { getSettings, putSettings } from '../../../lib/db'
-import { mergeSettingsPatch } from '../../../lib/settingsMerge'
+import { mergeSettingsPatch, shouldIgnoreTutorialStepPatch } from '../../../lib/settingsMerge'
 import { emitDataChanged } from '../../../lib/syncEvents'
 import type { RefreshHandler } from './types'
 
@@ -12,7 +12,12 @@ export interface SettingsActionDeps {
 export function createSettingsActions(deps: SettingsActionDeps) {
   const updateSettings = async (patch: Partial<AppSettings>) => {
     const current = (await getSettings()) ?? deps.settings!
-    const next = mergeSettingsPatch(current, patch)
+    if (shouldIgnoreTutorialStepPatch(current, patch)) return
+
+    const latest = (await getSettings()) ?? current
+    if (latest !== current && shouldIgnoreTutorialStepPatch(latest, patch)) return
+
+    const next = mergeSettingsPatch(latest, patch)
     await putSettings(next)
     await deps.refresh()
     emitDataChanged()

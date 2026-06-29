@@ -209,23 +209,8 @@ export async function startRealArchive(): Promise<void> {
   await tx.done
 }
 
-/** Users who finished the tour but still have demoMode (e.g. stale UI or v0.8.3). */
-export async function repairStuckDemoGraduation(): Promise<boolean> {
-  const db = await getDb()
-  const settings = (await db.get('meta', 'settings')) as AppSettings | undefined
-  if (!settings?.demoMode || !settings.tutorialComplete) return false
-  const step = settings.tutorialStep && settings.tutorialStep > 0 ? settings.tutorialStep : 8
-  await graduateFromDemo(step)
-  return true
-}
-
-export async function graduateFromDemo(tutorialStep: number): Promise<{ resetArchive: boolean }> {
-  const connected = await isGitHubVaultConnected()
-  if (!connected) {
-    await startRealArchive()
-    return { resetArchive: true }
-  }
-
+/** Stop Elara tutorial prompts immediately (before archive wipe). */
+export async function dismissTutorialPrompts(tutorialStep: number): Promise<void> {
   const db = await getDb()
   const current = (await db.get('meta', 'settings')) as AppSettings | undefined
   await db.put(
@@ -241,6 +226,27 @@ export async function graduateFromDemo(tutorialStep: number): Promise<{ resetArc
     },
     'settings',
   )
+}
+
+/** Users who finished the tour but still have demoMode (e.g. stale UI or v0.8.3). */
+export async function repairStuckDemoGraduation(): Promise<boolean> {
+  const db = await getDb()
+  const settings = (await db.get('meta', 'settings')) as AppSettings | undefined
+  if (!settings?.demoMode || !settings.tutorialComplete) return false
+  const step = settings.tutorialStep && settings.tutorialStep > 0 ? settings.tutorialStep : 8
+  await graduateFromDemo(step)
+  return true
+}
+
+export async function graduateFromDemo(tutorialStep: number): Promise<{ resetArchive: boolean }> {
+  await dismissTutorialPrompts(tutorialStep)
+
+  const connected = await isGitHubVaultConnected()
+  if (!connected) {
+    await startRealArchive()
+    return { resetArchive: true }
+  }
+
   return { resetArchive: false }
 }
 
