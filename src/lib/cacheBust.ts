@@ -56,5 +56,8 @@ export function getBuildVersion(): string {
 export function reloadAppHome(): void {
   const base = basePath().replace(/\/?$/, '/')
   const url = `${base}?graduated=${Date.now()}`
-  window.location.assign(url)
+  window.location.href = url
+  window.setTimeout(() => {
+    window.location.reload()
+  }, 300)
 }

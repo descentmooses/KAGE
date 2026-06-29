@@ -1,7 +1,7 @@
-export const APP_VERSION = '0.8.6'
+export const APP_VERSION = '0.8.7'
 
 export const WHATS_NEW = [
-  'Skip tour now reliably exits demo mode and starts your real archive',
-  'Fixed race where tutorial step saves could undo graduation',
-  'Tutorial overlay stays up with feedback while skipping',
+  'Skip tour instantly dismisses Elara prompts',
+  'Fixed stuck skip button after a failed graduation attempt',
+  'Late tutorial-step saves can no longer restore demo prompts',
 ] as const

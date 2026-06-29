@@ -16,3 +16,14 @@ export function mergeSettingsPatch(
 
   return next
 }
+
+/** Ignore late tutorial-step writes once the user has left demo mode. */
+export function shouldIgnoreTutorialStepPatch(
+  current: AppSettings,
+  patch: Partial<AppSettings>,
+): boolean {
+  return (
+    'tutorialStep' in patch &&
+    (current.tutorialComplete === true || current.demoMode === false)
+  )
+}
