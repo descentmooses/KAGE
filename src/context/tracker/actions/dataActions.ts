@@ -1,5 +1,5 @@
 import { exportAllData, importAllData } from '../../../lib/db'
-import { graduateFromDemo, seedDemoData, startRealArchive } from '../../../lib/demoSeed'
+import { dismissTutorialPrompts, graduateFromDemo, seedDemoData, startRealArchive } from '../../../lib/demoSeed'
 import { todayKey } from '../../../lib/dates'
 import type { CelebrationHandler, RefreshHandler } from './types'
 
@@ -43,6 +43,8 @@ export function createDataActions(deps: DataActionDeps) {
   }
 
   const completeTutorial = async (tutorialStep: number) => {
+    await dismissTutorialPrompts(tutorialStep)
+    await deps.refresh()
     await graduateFromDemo(tutorialStep)
     await deps.refresh()
   }
